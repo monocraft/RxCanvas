@@ -77,6 +77,30 @@ namespace RxCanvas
         bool IsClosed { get; set; }
     }
 
+    public interface IRectangle : INative
+    {
+        double X { get; set; }
+        double Y { get; set; }
+        double Width { get; set; }
+        double Height { get; set; }
+        IColor Stroke { get; set; }
+        double StrokeThickness { get; set; }
+        IColor Fill { get; set; }
+        bool IsFilled { get; set; }
+    }
+
+    public interface IEllipse : INative
+    {
+        double X { get; set; }
+        double Y { get; set; }
+        double Width { get; set; }
+        double Height { get; set; }
+        IColor Stroke { get; set; }
+        double StrokeThickness { get; set; }
+        IColor Fill { get; set; }
+        bool IsFilled { get; set; }
+    }
+
     public interface ICanvas : INative
     {
         IObservable<ImmutablePoint> Downs { get; set; }
@@ -151,6 +175,30 @@ namespace RxCanvas
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
         public bool IsClosed { get; set; }
+    }
+
+    public class XRectangle : XNative, IRectangle
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public IColor Stroke { get; set; }
+        public double StrokeThickness { get; set; }
+        public IColor Fill { get; set; }
+        public bool IsFilled { get; set; }
+    }
+
+    public class XEllipse : XNative, IEllipse
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public IColor Stroke { get; set; }
+        public double StrokeThickness { get; set; }
+        public IColor Fill { get; set; }
+        public bool IsFilled { get; set; }
     }
 
     #endregion
