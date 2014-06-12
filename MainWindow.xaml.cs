@@ -849,8 +849,8 @@ namespace RxCanvas
     {
         ICanvas _canvas;
         IEditor _lineEditor;
-        IEditor _rectangleEditor;
         IEditor _quadraticBezierEditor;
+        IEditor _rectangleEditor;
 
         public MainWindow()
         {
@@ -864,14 +864,14 @@ namespace RxCanvas
                 IsEnabled = false
             };
 
-            _rectangleEditor = new PortableXCanvasRectangleEditor(_canvas)
-            {
-                IsEnabled = false
-            };
-
             _quadraticBezierEditor = new PortableXQuadraticBezierEditor(_canvas)
             {
                 IsEnabled = true
+            };
+
+            _rectangleEditor = new PortableXCanvasRectangleEditor(_canvas)
+            {
+                IsEnabled = false
             };
 
             PreviewKeyDown += (sender, e) =>
@@ -880,18 +880,18 @@ namespace RxCanvas
                 {
                     case Key.L:
                         _lineEditor.IsEnabled = true;
-                        _rectangleEditor.IsEnabled = false;
                         _quadraticBezierEditor.IsEnabled = false;
+                        _rectangleEditor.IsEnabled = false;
                         break;
                     case Key.R:
                         _lineEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = true;
                         _quadraticBezierEditor.IsEnabled = false;
+                        _rectangleEditor.IsEnabled = true;
                         break;
                     case Key.Q:
                         _lineEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = false;
                         _quadraticBezierEditor.IsEnabled = true;
+                        _rectangleEditor.IsEnabled = false;
                         break;
                 }
             };
