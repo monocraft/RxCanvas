@@ -495,6 +495,104 @@ namespace RxCanvas
         }
     }
 
+    public class PortableXCanvasEllipseEditor : IEditor, IDisposable
+    {
+        public enum State { None, TopLeft, TopRight, BottomLeft, BottomRight }
+
+        public bool IsEnabled { get; set; }
+
+        private ICanvas _canvas;
+        private IEllipse _xellipse;
+        private IEllipse _elllipse;
+        private State _state = State.None;
+        private IDisposable _downs;
+        private IDisposable _drag;
+        private ImmutablePoint _start;
+
+        public PortableXCanvasEllipseEditor(ICanvas canvas)
+        {
+            _canvas = canvas;
+
+            var dragMoves = from move in _canvas.Moves
+                            where _canvas.IsCaptured
+                            select move;
+
+            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
+
+            var dragPositions = from move in allPositions
+                                select move;
+
+            _downs = _canvas.Downs.Subscribe(p =>
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                if (_canvas.IsCaptured)
+                {
+                    UpdatePositionAndSize(p);
+                    _state = State.None;
+                    _canvas.ReleaseCapture();
+                }
+                else
+                {
+                    _start = p;
+                    // TODO: Use IoC container to get XEllipse as IEllipse.
+                    _xellipse = new XEllipse()
+                    {
+                        X = p.X,
+                        Y = p.Y,
+                        Width = 0.0,
+                        Height = 0.0,
+                        Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
+                        StrokeThickness = 2.0,
+                        Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
+                        IsFilled = false
+                    };
+                    // TODO: Use IoC container to get WpfEllipse as IEllipse.
+                    _elllipse = new WpfEllipse(_xellipse);
+                    _canvas.Add(_elllipse);
+                    _canvas.Capture();
+                    _state = State.BottomRight;
+                }
+            });
+
+            _drag = dragPositions.Subscribe(p =>
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                if (_state == State.BottomRight)
+                {
+                    UpdatePositionAndSize(p);
+                }
+            });
+        }
+
+        private void UpdatePositionAndSize(ImmutablePoint p)
+        {
+            double width = Math.Abs(p.X - _start.X);
+            double height = Math.Abs(p.Y - _start.Y);
+            _xellipse.X = Math.Min(_start.X, p.X);
+            _xellipse.Y = Math.Min(_start.Y, p.Y);
+            _xellipse.Width = width;
+            _xellipse.Height = height;
+            _elllipse.X = _xellipse.X;
+            _elllipse.Y = _xellipse.Y;
+            _elllipse.Width = _xellipse.Width;
+            _elllipse.Height = _xellipse.Height;
+        }
+
+        public void Dispose()
+        {
+            _downs.Dispose();
+            _drag.Dispose();
+        }
+    }
+
     #endregion
 
     #region WPF
@@ -782,6 +880,89 @@ namespace RxCanvas
         }
     }
 
+    public class WpfEllipse : XNative, IEllipse
+    {
+        private SolidColorBrush _strokeBrush;
+        private SolidColorBrush _fillBrush;
+        private Ellipse _ellipse;
+
+        public WpfEllipse(IEllipse ellipse)
+        {
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(ellipse.Stroke.A, ellipse.Stroke.R, ellipse.Stroke.G, ellipse.Stroke.B));
+            _strokeBrush.Freeze();
+            _fillBrush = new SolidColorBrush(Color.FromArgb(ellipse.Fill.A, ellipse.Fill.R, ellipse.Fill.G, ellipse.Fill.B));
+            _fillBrush.Freeze();
+
+            _ellipse = new Ellipse()
+            {
+                Width = ellipse.Width,
+                Height = ellipse.Height,
+                Stroke = _strokeBrush,
+                StrokeThickness = ellipse.StrokeThickness,
+                Fill = _fillBrush
+            };
+
+            Canvas.SetLeft(_ellipse, ellipse.X);
+            Canvas.SetTop(_ellipse, ellipse.Y);
+
+            Native = _ellipse;
+        }
+
+        public double X
+        {
+            get { return Canvas.GetLeft(Native as Ellipse); }
+            set
+            {
+                Canvas.SetLeft(Native as Ellipse, value);
+            }
+        }
+
+        public double Y
+        {
+            get { return Canvas.GetTop(Native as Ellipse); }
+            set
+            {
+                Canvas.SetTop(Native as Ellipse, value);
+            }
+        }
+
+        public double Width
+        {
+            get { return (Native as Ellipse).Width; }
+            set { (Native as Ellipse).Width = value; }
+        }
+
+        public double Height
+        {
+            get { return (Native as Ellipse).Height; }
+            set { (Native as Ellipse).Height = value; }
+        }
+
+        public IColor Stroke
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double StrokeThickness
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public IColor Fill
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public bool IsFilled
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+    }
+
     public class WpfCanvas : XNative, ICanvas
     {
         public IObservable<ImmutablePoint> Downs { get; set; }
@@ -851,6 +1032,7 @@ namespace RxCanvas
         IEditor _lineEditor;
         IEditor _quadraticBezierEditor;
         IEditor _rectangleEditor;
+        IEditor _ellipseEditor;
 
         public MainWindow()
         {
@@ -869,6 +1051,11 @@ namespace RxCanvas
                 IsEnabled = true
             };
 
+            _ellipseEditor = new PortableXCanvasEllipseEditor(_canvas)
+            {
+                IsEnabled = false
+            };
+
             _rectangleEditor = new PortableXCanvasRectangleEditor(_canvas)
             {
                 IsEnabled = false
@@ -882,21 +1069,28 @@ namespace RxCanvas
                         _lineEditor.IsEnabled = true;
                         _quadraticBezierEditor.IsEnabled = false;
                         _rectangleEditor.IsEnabled = false;
-                        break;
-                    case Key.R:
-                        _lineEditor.IsEnabled = false;
-                        _quadraticBezierEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = true;
+                        _ellipseEditor.IsEnabled = false;
                         break;
                     case Key.Q:
                         _lineEditor.IsEnabled = false;
                         _quadraticBezierEditor.IsEnabled = true;
                         _rectangleEditor.IsEnabled = false;
+                        _ellipseEditor.IsEnabled = false;
+                        break;
+                    case Key.R:
+                        _lineEditor.IsEnabled = false;
+                        _quadraticBezierEditor.IsEnabled = false;
+                        _rectangleEditor.IsEnabled = true;
+                        _ellipseEditor.IsEnabled = false;
+                        break;
+                    case Key.E:
+                        _lineEditor.IsEnabled = false;
+                        _quadraticBezierEditor.IsEnabled = false;
+                        _rectangleEditor.IsEnabled = false;
+                        _ellipseEditor.IsEnabled = true;
                         break;
                 }
             };
-
-
         }
     }
 }
