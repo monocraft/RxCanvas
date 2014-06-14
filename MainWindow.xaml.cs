@@ -141,6 +141,10 @@ namespace RxCanvas
         IObservable<ImmutablePoint> Ups { get; set; }
         IObservable<ImmutablePoint> Moves { get; set; }
 
+        double Width { get; set; }
+        double Height { get; set; }
+        IColor Background { get; set; }
+
         bool EnableSnap { get; set; }
         double SnapX { get; set; }
         double SnapY { get; set; }
@@ -267,6 +271,46 @@ namespace RxCanvas
         public double StrokeThickness { get; set; }
         public IColor Fill { get; set; }
         public bool IsFilled { get; set; }
+    }
+
+    public class XCanvas : XNative, ICanvas
+    {
+        public IObservable<ImmutablePoint> Downs { get; set; }
+        public IObservable<ImmutablePoint> Ups { get; set; }
+        public IObservable<ImmutablePoint> Moves { get; set; }
+
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public IColor Background { get; set; }
+
+        public bool EnableSnap { get; set; }
+        public double SnapX { get; set; }
+        public double SnapY { get; set; }
+
+        public bool IsCaptured 
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public void Capture()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReleaseCapture()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Add(INative value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove(INative value)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     #endregion
@@ -1694,9 +1738,10 @@ namespace RxCanvas
         public IObservable<ImmutablePoint> Moves { get; set; }
 
         private SolidColorBrush _backgroundBrush;
-        private double _snapX = 15.0;
-        private double _snapY = 15.0;
-        private bool _enableSnap = true;
+        private IColor _background;
+        private double _snapX;
+        private double _snapY;
+        private bool _enableSnap;
 
         public double Snap(double val, double snap)
         {
@@ -1704,15 +1749,20 @@ namespace RxCanvas
             return r >= snap / 2.0 ? val + snap - r : val - r;
         }
 
-        public WpfCanvas(double width, double height, IColor backgroud)
+        public WpfCanvas(ICanvas canvas)
         {
-            _backgroundBrush = new SolidColorBrush(Color.FromArgb(backgroud.A, backgroud.R, backgroud.G, backgroud.B));
+            _background = canvas.Background;
+            _snapX = canvas.SnapX;
+            _snapY = canvas.SnapY;
+            _enableSnap = canvas.EnableSnap;
+
+            _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
             _backgroundBrush.Freeze();
 
             Native = new Canvas()
             {
-                Width = width,
-                Height = height,
+                Width = canvas.Width,
+                Height = canvas.Height,
                 Background = _backgroundBrush
             };
 
@@ -1733,6 +1783,37 @@ namespace RxCanvas
                 var p = e.EventArgs.GetPosition((Native as Canvas));
                 return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
+        }
+
+        public double Width 
+        {
+            get { return (Native as Canvas).Width; }
+            set
+            {
+                (Native as Canvas).Width = value;
+            } 
+        }
+
+        public double Height
+        {
+            get { return (Native as Canvas).Height; }
+            set
+            {
+                (Native as Canvas).Height = value;
+            }
+        }
+
+        public IColor Background
+        {
+            get { return _background; }
+            set
+            {
+                _background = value;
+
+                _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+                _backgroundBrush.Freeze();
+                (Native as Canvas).Background = _backgroundBrush;
+            }
         }
 
         public bool EnableSnap
@@ -1764,10 +1845,7 @@ namespace RxCanvas
 
         public bool IsCaptured
         {
-            get
-            {
-                return Mouse.Captured == (Native as Canvas);
-            }
+            get { return Mouse.Captured == (Native as Canvas); }
         }
 
         public void Capture()
@@ -1839,7 +1917,20 @@ namespace RxCanvas
                 .Where(t => t.Name.EndsWith("Editor"))
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
-            builder.Register<ICanvas>(c => new WpfCanvas(600.0, 600.0, new XColor(0xFF, 0xFF, 0xFF, 0xFF))).InstancePerLifetimeScope();
+
+            builder.Register<ICanvas>(c => 
+                {
+                    var xcanvas = new XCanvas() 
+                    { 
+                        Width = 600.0, 
+                        Height = 600.0, 
+                        Background = new XColor(0xFF, 0xFF, 0xFF, 0xFF), 
+                        SnapX = 15.0, 
+                        SnapY = 15.0, 
+                        EnableSnap = true 
+                    };
+                    return new WpfCanvas(xcanvas);
+                }).InstancePerLifetimeScope();
 
             // resolve dependencies
             _container = builder.Build();
