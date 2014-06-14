@@ -1883,10 +1883,13 @@ namespace RxCanvas
                     _canvas.EnableSnap = _canvas.EnableSnap ? false : true;
                 });
 
-            //_canvas = new WpfCanvas(600.0, 600.0, new XColor(0xFF, 0xFF, 0xFF, 0xFF));
+            // add canvas to root layout
             Layout.Children.Add(_canvas.Native as UIElement);
+
+            // add grid to canvas
             CreateGrid(_canvas, 600.0, 600.0, 30.0, 0.0, 0.0);
 
+            // handle user input
             PreviewKeyDown += (sender, e) =>
             {
                 Action action;
