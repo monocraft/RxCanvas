@@ -20,6 +20,12 @@ using System.Reactive.Linq;
 using System.Reactive.PlatformServices;
 using System.Reactive.Subjects;
 using System.Reactive.Threading;
+using Autofac;
+using Autofac.Builder;
+using Autofac.Core;
+using Autofac.Features;
+using Autofac.Util;
+using System.Reflection;
 
 namespace RxCanvas
 {
@@ -149,7 +155,10 @@ namespace RxCanvas
 
     public interface IEditor
     {
+        string Name { get; set; }
         bool IsEnabled { get; set; }
+        string Key { get; set; }
+        string Modifiers { get; set; }
     }
 
     #endregion
@@ -267,7 +276,10 @@ namespace RxCanvas
     {
         public enum State { None, Start, End }
 
+        public string Name { get; set; }
         public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
 
         private ICanvas _canvas;
         private ILine _xline;
@@ -279,6 +291,10 @@ namespace RxCanvas
         public PortableXLineEditor(ICanvas canvas)
         {
             _canvas = canvas;
+
+            Name = "Line";
+            Key = "L";
+            Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
                             where _canvas.IsCaptured
@@ -353,7 +369,10 @@ namespace RxCanvas
     {
         public enum State { None, Start, Point1, Point2, Point3 }
 
+        public string Name { get; set; }
         public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
 
         private ICanvas _canvas;
         private IBezier _xb;
@@ -365,6 +384,10 @@ namespace RxCanvas
         public PortableXBezierEditor(ICanvas canvas)
         {
             _canvas = canvas;
+
+            Name = "Bézier";
+            Key = "B";
+            Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
                             where _canvas.IsCaptured
@@ -480,7 +503,10 @@ namespace RxCanvas
     {
         public enum State { None, Start, Point1, Point2 }
 
+        public string Name { get; set; }
         public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
 
         private ICanvas _canvas;
         private IQuadraticBezier _xqb;
@@ -492,6 +518,10 @@ namespace RxCanvas
         public PortableXQuadraticBezierEditor(ICanvas canvas)
         {
             _canvas = canvas;
+
+            Name = "Quadratic Bézier";
+            Key = "Q";
+            Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
                             where _canvas.IsCaptured
@@ -586,7 +616,10 @@ namespace RxCanvas
     {
         public enum State { None, Size, StartAngle, SweepAngle }
 
+        public string Name { get; set; }
         public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
 
         private ICanvas _canvas;
         private IArc _xarc;
@@ -599,6 +632,10 @@ namespace RxCanvas
         public PortableXArcEditor(ICanvas canvas)
         {
             _canvas = canvas;
+
+            Name = "Arc";
+            Key = "A";
+            Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
                             where _canvas.IsCaptured
@@ -683,7 +720,10 @@ namespace RxCanvas
     {
         public enum State { None, TopLeft, TopRight, BottomLeft, BottomRight }
 
+        public string Name { get; set; }
         public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
 
         private ICanvas _canvas;
         private IRectangle _xrectangle;
@@ -696,6 +736,10 @@ namespace RxCanvas
         public PortableXCanvasRectangleEditor(ICanvas canvas)
         {
             _canvas = canvas;
+
+            Name = "Rectangle";
+            Key = "R";
+            Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
                             where _canvas.IsCaptured
@@ -781,7 +825,10 @@ namespace RxCanvas
     {
         public enum State { None, TopLeft, TopRight, BottomLeft, BottomRight }
 
+        public string Name { get; set; }
         public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
 
         private ICanvas _canvas;
         private IEllipse _xellipse;
@@ -794,6 +841,10 @@ namespace RxCanvas
         public PortableXCanvasEllipseEditor(ICanvas canvas)
         {
             _canvas = canvas;
+
+            Name = "Ellipse";
+            Key = "E";
+            Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
                             where _canvas.IsCaptured
@@ -1743,15 +1794,19 @@ namespace RxCanvas
 
     public partial class MainWindow : Window
     {
-        ICanvas _canvas;
-        IEditor _lineEditor;
-        IEditor _BezierEditor;
-        IEditor _quadraticBezierEditor;
-        IEditor _arcEditor;
-        IEditor _rectangleEditor;
-        IEditor _ellipseEditor;
+        private IContainer _container;
+        private ILifetimeScope _scope;
+        private ICollection<IEditor> _editors;
+        private IDictionary<Tuple<Key, ModifierKeys>, Action> _shortcuts;
+        private ICanvas _canvas;
+        //IEditor _lineEditor;
+        //IEditor _BezierEditor;
+        //IEditor _quadraticBezierEditor;
+        //IEditor _arcEditor;
+        //IEditor _rectangleEditor;
+        //IEditor _ellipseEditor;
 
-        private WpfLine CreateGridLine(double x1, double y1, double x2, double y2)
+        private INative CreateGridLine(double x1, double y1, double x2, double y2)
         {
             var xline = new XLine()
             {
@@ -1765,16 +1820,16 @@ namespace RxCanvas
             return new WpfLine(xline);
         }
 
-        private void CreateGrid(double width, double height, double size, double originX, double originY)
+        private void CreateGrid(ICanvas canvas, double width, double height, double size, double originX, double originY)
         {
             for (double y = size; y < height; y += size)
             {
-                _canvas.Add(CreateGridLine(originX, y, width, y));
+                canvas.Add(CreateGridLine(originX, y, width, y));
             }
 
             for (double x = size; x < width; x += size)
             {
-                _canvas.Add(CreateGridLine(x, originY, x, height));
+                canvas.Add(CreateGridLine(x, originY, x, height));
             }
         }
 
@@ -1782,20 +1837,79 @@ namespace RxCanvas
         {
             InitializeComponent();
 
-            _canvas = new WpfCanvas(600.0, 600.0, new XColor(0xFF, 0xFF, 0xFF, 0xFF));
+            // register components
+            var builder = new ContainerBuilder();
+
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
+                .Where(t => t.Name.EndsWith("Editor"))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+            builder.Register<ICanvas>(c => new WpfCanvas(600.0, 600.0, new XColor(0xFF, 0xFF, 0xFF, 0xFF))).InstancePerLifetimeScope();
+
+            // resolve dependencies
+            _container = builder.Build();
+            _scope = _container.BeginLifetimeScope();
+
+            _canvas = _scope.Resolve<ICanvas>();
+            _editors = _scope.Resolve<ICollection<IEditor>>();
+
+            // initialize editors
+            _editors.Where(e => e.Name == "Line").FirstOrDefault().IsEnabled = true;
+
+            // initialize shortcuts
+            _shortcuts = new Dictionary<Tuple<Key, ModifierKeys>, Action>();
+
+            // initialize key converters
+            var keyConverter = new KeyConverter();
+            var modifiersKeyConverter = new ModifierKeysConverter();
+            
+            // add editor shortcuts
+            foreach (var editor in _editors)
+            {
+                var _editor = editor;
+                _shortcuts.Add(
+                    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key), 
+                                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
+                    () =>
+                    {
+                        foreach(var e in _editors)
+                        {
+                            e.IsEnabled = false;
+                        };
+                        _editor.IsEnabled = true;
+                    });
+            }
+
+            // add snap shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
+                () =>
+                {
+                    _canvas.EnableSnap = _canvas.EnableSnap ? false : true;
+                });
+
+            //_canvas = new WpfCanvas(600.0, 600.0, new XColor(0xFF, 0xFF, 0xFF, 0xFF));
             Layout.Children.Add(_canvas.Native as UIElement);
+            CreateGrid(_canvas, 600.0, 600.0, 30.0, 0.0, 0.0);
 
-            CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
-
-            _lineEditor = new PortableXLineEditor(_canvas) { IsEnabled = true };
-            _BezierEditor = new PortableXBezierEditor(_canvas) { IsEnabled = false };
-            _quadraticBezierEditor = new PortableXQuadraticBezierEditor(_canvas) { IsEnabled = false };
-            _arcEditor = new PortableXArcEditor(_canvas) { IsEnabled = false };
-            _ellipseEditor = new PortableXCanvasEllipseEditor(_canvas) { IsEnabled = false };
-            _rectangleEditor = new PortableXCanvasRectangleEditor(_canvas) { IsEnabled = false };
+            //_lineEditor = new PortableXLineEditor(_canvas) { IsEnabled = true };
+            //_BezierEditor = new PortableXBezierEditor(_canvas) { IsEnabled = false };
+            //_quadraticBezierEditor = new PortableXQuadraticBezierEditor(_canvas) { IsEnabled = false };
+            //_arcEditor = new PortableXArcEditor(_canvas) { IsEnabled = false };
+            //_ellipseEditor = new PortableXCanvasEllipseEditor(_canvas) { IsEnabled = false };
+            //_rectangleEditor = new PortableXCanvasRectangleEditor(_canvas) { IsEnabled = false };
 
             PreviewKeyDown += (sender, e) =>
             {
+                Action action;
+                bool result = _shortcuts.TryGetValue(new Tuple<Key, ModifierKeys>(e.Key, Keyboard.Modifiers), out action);
+                if(result == true && action != null)
+                {
+                    action();
+                }
+
+                /*
                 switch (e.Key)
                 {
                     // Line
@@ -1857,6 +1971,7 @@ namespace RxCanvas
                         _canvas.EnableSnap = _canvas.EnableSnap ? false : true;
                         break;
                 }
+                */
             };
         }
     }
