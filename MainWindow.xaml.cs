@@ -215,8 +215,9 @@ namespace RxCanvas
         public object Native { get; set; }
     }
 
-    public class XLine : XNative, ILine
+    public class XLine : ILine
     {
+        public object Native { get; set; }
         public double X1 { get; set; }
         public double Y1 { get; set; }
         public double X2 { get; set; }
@@ -225,8 +226,9 @@ namespace RxCanvas
         public double StrokeThickness { get; set; }
     }
 
-    public class XBezier : XNative, IBezier
+    public class XBezier : IBezier
     {
+        public object Native { get; set; }
         public IPoint Start { get; set; }
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
@@ -237,8 +239,9 @@ namespace RxCanvas
         public bool IsClosed { get; set; }
     }
 
-    public class XQuadraticBezier : XNative, IQuadraticBezier
+    public class XQuadraticBezier : IQuadraticBezier
     {
+        public object Native { get; set; }
         public IPoint Start { get; set; }
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
@@ -248,8 +251,9 @@ namespace RxCanvas
         public bool IsClosed { get; set; }
     }
 
-    public class XArc : XNative, IArc
+    public class XArc : IArc
     {
+        public object Native { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
@@ -263,8 +267,9 @@ namespace RxCanvas
         public bool IsClosed { get; set; }
     }
 
-    public class XRectangle : XNative, IRectangle
+    public class XRectangle : IRectangle
     {
+        public object Native { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
@@ -275,8 +280,9 @@ namespace RxCanvas
         public bool IsFilled { get; set; }
     }
 
-    public class XEllipse : XNative, IEllipse
+    public class XEllipse : IEllipse
     {
+        public object Native { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
@@ -287,8 +293,10 @@ namespace RxCanvas
         public bool IsFilled { get; set; }
     }
 
-    public class XCanvas : XNative, ICanvas
+    public class XCanvas : ICanvas
     {
+        public object Native { get; set; }
+
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
@@ -985,8 +993,10 @@ namespace RxCanvas
 
     #region WPF
 
-    public class WpfLine : XNative, ILine
+    public class WpfLine : ILine
     {
+        public object Native { get; set; }
+
         private SolidColorBrush _strokeBrush;
         private Line _line;
 
@@ -1048,8 +1058,10 @@ namespace RxCanvas
         }
     }
 
-    public class WpfBezier : XNative, IBezier
+    public class WpfBezier : IBezier
     {
+        public object Native { get; set; }
+
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
         private Path _path;
@@ -1211,8 +1223,10 @@ namespace RxCanvas
         }
     }
 
-    public class WpfQuadraticBezier : XNative, IQuadraticBezier
+    public class WpfQuadraticBezier : IQuadraticBezier
     {
+        public object Native { get; set; }
+
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
         private Path _path;
@@ -1348,8 +1362,10 @@ namespace RxCanvas
         }
     }
 
-    public class WpfArc : XNative, IArc
+    public class WpfArc : IArc
     {
+        public object Native { get; set; }
+
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
         private Path _path;
@@ -1575,8 +1591,10 @@ namespace RxCanvas
         }
     }
 
-    public class WpfRectangle : XNative, IRectangle
+    public class WpfRectangle : IRectangle
     {
+        public object Native { get; set; }
+
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
         private Rectangle _rectangle;
@@ -1658,8 +1676,10 @@ namespace RxCanvas
         }
     }
 
-    public class WpfEllipse : XNative, IEllipse
+    public class WpfEllipse : IEllipse
     {
+        public object Native { get; set; }
+
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
         private Ellipse _ellipse;
@@ -1741,8 +1761,10 @@ namespace RxCanvas
         }
     }
 
-    public class WpfCanvas : XNative, ICanvas
+    public class WpfCanvas : ICanvas
     {
+        public object Native { get; set; }
+
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
