@@ -166,6 +166,17 @@ namespace RxCanvas
         string Modifiers { get; set; }
     }
 
+    public interface INativeFactory
+    {
+        ILine CreateLine(ILine line);
+        IBezier CreateBezier(IBezier bezier);
+        IQuadraticBezier CreateQuadraticBezier(IQuadraticBezier quadraticBezier);
+        IArc CreateArc(IArc arc);
+        IRectangle CreateRectangle(IRectangle rectangle);
+        IEllipse CreateEllipse(IEllipse ellipse);
+        ICanvas CreateCanvas(ICanvas canvas);
+    }
+
     #endregion
 
     #region X
