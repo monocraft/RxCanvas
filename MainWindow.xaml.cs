@@ -1931,6 +1931,12 @@ namespace RxCanvas
         private ICanvas _backgroundCanvas;
         private ICanvas _drawingCanvas;
 
+        public MainWindow()
+        {
+            InitializeComponent();
+            RegisterAndBuild();
+        }
+
         private INative CreateGridLine(IColor stroke, double thickness, double x1, double y1, double x2, double y2)
         {
             var xline = new XLine()
@@ -1961,10 +1967,8 @@ namespace RxCanvas
             }
         }
 
-        public MainWindow()
+        private void RegisterAndBuild()
         {
-            InitializeComponent();
-
             // register components
             var builder = new ContainerBuilder();
 
@@ -1975,19 +1979,19 @@ namespace RxCanvas
 
             builder.Register<INativeFactory>(f => new WpfNativeFactory()).InstancePerLifetimeScope();
 
-            builder.Register<ICanvas>(c => 
+            builder.Register<ICanvas>(c =>
+            {
+                var xcanvas = new XCanvas()
                 {
-                    var xcanvas = new XCanvas() 
-                    { 
-                        Width = 600.0, 
-                        Height = 600.0, 
-                        Background = new XColor(0x00, 0xFF, 0xFF, 0xFF), 
-                        SnapX = 15.0, 
-                        SnapY = 15.0, 
-                        EnableSnap = true 
-                    };
-                    return new WpfCanvas(xcanvas);
-                }).InstancePerLifetimeScope();
+                    Width = 600.0,
+                    Height = 600.0,
+                    Background = new XColor(0x00, 0xFF, 0xFF, 0xFF),
+                    SnapX = 15.0,
+                    SnapY = 15.0,
+                    EnableSnap = true
+                };
+                return new WpfCanvas(xcanvas);
+            }).InstancePerLifetimeScope();
 
             // resolve dependencies
             _container = builder.Build();
@@ -2007,17 +2011,17 @@ namespace RxCanvas
             // initialize key converters
             var keyConverter = new KeyConverter();
             var modifiersKeyConverter = new ModifierKeysConverter();
-            
+
             // add editor shortcuts
             foreach (var editor in _editors)
             {
                 var _editor = editor;
                 _shortcuts.Add(
-                    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key), 
+                    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key),
                                                  (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
                     () =>
                     {
-                        foreach(var e in _editors)
+                        foreach (var e in _editors)
                         {
                             e.IsEnabled = false;
                         };
@@ -2031,7 +2035,7 @@ namespace RxCanvas
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
                 () =>
                 {
-                    var canvas =_drawingScope.Resolve<ICanvas>();
+                    var canvas = _drawingScope.Resolve<ICanvas>();
                     canvas.EnableSnap = canvas.EnableSnap ? false : true;
                 });
 
@@ -2047,7 +2051,7 @@ namespace RxCanvas
             {
                 Action action;
                 bool result = _shortcuts.TryGetValue(new Tuple<Key, ModifierKeys>(e.Key, Keyboard.Modifiers), out action);
-                if(result == true && action != null)
+                if (result == true && action != null)
                 {
                     action();
                 }
