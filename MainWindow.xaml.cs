@@ -998,11 +998,14 @@ namespace RxCanvas
         public object Native { get; set; }
 
         private SolidColorBrush _strokeBrush;
+        private IColor _stroke;
         private Line _line;
 
         public WpfLine(ILine line)
         {
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(line.Stroke.A, line.Stroke.R, line.Stroke.G, line.Stroke.B));
+            _stroke = line.Stroke;
+
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
 
             _line = new Line()
@@ -1020,41 +1023,44 @@ namespace RxCanvas
 
         public double X1
         {
-            get { return (Native as Line).X1; }
-            set
-            {
-                (Native as Line).X1 = value;
-            }
+            get { return _line.X1; }
+            set { _line.X1 = value; }
         }
 
         public double Y1
         {
-            get { return (Native as Line).Y1; }
-            set { (Native as Line).Y1 = value; }
+            get { return _line.Y1; }
+            set { _line.Y1 = value; }
         }
 
         public double X2
         {
-            get { return (Native as Line).X2; }
-            set { (Native as Line).X2 = value; }
+            get { return _line.X2; }
+            set { _line.X2 = value; }
         }
 
         public double Y2
         {
-            get { return (Native as Line).Y2; }
-            set { (Native as Line).Y2 = value; }
+            get { return _line.Y2; }
+            set { _line.Y2 = value; }
         }
 
         public IColor Stroke
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _stroke; }
+            set 
+            {
+                _stroke = value;
+                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush.Freeze();
+                _line.Stroke = _strokeBrush;
+            }
         }
 
         public double StrokeThickness
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _line.StrokeThickness; }
+            set { _line.StrokeThickness = value; }
         }
     }
 
@@ -1068,7 +1074,8 @@ namespace RxCanvas
         private PathGeometry _pg;
         private PathFigure _pf;
         private BezierSegment _bs;
-
+        private IColor _fill;
+        private IColor _stroke;
         private IPoint _start;
         private IPoint _point1;
         private IPoint _point2;
@@ -1076,10 +1083,18 @@ namespace RxCanvas
 
         public WpfBezier(IBezier b)
         {
-            _fillBrush = new SolidColorBrush(Color.FromArgb(b.Fill.A, b.Fill.R, b.Fill.G, b.Fill.B));
+            _fill = b.Fill;
+            _stroke = b.Stroke;
+            _start = b.Start;
+            _point1 = b.Point1;
+            _point2 = b.Point2;
+            _point3 = b.Point3;
+
+            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(b.Stroke.A, b.Stroke.R, b.Stroke.G, b.Stroke.B));
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
+
             _path = new Path();
             _path.Tag = this;
             _path.Fill = _fillBrush;
@@ -1096,67 +1111,8 @@ namespace RxCanvas
             _pf.Segments.Add(_bs);
             _pg.Figures.Add(_pf);
             _path.Data = _pg;
+
             Native = _path;
-        }
-
-        private void SetStart(double x, double y)
-        {
-            _pf.StartPoint = new Point(x, y);
-        }
-
-        private void SetPoint1(double x, double y)
-        {
-            _bs.Point1 = new Point(x, y);
-        }
-
-        private void SetPoint2(double x, double y)
-        {
-            _bs.Point2 = new Point(x, y);
-        }
-
-        private void SetPoint3(double x, double y)
-        {
-            _bs.Point3 = new Point(x, y);
-        }
-
-        private double GetStartX()
-        {
-            return _pf.StartPoint.X;
-        }
-
-        private double GetStartY()
-        {
-            return _pf.StartPoint.Y;
-        }
-
-        private double GetPoint1X()
-        {
-            return _bs.Point1.X;
-        }
-
-        private double GetPoint1Y()
-        {
-            return _bs.Point1.Y;
-        }
-
-        private double GetPoint2X()
-        {
-            return _bs.Point2.X;
-        }
-
-        private double GetPoint2Y()
-        {
-            return _bs.Point2.Y;
-        }
-
-        private double GetPoint3X()
-        {
-            return _bs.Point3.X;
-        }
-
-        private double GetPoint3Y()
-        {
-            return _bs.Point3.Y;
         }
 
         public IPoint Start
@@ -1165,7 +1121,7 @@ namespace RxCanvas
             set
             {
                 _start = value;
-                SetStart(_start.X, _start.Y);
+                _pf.StartPoint = new Point(_start.X, _start.Y);
             }
         }
 
@@ -1175,7 +1131,7 @@ namespace RxCanvas
             set
             {
                 _point1 = value;
-                SetPoint1(_point1.X, _point1.Y);
+                _bs.Point1 = new Point(_point1.X, _point1.Y);
             }
         }
 
@@ -1185,7 +1141,7 @@ namespace RxCanvas
             set
             {
                 _point2 = value;
-                SetPoint2(_point2.X, _point2.Y);
+                _bs.Point2 = new Point(_point2.X, _point2.Y);
             }
         }
 
@@ -1195,31 +1151,44 @@ namespace RxCanvas
             set
             {
                 _point3 = value;
-                SetPoint3(_point3.X, _point3.Y);
+                _bs.Point3 = new Point(_point3.X, _point3.Y);
             }
         }
+
         public IColor Fill
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _fill; }
+            set 
+            {
+                _fill = value;
+                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush.Freeze();
+                _path.Fill = _fillBrush;
+            }
         }
 
         public IColor Stroke
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _stroke; }
+            set 
+            {
+                _stroke = value;
+                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush.Freeze();
+                _path.Stroke = _strokeBrush;
+            }
         }
 
         public double StrokeThickness
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _path.StrokeThickness; }
+            set { _path.StrokeThickness = value; }
         }
 
         public bool IsClosed
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _pf.IsClosed; }
+            set { _pf.IsClosed = value; }
         }
     }
 
@@ -1233,17 +1202,25 @@ namespace RxCanvas
         private PathGeometry _pg;
         private PathFigure _pf;
         private QuadraticBezierSegment _qbs;
-
+        private IColor _fill;
+        private IColor _stroke;
         private IPoint _start;
         private IPoint _point1;
         private IPoint _point2;
 
         public WpfQuadraticBezier(IQuadraticBezier qb)
         {
-            _fillBrush = new SolidColorBrush(Color.FromArgb(qb.Fill.A, qb.Fill.R, qb.Fill.G, qb.Fill.B));
+            _fill = qb.Fill;
+            _stroke = qb.Stroke;
+            _start = qb.Start;
+            _point1 = qb.Point1;
+            _point2 = qb.Point2;
+
+            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(qb.Stroke.A, qb.Stroke.R, qb.Stroke.G, qb.Stroke.B));
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
+
             _path = new Path();
             _path.Tag = this;
             _path.Fill = _fillBrush;
@@ -1259,52 +1236,8 @@ namespace RxCanvas
             _pf.Segments.Add(_qbs);
             _pg.Figures.Add(_pf);
             _path.Data = _pg;
+
             Native = _path;
-        }
-
-        private void SetStart(double x, double y)
-        {
-            _pf.StartPoint = new Point(x, y);
-        }
-
-        private void SetPoint1(double x, double y)
-        {
-            _qbs.Point1 = new Point(x, y);
-        }
-
-        private void SetPoint2(double x, double y)
-        {
-            _qbs.Point2 = new Point(x, y);
-        }
-
-        private double GetStartX()
-        {
-            return _pf.StartPoint.X;
-        }
-
-        private double GetStartY()
-        {
-            return _pf.StartPoint.Y;
-        }
-
-        private double GetPoint1X()
-        {
-            return _qbs.Point1.X;
-        }
-
-        private double GetPoint1Y()
-        {
-            return _qbs.Point1.Y;
-        }
-
-        private double GetPoint2X()
-        {
-            return _qbs.Point2.X;
-        }
-
-        private double GetPoint2Y()
-        {
-            return _qbs.Point2.Y;
         }
 
         public IPoint Start
@@ -1313,7 +1246,7 @@ namespace RxCanvas
             set
             {
                 _start = value;
-                SetStart(_start.X, _start.Y);
+                _pf.StartPoint = new Point(_start.X, _start.Y);
             }
         }
 
@@ -1323,7 +1256,7 @@ namespace RxCanvas
             set
             {
                 _point1 = value;
-                SetPoint1(_point1.X, _point1.Y);
+                _qbs.Point1 = new Point(_point1.X, _point1.Y);
             }
         }
 
@@ -1333,32 +1266,44 @@ namespace RxCanvas
             set
             {
                 _point2 = value;
-                SetPoint2(_point2.X, _point2.Y);
+                _qbs.Point2 = new Point(_point2.X, _point2.Y);
             }
         }
 
         public IColor Fill
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _fill; }
+            set
+            {
+                _fill = value;
+                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush.Freeze();
+                _path.Fill = _fillBrush;
+            }
         }
 
         public IColor Stroke
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _stroke; }
+            set
+            {
+                _stroke = value;
+                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush.Freeze();
+                _path.Stroke = _strokeBrush;
+            }
         }
 
         public double StrokeThickness
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _path.StrokeThickness; }
+            set { _path.StrokeThickness = value; }
         }
 
         public bool IsClosed
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _pf.IsClosed; }
+            set { _pf.IsClosed = value; }
         }
     }
 
@@ -1373,13 +1318,19 @@ namespace RxCanvas
         private PathFigure _pf;
         private ArcSegment _as;
         private Point _start;
+        private IColor _fill;
+        private IColor _stroke;
 
         public WpfArc(IArc arc)
         {
-            _fillBrush = new SolidColorBrush(Color.FromArgb(arc.Fill.A, arc.Fill.R, arc.Fill.G, arc.Fill.B));
+            _fill = arc.Fill;
+            _stroke = arc.Stroke;
+
+            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(arc.Stroke.A, arc.Stroke.R, arc.Stroke.G, arc.Stroke.B));
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
+
             _path = new Path();
             _path.Tag = this;
             _path.Fill = _fillBrush;
@@ -1395,6 +1346,7 @@ namespace RxCanvas
             _pf.Segments.Add(_as);
             _pg.Figures.Add(_pf);
             _path.Data = _pg;
+
             Native = _path;
         }
 
@@ -1562,32 +1514,44 @@ namespace RxCanvas
 
         public IColor Stroke
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _stroke; }
+            set 
+            {
+                _stroke = value;
+                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush.Freeze();
+                _path.Stroke = _strokeBrush;
+            }
         }
 
         public double StrokeThickness
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _path.StrokeThickness; }
+            set { _path.StrokeThickness = value; }
         }
 
         public IColor Fill
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _fill; }
+            set 
+            {
+                _fill = value;
+                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush.Freeze();
+                _path.Fill = _fillBrush;
+            }
         }
 
         public bool IsFilled
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _pf.IsFilled; }
+            set { _pf.IsFilled = value; }
         }
 
         public bool IsClosed
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _pf.IsClosed; }
+            set { _pf.IsClosed = value; }
         }
     }
 
@@ -1598,12 +1562,17 @@ namespace RxCanvas
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
         private Rectangle _rectangle;
+        private IColor _stroke;
+        private IColor _fill;
 
         public WpfRectangle(IRectangle rectangle)
         {
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(rectangle.Stroke.A, rectangle.Stroke.R, rectangle.Stroke.G, rectangle.Stroke.B));
+            _stroke = rectangle.Stroke;
+            _fill = rectangle.Fill;
+
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
-            _fillBrush = new SolidColorBrush(Color.FromArgb(rectangle.Fill.A, rectangle.Fill.R, rectangle.Fill.G, rectangle.Fill.B));
+            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
             _fillBrush.Freeze();
 
             _rectangle = new Rectangle()
@@ -1623,50 +1592,56 @@ namespace RxCanvas
 
         public double X
         {
-            get { return Canvas.GetLeft(Native as Rectangle); }
-            set
-            {
-                Canvas.SetLeft(Native as Rectangle, value);
-            }
+            get { return Canvas.GetLeft(_rectangle); }
+            set { Canvas.SetLeft(_rectangle, value); }
         }
 
         public double Y
         {
-            get { return Canvas.GetTop(Native as Rectangle); }
-            set
-            {
-                Canvas.SetTop(Native as Rectangle, value);
-            }
+            get { return Canvas.GetTop(_rectangle); }
+            set { Canvas.SetTop(_rectangle, value); }
         }
 
         public double Width
         {
-            get { return (Native as Rectangle).Width; }
-            set { (Native as Rectangle).Width = value; }
+            get { return _rectangle.Width; }
+            set { _rectangle.Width = value; }
         }
 
         public double Height
         {
-            get { return (Native as Rectangle).Height; }
-            set { (Native as Rectangle).Height = value; }
+            get { return _rectangle.Height; }
+            set { _rectangle.Height = value; }
         }
 
         public IColor Stroke
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _stroke; }
+            set 
+            {
+                _stroke = value;
+                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush.Freeze();
+                _rectangle.Stroke = _strokeBrush;
+            }
         }
 
         public double StrokeThickness
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _rectangle.StrokeThickness; }
+            set { _rectangle.StrokeThickness = value; }
         }
 
         public IColor Fill
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _fill; }
+            set 
+            {
+                _fill = value;
+                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush.Freeze();
+                _rectangle.Fill = _fillBrush;
+            }
         }
 
         public bool IsFilled
@@ -1684,11 +1659,17 @@ namespace RxCanvas
         private SolidColorBrush _fillBrush;
         private Ellipse _ellipse;
 
+        private IColor _stroke;
+        private IColor _fill;
+
         public WpfEllipse(IEllipse ellipse)
         {
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(ellipse.Stroke.A, ellipse.Stroke.R, ellipse.Stroke.G, ellipse.Stroke.B));
+            _stroke = ellipse.Stroke;
+            _fill = ellipse.Fill;
+
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
-            _fillBrush = new SolidColorBrush(Color.FromArgb(ellipse.Fill.A, ellipse.Fill.R, ellipse.Fill.G, ellipse.Fill.B));
+            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
             _fillBrush.Freeze();
 
             _ellipse = new Ellipse()
@@ -1708,50 +1689,56 @@ namespace RxCanvas
 
         public double X
         {
-            get { return Canvas.GetLeft(Native as Ellipse); }
-            set
-            {
-                Canvas.SetLeft(Native as Ellipse, value);
-            }
+            get { return Canvas.GetLeft(_ellipse); }
+            set { Canvas.SetLeft(_ellipse, value); }
         }
 
         public double Y
         {
-            get { return Canvas.GetTop(Native as Ellipse); }
-            set
-            {
-                Canvas.SetTop(Native as Ellipse, value);
-            }
+            get { return Canvas.GetTop(_ellipse); }
+            set { Canvas.SetTop(_ellipse, value); }
         }
 
         public double Width
         {
-            get { return (Native as Ellipse).Width; }
-            set { (Native as Ellipse).Width = value; }
+            get { return _ellipse.Width; }
+            set { _ellipse.Width = value; }
         }
 
         public double Height
         {
-            get { return (Native as Ellipse).Height; }
-            set { (Native as Ellipse).Height = value; }
+            get { return _ellipse.Height; }
+            set { _ellipse.Height = value; }
         }
 
         public IColor Stroke
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _stroke; }
+            set 
+            {
+                _stroke = value;
+                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush.Freeze();
+                _ellipse.Stroke = _strokeBrush;
+            }
         }
 
         public double StrokeThickness
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _ellipse.StrokeThickness; }
+            set { _ellipse.StrokeThickness = value; }
         }
 
         public IColor Fill
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _fill; }
+            set 
+            {
+                _fill = value;
+                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush.Freeze();
+                _ellipse.Fill = _fillBrush;
+            }
         }
 
         public bool IsFilled
@@ -1774,6 +1761,7 @@ namespace RxCanvas
         private double _snapX;
         private double _snapY;
         private bool _enableSnap;
+        private Canvas _canvas;
 
         public double Snap(double val, double snap)
         {
@@ -1793,50 +1781,46 @@ namespace RxCanvas
 
             Children = new ObservableCollection<INative>();
 
-            Native = new Canvas()
+            _canvas = new Canvas()
             {
                 Width = canvas.Width,
                 Height = canvas.Height,
                 Background = _backgroundBrush
             };
 
-            Downs = Observable.FromEventPattern<MouseButtonEventArgs>((Native as Canvas), "PreviewMouseLeftButtonDown").Select(e =>
+            Downs = Observable.FromEventPattern<MouseButtonEventArgs>(_canvas, "PreviewMouseLeftButtonDown").Select(e =>
             {
-                var p = e.EventArgs.GetPosition((Native as Canvas));
+                var p = e.EventArgs.GetPosition(_canvas);
                 return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
 
-            Ups = Observable.FromEventPattern<MouseButtonEventArgs>((Native as Canvas), "PreviewMouseLeftButtonUp").Select(e =>
+            Ups = Observable.FromEventPattern<MouseButtonEventArgs>(_canvas, "PreviewMouseLeftButtonUp").Select(e =>
             {
-                var p = e.EventArgs.GetPosition((Native as Canvas));
+                var p = e.EventArgs.GetPosition(_canvas);
                 return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
 
-            Moves = Observable.FromEventPattern<MouseEventArgs>((Native as Canvas), "PreviewMouseMove").Select(e =>
+            Moves = Observable.FromEventPattern<MouseEventArgs>(_canvas, "PreviewMouseMove").Select(e =>
             {
-                var p = e.EventArgs.GetPosition((Native as Canvas));
+                var p = e.EventArgs.GetPosition(_canvas);
                 return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
+
+            Native = _canvas;
         }
 
         public IList<INative> Children { get; set; }
 
         public double Width 
         {
-            get { return (Native as Canvas).Width; }
-            set
-            {
-                (Native as Canvas).Width = value;
-            } 
+            get { return _canvas.Width; }
+            set { _canvas.Width = value; } 
         }
 
         public double Height
         {
-            get { return (Native as Canvas).Height; }
-            set
-            {
-                (Native as Canvas).Height = value;
-            }
+            get { return _canvas.Height; }
+            set { _canvas.Height = value; }
         }
 
         public IColor Background
@@ -1845,64 +1829,54 @@ namespace RxCanvas
             set
             {
                 _background = value;
-
                 _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
                 _backgroundBrush.Freeze();
-                (Native as Canvas).Background = _backgroundBrush;
+                _canvas.Background = _backgroundBrush;
             }
         }
 
         public bool EnableSnap
         {
             get { return _enableSnap; }
-            set
-            {
-                _enableSnap = value;
-            }
+            set { _enableSnap = value; }
         }
 
         public double SnapX
         {
             get { return _snapX; }
-            set
-            {
-                _snapX = value;
-            }
+            set { _snapX = value; }
         }
 
         public double SnapY
         {
             get { return _snapY; }
-            set
-            {
-                _snapY = value;
-            }
+            set { _snapY = value; }
         }
 
         public bool IsCaptured
         {
-            get { return Mouse.Captured == (Native as Canvas); }
+            get { return Mouse.Captured == _canvas; }
         }
 
         public void Capture()
         {
-            (Native as Canvas).CaptureMouse();
+            _canvas.CaptureMouse();
         }
 
         public void ReleaseCapture()
         {
-            (Native as Canvas).ReleaseMouseCapture();
+            _canvas.ReleaseMouseCapture();
         }
 
         public void Add(INative value)
         {
-            (Native as Canvas).Children.Add(value.Native as UIElement);
+            _canvas.Children.Add(value.Native as UIElement);
             Children.Add(value);
         }
 
         public void Remove(INative value)
         {
-            (Native as Canvas).Children.Remove(value.Native as UIElement);
+            _canvas.Children.Remove(value.Native as UIElement);
             Children.Remove(value);
         }
     }
@@ -1957,7 +1931,7 @@ namespace RxCanvas
         private ICanvas _backgroundCanvas;
         private ICanvas _drawingCanvas;
 
-        private INative CreateGridLine(double x1, double y1, double x2, double y2)
+        private INative CreateGridLine(IColor stroke, double thickness, double x1, double y1, double x2, double y2)
         {
             var xline = new XLine()
             {
@@ -1965,22 +1939,25 @@ namespace RxCanvas
                 Y1 = y1,
                 X2 = x2,
                 Y2 = y2,
-                Stroke = new XColor(0xFF, 0xE8, 0xE8, 0xE8),
-                StrokeThickness = 2.0,
+                Stroke = stroke,
+                StrokeThickness = thickness,
             };
             return new WpfLine(xline);
         }
 
         private void CreateGrid(ICanvas canvas, double width, double height, double size, double originX, double originY)
         {
+            IColor stroke = new XColor(0xFF, 0xE8, 0xE8, 0xE8);
+            double thickness = 2.0;
+
             for (double y = size; y < height; y += size)
             {
-                canvas.Add(CreateGridLine(originX, y, width, y));
+                canvas.Add(CreateGridLine(stroke, thickness, originX, y, width, y));
             }
 
             for (double x = size; x < width; x += size)
             {
-                canvas.Add(CreateGridLine(x, originY, x, height));
+                canvas.Add(CreateGridLine(stroke, thickness, x, originY, x, height));
             }
         }
 
