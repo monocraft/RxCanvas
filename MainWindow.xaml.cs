@@ -27,6 +27,7 @@ using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Features;
 using Autofac.Util;
+using System.Collections.ObjectModel;
 
 namespace RxCanvas
 {
@@ -140,6 +141,8 @@ namespace RxCanvas
         IObservable<ImmutablePoint> Downs { get; set; }
         IObservable<ImmutablePoint> Ups { get; set; }
         IObservable<ImmutablePoint> Moves { get; set; }
+
+        IList<INative> Children { get; set; }
 
         double Width { get; set; }
         double Height { get; set; }
@@ -290,6 +293,8 @@ namespace RxCanvas
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
 
+        public IList<INative> Children { get; set; }
+
         public double Width { get; set; }
         public double Height { get; set; }
         public IColor Background { get; set; }
@@ -344,7 +349,7 @@ namespace RxCanvas
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public PortableXLineEditor(ICanvas canvas)
+        public PortableXLineEditor(INativeFactory factory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -389,8 +394,7 @@ namespace RxCanvas
                         Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                         StrokeThickness = 2.0,
                     };
-                    // TODO: Use IoC container to get WpfLine as ILine.
-                    _line = new WpfLine(_xline);
+                    _line = factory.CreateLine(_xline);
                     _canvas.Add(_line);
                     _canvas.Capture();
                     _state = State.End;
@@ -437,7 +441,7 @@ namespace RxCanvas
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public PortableXBezierEditor(ICanvas canvas)
+        public PortableXBezierEditor(INativeFactory factory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -509,8 +513,7 @@ namespace RxCanvas
                         StrokeThickness = 2.0,
                         IsClosed = false
                     };
-                    // TODO: Use IoC container to get WpfBezier as IBezier.
-                    _b = new WpfBezier(_xb);
+                    _b = factory.CreateBezier(_xb);
                     _canvas.Add(_b);
                     _canvas.Capture();
                     _state = State.Start;
@@ -571,7 +574,7 @@ namespace RxCanvas
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public PortableXQuadraticBezierEditor(ICanvas canvas)
+        public PortableXQuadraticBezierEditor(INativeFactory factory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -631,8 +634,7 @@ namespace RxCanvas
                         StrokeThickness = 2.0,
                         IsClosed = false
                     };
-                    // TODO: Use IoC container to get WpfQuadraticBezier as IQuadraticBezier.
-                    _qb = new WpfQuadraticBezier(_xqb);
+                    _qb = factory.CreateQuadraticBezier(_xqb);
                     _canvas.Add(_qb);
                     _canvas.Capture();
                     _state = State.Start;
@@ -685,7 +687,7 @@ namespace RxCanvas
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public PortableXArcEditor(ICanvas canvas)
+        public PortableXArcEditor(INativeFactory factory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -732,8 +734,7 @@ namespace RxCanvas
                         Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                         IsFilled = false
                     };
-                    // TODO: Use IoC container to get WpfArc as IArc.
-                    _arc = new WpfArc(_xarc);
+                    _arc = factory.CreateArc(_xarc);
                     _canvas.Add(_arc);
                     _canvas.Capture();
                     _state = State.Size;
@@ -789,7 +790,7 @@ namespace RxCanvas
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public PortableXCanvasRectangleEditor(ICanvas canvas)
+        public PortableXCanvasRectangleEditor(INativeFactory factory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -834,8 +835,7 @@ namespace RxCanvas
                         Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                         IsFilled = false
                     };
-                    // TODO: Use IoC container to get WpfRectangle as IRectangle.
-                    _rectangle = new WpfRectangle(_xrectangle);
+                    _rectangle = factory.CreateRectangle(_xrectangle);
                     _canvas.Add(_rectangle);
                     _canvas.Capture();
                     _state = State.BottomRight;
@@ -894,7 +894,7 @@ namespace RxCanvas
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public PortableXCanvasEllipseEditor(ICanvas canvas)
+        public PortableXCanvasEllipseEditor(INativeFactory factory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -939,8 +939,7 @@ namespace RxCanvas
                         Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                         IsFilled = false
                     };
-                    // TODO: Use IoC container to get WpfEllipse as IEllipse.
-                    _elllipse = new WpfEllipse(_xellipse);
+                    _elllipse = factory.CreateEllipse(_xellipse);
                     _canvas.Add(_elllipse);
                     _canvas.Capture();
                     _state = State.BottomRight;
@@ -1770,6 +1769,8 @@ namespace RxCanvas
             _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
             _backgroundBrush.Freeze();
 
+            Children = new ObservableCollection<INative>();
+
             Native = new Canvas()
             {
                 Width = canvas.Width,
@@ -1795,6 +1796,8 @@ namespace RxCanvas
                 return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
         }
+
+        public IList<INative> Children { get; set; }
 
         public double Width 
         {
@@ -1872,11 +1875,51 @@ namespace RxCanvas
         public void Add(INative value)
         {
             (Native as Canvas).Children.Add(value.Native as UIElement);
+            Children.Add(value);
         }
 
         public void Remove(INative value)
         {
             (Native as Canvas).Children.Remove(value.Native as UIElement);
+            Children.Remove(value);
+        }
+    }
+
+    public class WpfNativeFactory : INativeFactory
+    {
+        public ILine CreateLine(ILine line)
+        {
+            return new WpfLine(line);
+        }
+
+        public IBezier CreateBezier(IBezier bezier)
+        {
+            return new WpfBezier(bezier);
+        }
+
+        public IQuadraticBezier CreateQuadraticBezier(IQuadraticBezier quadraticBezier)
+        {
+            return new WpfQuadraticBezier(quadraticBezier);
+        }
+
+        public IArc CreateArc(IArc arc)
+        {
+            return new WpfArc(arc);
+        }
+
+        public IRectangle CreateRectangle(IRectangle rectangle)
+        {
+            return new WpfRectangle(rectangle);
+        }
+
+        public IEllipse CreateEllipse(IEllipse ellipse)
+        {
+            return new WpfEllipse(ellipse);
+        }
+
+        public ICanvas CreateCanvas(ICanvas canvas)
+        {
+            return new WpfCanvas(canvas);
         }
     }
 
@@ -1885,10 +1928,12 @@ namespace RxCanvas
     public partial class MainWindow : Window
     {
         private IContainer _container;
-        private ILifetimeScope _scope;
+        private ILifetimeScope _backgroundScope;
+        private ILifetimeScope _drawingScope;
         private ICollection<IEditor> _editors;
         private IDictionary<Tuple<Key, ModifierKeys>, Action> _shortcuts;
-        private ICanvas _canvas;
+        private ICanvas _backgroundCanvas;
+        private ICanvas _drawingCanvas;
 
         private INative CreateGridLine(double x1, double y1, double x2, double y2)
         {
@@ -1929,13 +1974,15 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
+            builder.Register<INativeFactory>(f => new WpfNativeFactory()).InstancePerLifetimeScope();
+
             builder.Register<ICanvas>(c => 
                 {
                     var xcanvas = new XCanvas() 
                     { 
                         Width = 600.0, 
                         Height = 600.0, 
-                        Background = new XColor(0xFF, 0xFF, 0xFF, 0xFF), 
+                        Background = new XColor(0x00, 0xFF, 0xFF, 0xFF), 
                         SnapX = 15.0, 
                         SnapY = 15.0, 
                         EnableSnap = true 
@@ -1945,10 +1992,12 @@ namespace RxCanvas
 
             // resolve dependencies
             _container = builder.Build();
-            _scope = _container.BeginLifetimeScope();
+            _backgroundScope = _container.BeginLifetimeScope();
+            _drawingScope = _container.BeginLifetimeScope();
 
-            _canvas = _scope.Resolve<ICanvas>();
-            _editors = _scope.Resolve<ICollection<IEditor>>();
+            _backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
+            _drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            _editors = _drawingScope.Resolve<ICollection<IEditor>>();
 
             // initialize editors
             _editors.Where(e => e.Name == "Line").FirstOrDefault().IsEnabled = true;
@@ -1983,14 +2032,16 @@ namespace RxCanvas
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
                 () =>
                 {
-                    _canvas.EnableSnap = _canvas.EnableSnap ? false : true;
+                    var canvas =_drawingScope.Resolve<ICanvas>();
+                    canvas.EnableSnap = canvas.EnableSnap ? false : true;
                 });
 
             // add canvas to root layout
-            Layout.Children.Add(_canvas.Native as UIElement);
+            Layout.Children.Add(_backgroundCanvas.Native as UIElement);
+            Layout.Children.Add(_drawingCanvas.Native as UIElement);
 
             // add grid to canvas
-            CreateGrid(_canvas, 600.0, 600.0, 30.0, 0.0, 0.0);
+            CreateGrid(_backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
 
             // handle user input
             PreviewKeyDown += (sender, e) =>
@@ -2002,6 +2053,8 @@ namespace RxCanvas
                     action();
                 }
             };
+
+            DataContext = _drawingCanvas;
         }
     }
 }
