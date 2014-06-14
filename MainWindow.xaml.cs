@@ -1799,12 +1799,6 @@ namespace RxCanvas
         private ICollection<IEditor> _editors;
         private IDictionary<Tuple<Key, ModifierKeys>, Action> _shortcuts;
         private ICanvas _canvas;
-        //IEditor _lineEditor;
-        //IEditor _BezierEditor;
-        //IEditor _quadraticBezierEditor;
-        //IEditor _arcEditor;
-        //IEditor _rectangleEditor;
-        //IEditor _ellipseEditor;
 
         private INative CreateGridLine(double x1, double y1, double x2, double y2)
         {
@@ -1893,13 +1887,6 @@ namespace RxCanvas
             Layout.Children.Add(_canvas.Native as UIElement);
             CreateGrid(_canvas, 600.0, 600.0, 30.0, 0.0, 0.0);
 
-            //_lineEditor = new PortableXLineEditor(_canvas) { IsEnabled = true };
-            //_BezierEditor = new PortableXBezierEditor(_canvas) { IsEnabled = false };
-            //_quadraticBezierEditor = new PortableXQuadraticBezierEditor(_canvas) { IsEnabled = false };
-            //_arcEditor = new PortableXArcEditor(_canvas) { IsEnabled = false };
-            //_ellipseEditor = new PortableXCanvasEllipseEditor(_canvas) { IsEnabled = false };
-            //_rectangleEditor = new PortableXCanvasRectangleEditor(_canvas) { IsEnabled = false };
-
             PreviewKeyDown += (sender, e) =>
             {
                 Action action;
@@ -1908,70 +1895,6 @@ namespace RxCanvas
                 {
                     action();
                 }
-
-                /*
-                switch (e.Key)
-                {
-                    // Line
-                    case Key.L:
-                        _lineEditor.IsEnabled = true;
-                        _BezierEditor.IsEnabled = false;
-                        _quadraticBezierEditor.IsEnabled = false;
-                        _arcEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = false;
-                        _ellipseEditor.IsEnabled = false;
-                        break;
-                    // Bezier
-                    case Key.B:
-                        _lineEditor.IsEnabled = false;
-                        _BezierEditor.IsEnabled = true;
-                        _quadraticBezierEditor.IsEnabled = false;
-                        _arcEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = false;
-                        _ellipseEditor.IsEnabled = false;
-                        break;
-                    // QuadraticBezier
-                    case Key.Q:
-                        _lineEditor.IsEnabled = false;
-                        _BezierEditor.IsEnabled = false;
-                        _quadraticBezierEditor.IsEnabled = true;
-                        _arcEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = false;
-                        _ellipseEditor.IsEnabled = false;
-                        break;
-                    // Arc
-                    case Key.A:
-                        _lineEditor.IsEnabled = false;
-                        _BezierEditor.IsEnabled = false;
-                        _quadraticBezierEditor.IsEnabled = false;
-                        _arcEditor.IsEnabled = true;
-                        _rectangleEditor.IsEnabled = false;
-                        _ellipseEditor.IsEnabled = false;
-                        break;
-                    // Rectangle
-                    case Key.R:
-                        _lineEditor.IsEnabled = false;
-                        _BezierEditor.IsEnabled = false;
-                        _quadraticBezierEditor.IsEnabled = false;
-                        _arcEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = true;
-                        _ellipseEditor.IsEnabled = false;
-                        break;
-                    // Ellipse
-                    case Key.E:
-                        _lineEditor.IsEnabled = false;
-                        _BezierEditor.IsEnabled = false;
-                        _quadraticBezierEditor.IsEnabled = false;
-                        _arcEditor.IsEnabled = false;
-                        _rectangleEditor.IsEnabled = false;
-                        _ellipseEditor.IsEnabled = true;
-                        break;
-                    // Toggle EnableSnap
-                    case Key.S:
-                        _canvas.EnableSnap = _canvas.EnableSnap ? false : true;
-                        break;
-                }
-                */
             };
         }
     }
