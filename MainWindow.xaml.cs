@@ -12,7 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
 using System.Diagnostics;
+using System.Reflection;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Joins;
@@ -25,7 +27,6 @@ using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Features;
 using Autofac.Util;
-using System.Reflection;
 
 namespace RxCanvas
 {
