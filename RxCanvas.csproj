@@ -126,6 +126,24 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="RxCanvas.Core\RxCanvas.Core.csproj">
+      <Project>{9bdd1a2b-3d2f-43ea-9df6-e79ea243b490}</Project>
+      <Name>RxCanvas.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="RxCanvas.Editors\RxCanvas.Editors.csproj">
+      <Project>{712f124c-a263-4c22-8369-b7f84cafd7a4}</Project>
+      <Name>RxCanvas.Editors</Name>
+    </ProjectReference>
+    <ProjectReference Include="RxCanvas.Model\RxCanvas.Model.csproj">
+      <Project>{714a5c10-b8f4-49ec-bed6-1123ca7b7a04}</Project>
+      <Name>RxCanvas.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="RxCanvas.Xaml\RxCanvas.Xaml.csproj">
+      <Project>{1153080c-2d0c-42ed-9880-5762fb1717b1}</Project>
+      <Name>RxCanvas.Xaml</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
