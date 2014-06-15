@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Microsoft.Win32;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reactive.Concurrency;
@@ -27,7 +29,7 @@ using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Features;
 using Autofac.Util;
-using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
 namespace RxCanvas
 {
@@ -1646,8 +1648,14 @@ namespace RxCanvas
 
         public bool IsFilled
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _fill.A == 0xFF; }
+            set
+            {
+                _fill.A = (value == true) ? (byte)0xFF : (byte)0x00;
+                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush.Freeze();
+                _rectangle.Fill = _fillBrush;
+            }
         }
     }
 
@@ -1743,8 +1751,14 @@ namespace RxCanvas
 
         public bool IsFilled
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return _fill.A == 0xFF; }
+            set 
+            { 
+                _fill.A = (value == true) ? (byte)0xFF : (byte)0x00;
+                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush.Freeze();
+                _ellipse.Fill = _fillBrush;
+            }
         }
     }
 
@@ -2037,6 +2051,36 @@ namespace RxCanvas
                 {
                     var canvas = _drawingScope.Resolve<ICanvas>();
                     canvas.EnableSnap = canvas.EnableSnap ? false : true;
+                });
+
+            // add save shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () =>
+                {
+                    var canvas = _drawingScope.Resolve<ICanvas>();
+                    var dlg = new SaveFileDialog()
+                    {
+                        Filter = "Json File (*.json)|*.json",
+                        FileName = "children"
+                    };
+
+                    if (dlg.ShowDialog() == true)
+                    {
+                        var path = dlg.FileName;
+                        var json = JsonConvert.SerializeObject(canvas.Children, 
+                            Formatting.Indented, 
+                            new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
+                        using(var fs = System.IO.File.Create(path))
+                        {
+                            using(var writer = new System.IO.StreamWriter(fs))
+                            {
+                                writer.Write(json);
+                            }
+                        }
+                    }
                 });
 
             // add canvas to root layout
