@@ -161,6 +161,7 @@ namespace RxCanvas
 
         void Add(INative value);
         void Remove(INative value);
+        void Clear();
     }
 
     public interface IEditor
@@ -318,6 +319,11 @@ namespace RxCanvas
             get { throw new NotImplementedException(); }
         }
 
+        public XCanvas()
+        {
+            Children = new ObservableCollection<INative>();
+        }
+
         public void Capture()
         {
             throw new NotImplementedException();
@@ -330,12 +336,17 @@ namespace RxCanvas
 
         public void Add(INative value)
         {
-            throw new NotImplementedException();
+            Children.Add(value);
         }
 
         public void Remove(INative value)
         {
-            throw new NotImplementedException();
+            Children.Remove(value);
+        }
+
+        public void Clear()
+        {
+            Children.Clear();
         }
     }
 
@@ -1893,6 +1904,12 @@ namespace RxCanvas
             _canvas.Children.Remove(value.Native as UIElement);
             Children.Remove(value);
         }
+
+        public void Clear()
+        {
+            _canvas.Children.Clear();
+            Children.Clear();
+        }
     }
 
     public class WpfNativeFactory : INativeFactory
@@ -2081,6 +2098,16 @@ namespace RxCanvas
                             }
                         }
                     }
+                });
+
+            // add clear shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Delete"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () =>
+                {
+                    var canvas = _drawingScope.Resolve<ICanvas>();
+                    canvas.Clear();
                 });
 
             // add canvas to root layout
