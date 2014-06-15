@@ -17,6 +17,7 @@ using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Joins;
@@ -2037,78 +2038,7 @@ namespace RxCanvas
             _editors.Where(e => e.Name == "Line").FirstOrDefault().IsEnabled = true;
 
             // initialize shortcuts
-            _shortcuts = new Dictionary<Tuple<Key, ModifierKeys>, Action>();
-
-            // initialize key converters
-            var keyConverter = new KeyConverter();
-            var modifiersKeyConverter = new ModifierKeysConverter();
-
-            // add editor shortcuts
-            foreach (var editor in _editors)
-            {
-                var _editor = editor;
-                _shortcuts.Add(
-                    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key),
-                                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
-                    () =>
-                    {
-                        foreach (var e in _editors)
-                        {
-                            e.IsEnabled = false;
-                        };
-                        _editor.IsEnabled = true;
-                    });
-            }
-
-            // add snap shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
-                () =>
-                {
-                    var canvas = _drawingScope.Resolve<ICanvas>();
-                    canvas.EnableSnap = canvas.EnableSnap ? false : true;
-                });
-
-            // add save shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () =>
-                {
-                    var canvas = _drawingScope.Resolve<ICanvas>();
-                    var dlg = new SaveFileDialog()
-                    {
-                        Filter = "Json File (*.json)|*.json",
-                        FileName = "children"
-                    };
-
-                    if (dlg.ShowDialog() == true)
-                    {
-                        var path = dlg.FileName;
-                        var json = JsonConvert.SerializeObject(canvas.Children, 
-                            Formatting.Indented, 
-                            new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-
-                        using(var fs = System.IO.File.Create(path))
-                        {
-                            using(var writer = new System.IO.StreamWriter(fs))
-                            {
-                                writer.Write(json);
-                            }
-                        }
-                    }
-                });
-
-            // add clear shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Delete"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () =>
-                {
-                    var canvas = _drawingScope.Resolve<ICanvas>();
-                    canvas.Clear();
-                });
+            InitlializeShortucts();
 
             // add canvas to root layout
             Layout.Children.Add(_backgroundCanvas.Native as UIElement);
@@ -2129,6 +2059,91 @@ namespace RxCanvas
             };
 
             DataContext = _drawingCanvas;
+        }
+
+        private void InitlializeShortucts()
+        {
+            // shortcuts dictionary
+            _shortcuts = new Dictionary<Tuple<Key, ModifierKeys>, Action>();
+
+            // key converters
+            var keyConverter = new KeyConverter();
+            var modifiersKeyConverter = new ModifierKeysConverter();
+
+            // editor shortcuts
+            foreach (var editor in _editors)
+            {
+                var _editor = editor;
+                _shortcuts.Add(
+                    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key),
+                                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
+                    () => EnableEditor(_editor));
+            }
+
+            // snap shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
+                () => ToggleSpan());
+
+            // save shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => SaveJson());
+
+            // clear shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Delete"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Clear());
+        }
+
+        private void EnableEditor(IEditor _editor)
+        {
+            foreach (var editor in _editors)
+            {
+                editor.IsEnabled = false;
+            };
+            _editor.IsEnabled = true;
+        }
+
+        private void ToggleSpan()
+        {
+            var canvas = _drawingScope.Resolve<ICanvas>();
+            canvas.EnableSnap = canvas.EnableSnap ? false : true;
+        }
+
+        private void SaveJson()
+        {
+            var canvas = _drawingScope.Resolve<ICanvas>();
+            var dlg = new SaveFileDialog()
+            {
+                Filter = "Json File (*.json)|*.json",
+                FileName = "children"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                var path = dlg.FileName;
+                var json = JsonConvert.SerializeObject(canvas.Children,
+                    Formatting.Indented,
+                    new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
+                using (var fs = System.IO.File.Create(path))
+                {
+                    using (var writer = new System.IO.StreamWriter(fs))
+                    {
+                        writer.Write(json);
+                    }
+                }
+            }
+        }
+
+        private void Clear()
+        {
+            var canvas = _drawingScope.Resolve<ICanvas>();
+            canvas.Clear();
         }
     }
 }
