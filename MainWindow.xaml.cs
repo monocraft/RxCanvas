@@ -53,34 +53,39 @@ namespace RxCanvas
             RegisterAndBuild();
         }
 
-        private INative CreateGridLine(INativeFactory nativeFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
+        private INative CreateGridLine(INativeFactory nf, IPortableFactory pf, IColor stroke,  double thickness,  double x1, double y1,  double x2, double y2)
         {
-            var xline = new XLine()
-            {
-                X1 = x1,
-                Y1 = y1,
-                X2 = x2,
-                Y2 = y2,
-                Stroke = stroke,
-                StrokeThickness = thickness,
-            };
-            return nativeFactory.CreateLine(xline);
+            var xline = pf.CreateLine();
+            xline.X1 = x1;
+            xline.Y1 = y1;
+            xline.X2 = x2;
+            xline.Y2 = y2;
+            xline.Stroke = stroke;
+            xline.StrokeThickness = thickness;
+            return nf.CreateLine(xline);
         }
 
         private void CreateGrid(ICanvas canvas, double width, double height, double size, double originX, double originY)
         {
-            INativeFactory nativeFactory = _backgroundScope.Resolve<INativeFactory>();
-            IColor stroke = new XColor(0xFF, 0xE8, 0xE8, 0xE8);
+            var nf = _backgroundScope.Resolve<INativeFactory>();
+            var pf = _backgroundScope.Resolve<IPortableFactory>();
+
             double thickness = 2.0;
+
+            var stroke = pf.CreateColor();
+            stroke.A = 0xFF;
+            stroke.R = 0xE8;
+            stroke.G = 0xE8;
+            stroke.B = 0xE8;
 
             for (double y = size; y < height; y += size)
             {
-                canvas.Add(CreateGridLine(nativeFactory, stroke, thickness, originX, y, width, y));
+                canvas.Add(CreateGridLine(nf, pf, stroke, thickness, originX, y, width, y));
             }
 
             for (double x = size; x < width; x += size)
             {
-                canvas.Add(CreateGridLine(nativeFactory, stroke, thickness, x, originY, x, height));
+                canvas.Add(CreateGridLine(nf, pf, stroke, thickness, x, originY, x, height));
             }
         }
 

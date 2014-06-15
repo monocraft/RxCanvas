@@ -145,6 +145,8 @@ namespace RxCanvas.Core
 
     public interface IPortableFactory
     {
+        IColor CreateColor();
+        IPoint CreatePoint();
         ILine CreateLine();
         IBezier CreateBezier();
         IQuadraticBezier CreateQuadraticBezier();
@@ -164,5 +166,4 @@ namespace RxCanvas.Core
         IEllipse CreateEllipse(IEllipse ellipse);
         ICanvas CreateCanvas(ICanvas canvas);
     }
-
 }

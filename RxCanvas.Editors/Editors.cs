@@ -621,6 +621,16 @@ namespace RxCanvas.Editors
 
     public class PortableXDefaultsFactory : IPortableFactory
     {
+        public IColor CreateColor()
+        {
+            return new XColor(0x00, 0x00, 0x00, 0x00);
+        }
+
+        public IPoint CreatePoint()
+        {
+            return new XPoint(0.0, 0.0);
+        }
+
         public ILine CreateLine()
         {
             return new XLine()
