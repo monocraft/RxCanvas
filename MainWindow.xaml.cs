@@ -155,7 +155,7 @@ namespace RxCanvas
         double SnapX { get; set; }
         double SnapY { get; set; }
 
-        bool IsCaptured { get; }
+        bool IsCaptured { get; set; }
 
         void Capture();
         void ReleaseCapture();
@@ -315,10 +315,7 @@ namespace RxCanvas
         public double SnapX { get; set; }
         public double SnapY { get; set; }
 
-        public bool IsCaptured 
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public bool IsCaptured { get; set; }
 
         public XCanvas()
         {
@@ -327,12 +324,12 @@ namespace RxCanvas
 
         public void Capture()
         {
-            throw new NotImplementedException();
+            IsCaptured = true;
         }
 
         public void ReleaseCapture()
         {
-            throw new NotImplementedException();
+            IsCaptured = false;
         }
 
         public void Add(INative value)
@@ -1882,6 +1879,7 @@ namespace RxCanvas
         public bool IsCaptured
         {
             get { return Mouse.Captured == _canvas; }
+            set { _canvas.CaptureMouse(); }
         }
 
         public void Capture()
@@ -2034,7 +2032,7 @@ namespace RxCanvas
             _drawingCanvas = _drawingScope.Resolve<ICanvas>();
             _editors = _drawingScope.Resolve<ICollection<IEditor>>();
 
-            // initialize editors
+            // set default editor
             _editors.Where(e => e.Name == "Line").FirstOrDefault().IsEnabled = true;
 
             // initialize shortcuts
@@ -2044,10 +2042,10 @@ namespace RxCanvas
             Layout.Children.Add(_backgroundCanvas.Native as UIElement);
             Layout.Children.Add(_drawingCanvas.Native as UIElement);
 
-            // add grid to canvas
+            // create grid canvas
             CreateGrid(_backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
 
-            // handle user input
+            // handle keyboard input
             PreviewKeyDown += (sender, e) =>
             {
                 Action action;
@@ -2058,6 +2056,7 @@ namespace RxCanvas
                 }
             };
 
+            // set data context
             DataContext = _drawingCanvas;
         }
 
