@@ -62,42 +62,6 @@ namespace RxCanvas
             }
         }
 
-        private INative CreateGridLine(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
-        {
-            var xline = canvasFactory.CreateLine();
-            xline.X1 = x1;
-            xline.Y1 = y1;
-            xline.X2 = x2;
-            xline.Y2 = y2;
-            xline.Stroke = stroke;
-            xline.StrokeThickness = thickness;
-            return nativeConverter.Convert(xline);
-        }
-
-        private void CreateGrid(ICanvas canvas, double width, double height, double size, double originX, double originY)
-        {
-            var nativeConverter = _backgroundScope.Resolve<IModelToNativeConverter>();
-            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
-
-            double thickness = 2.0;
-
-            var stroke = canvasFactory.CreateColor();
-            stroke.A = 0xFF;
-            stroke.R = 0xE8;
-            stroke.G = 0xE8;
-            stroke.B = 0xE8;
-
-            for (double y = size; y < height; y += size)
-            {
-                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, originX, y, width, y));
-            }
-
-            for (double x = size; x < width; x += size)
-            {
-                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, x, originY, x, height));
-            }
-        }
-
         private void RegisterAndBuild()
         {
             // register components
@@ -109,10 +73,10 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-
-            builder.Register<ICoreToModelConverter>(f => new CoreToModelConverter()).InstancePerLifetimeScope();
-            builder.Register<IModelToNativeConverter>(f => new ModelToWpfConverter()).InstancePerLifetimeScope();
-            builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).InstancePerLifetimeScope();
+            builder.Register<ICanvasSerializer>(f => new JsonXModelSerializer()).SingleInstance();
+            builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
+            builder.Register<IModelToNativeConverter>(f => new XModelToWpfConverter()).SingleInstance();
+            builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).SingleInstance();
 
             builder.Register<ICanvas>(c =>
             {
@@ -142,7 +106,7 @@ namespace RxCanvas
             Layout.Children.Add(_drawingCanvas.Native as UIElement);
 
             // create grid canvas
-            CreateGrid(_backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
+            CreateGrid();
 
             // handle keyboard input
             PreviewKeyDown += (sender, e) =>
@@ -204,6 +168,46 @@ namespace RxCanvas
                 () => Clear());
         }
 
+        private void CreateGrid()
+        {
+            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
+            var nativeConverter = _backgroundScope.Resolve<IModelToNativeConverter>();
+            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
+            CreateGrid(nativeConverter, canvasFactory, backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
+        }
+
+        private INative CreateGridLine(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
+        {
+            var xline = canvasFactory.CreateLine();
+            xline.X1 = x1;
+            xline.Y1 = y1;
+            xline.X2 = x2;
+            xline.Y2 = y2;
+            xline.Stroke = stroke;
+            xline.StrokeThickness = thickness;
+            return nativeConverter.Convert(xline);
+        }
+
+        private void CreateGrid(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas, double width, double height, double size, double originX, double originY)
+        {
+            double thickness = 2.0;
+            var stroke = canvasFactory.CreateColor();
+            stroke.A = 0xFF;
+            stroke.R = 0xE8;
+            stroke.G = 0xE8;
+            stroke.B = 0xE8;
+
+            for (double y = size; y < height; y += size)
+            {
+                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, originX, y, width, y));
+            }
+
+            for (double x = size; x < width; x += size)
+            {
+                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, x, originY, x, height));
+            }
+        }
+
         private void EnableEditor(IEditor _editor)
         {
             foreach (var editor in _editors)
@@ -228,7 +232,55 @@ namespace RxCanvas
 
             if (dlg.ShowDialog() == true)
             {
-                OpenJson(dlg.FileName);
+                var canvasSerializer = _drawingScope.Resolve<ICanvasSerializer>();
+                var xcanvas = canvasSerializer.Deserialize(dlg.FileName);
+                ConvertToNative(xcanvas);
+            }
+        }
+
+        private void ConvertToNative(ICanvas xcanvas)
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
+
+            drawingCanvas.Clear();
+
+            foreach (var child in xcanvas.Children)
+            {
+                if (child is ILine)
+                {
+                    var native = nativeConverter.Convert(child as ILine);
+                    drawingCanvas.Add(native);
+                }
+                else if (child is IBezier)
+                {
+                    var native = nativeConverter.Convert(child as IBezier);
+                    drawingCanvas.Add(native);
+                }
+                else if (child is IQuadraticBezier)
+                {
+                    var native = nativeConverter.Convert(child as IQuadraticBezier);
+                    drawingCanvas.Add(native);
+                }
+                else if (child is IArc)
+                {
+                    var native = nativeConverter.Convert(child as IArc);
+                    drawingCanvas.Add(native);
+                }
+                else if (child is IRectangle)
+                {
+                    var native = nativeConverter.Convert(child as IRectangle);
+                    drawingCanvas.Add(native);
+                }
+                else if (child is IEllipse)
+                {
+                    var native = nativeConverter.Convert(child as IEllipse);
+                    drawingCanvas.Add(native);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
             }
         }
 
@@ -242,11 +294,50 @@ namespace RxCanvas
 
             if (dlg.ShowDialog() == true)
             {
-                SaveJson(dlg.FileName);
+                var canvasSerializer = _drawingScope.Resolve<ICanvasSerializer>();
+                var canvas = ConvertToModel();
+                canvasSerializer.Serialize(dlg.FileName, canvas);
             }
         }
 
-        private void OpenJson(string path)
+        private ICanvas ConvertToModel()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var modelConverter = _drawingScope.Resolve<ICoreToModelConverter>();
+            var canvas = modelConverter.Convert(drawingCanvas);
+            return canvas;
+        }
+
+        private void Clear()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            drawingCanvas.Clear();
+        }
+    }
+
+    public class JsonXModelSerializer : ICanvasSerializer
+    {
+        public void Serialize(string path, ICanvas canvas)
+        {
+            var json = JsonConvert.SerializeObject(canvas,
+                Formatting.Indented,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+                });
+
+            using (var fs = System.IO.File.Create(path))
+            {
+                using (var writer = new System.IO.StreamWriter(fs))
+                {
+                    writer.Write(json);
+                }
+            }
+        }
+
+        public ICanvas Deserialize(string path)
         {
             string json;
 
@@ -266,89 +357,7 @@ namespace RxCanvas
                     TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
                 });
 
-            ConvertToNative(canvas);
-        }
-
-        private void SaveJson(string path)
-        {
-            var canvas = ConvertToModel();
-
-            var json = JsonConvert.SerializeObject(canvas,
-                Formatting.Indented,
-                new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    TypeNameHandling = TypeNameHandling.Auto,
-                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-                });
-
-            using (var fs = System.IO.File.Create(path))
-            {
-                using (var writer = new System.IO.StreamWriter(fs))
-                {
-                    writer.Write(json);
-                }
-            }
-        }
-
-        private void ConvertToNative(ICanvas canvas)
-        {
-            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
-            var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
-
-            nativeCanvas.Clear();
-
-            foreach (var child in canvas.Children)
-            {
-                if (child is ILine)
-                {
-                    var native = nativeConverter.Convert(child as ILine);
-                    nativeCanvas.Add(native);
-                }
-                else if (child is IBezier)
-                {
-                    var native = nativeConverter.Convert(child as IBezier);
-                    nativeCanvas.Add(native);
-                }
-                else if (child is IQuadraticBezier)
-                {
-                    var native = nativeConverter.Convert(child as IQuadraticBezier);
-                    nativeCanvas.Add(native);
-                }
-                else if (child is IArc)
-                {
-                    var native = nativeConverter.Convert(child as IArc);
-                    nativeCanvas.Add(native);
-                }
-                else if (child is IRectangle)
-                {
-                    var native = nativeConverter.Convert(child as IRectangle);
-                    nativeCanvas.Add(native);
-                }
-                else if (child is IEllipse)
-                {
-                    var native = nativeConverter.Convert(child as IEllipse);
-                    nativeCanvas.Add(native);
-                }
-                else
-                {
-                    throw new NotSupportedException();
-                }
-            }
-        }
-
-        private ICanvas ConvertToModel()
-        {
-            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
-            var modelConverter = _drawingScope.Resolve<ICoreToModelConverter>();
-            var canvas = modelConverter.Convert(nativeCanvas);
             return canvas;
-        }
-
-        private void Clear()
-        {
-            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
-            nativeCanvas.Clear();
         }
     }
 }

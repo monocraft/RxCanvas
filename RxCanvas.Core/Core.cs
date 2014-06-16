@@ -177,4 +177,10 @@ namespace RxCanvas.Core
         IEllipse Convert(IEllipse ellipse);
         ICanvas Convert(ICanvas canvas);
     }
+
+    public interface ICanvasSerializer
+    {
+        void Serialize(string path, ICanvas canvas);
+        ICanvas Deserialize(string path);
+    }
 }

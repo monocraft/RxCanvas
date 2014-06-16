@@ -949,7 +949,7 @@ namespace RxCanvas.Xaml
         }
     }
 
-    public class ModelToWpfConverter : IModelToNativeConverter
+    public class XModelToWpfConverter : IModelToNativeConverter
     {
         public ILine Convert(ILine line)
         {
