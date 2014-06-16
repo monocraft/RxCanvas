@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using System.Runtime.Serialization.Formatters;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
@@ -50,10 +51,18 @@ namespace RxCanvas
         public MainWindow()
         {
             InitializeComponent();
-            RegisterAndBuild();
+
+            try
+            {
+                RegisterAndBuild();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message + Environment.NewLine + ex.StackTrace);
+            }
         }
 
-        private INative CreateGridLine(INativeFactory nf, IPortableFactory pf, IColor stroke,  double thickness,  double x1, double y1,  double x2, double y2)
+        private INative CreateGridLine(ICanvasConverter nf, ICanvasFactory pf, IColor stroke,  double thickness,  double x1, double y1,  double x2, double y2)
         {
             var xline = pf.CreateLine();
             xline.X1 = x1;
@@ -62,13 +71,13 @@ namespace RxCanvas
             xline.Y2 = y2;
             xline.Stroke = stroke;
             xline.StrokeThickness = thickness;
-            return nf.CreateLine(xline);
+            return nf.Convert(xline);
         }
 
         private void CreateGrid(ICanvas canvas, double width, double height, double size, double originX, double originY)
         {
-            var nf = _backgroundScope.Resolve<INativeFactory>();
-            var pf = _backgroundScope.Resolve<IPortableFactory>();
+            var nf = _backgroundScope.Resolve<ICanvasConverter>();
+            var pf = _backgroundScope.Resolve<ICanvasFactory>();
 
             double thickness = 2.0;
 
@@ -100,15 +109,15 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            builder.Register<INativeFactory>(f => new WpfNativeFactory()).InstancePerLifetimeScope();
-            builder.Register<IPortableFactory>(f => new PortableXDefaultsFactory()).InstancePerLifetimeScope();
+            builder.Register<ICanvasConverter>(f => new ModelToWpfConverter()).InstancePerLifetimeScope();
+            builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).InstancePerLifetimeScope();
 
             builder.Register<ICanvas>(c =>
             {
-                var portableFactory = c.Resolve<IPortableFactory>();
+                var portableFactory = c.Resolve<ICanvasFactory>();
                 var xcanvas = portableFactory.CreateCanvas();
-                var nativeFactory = c.Resolve<INativeFactory>();
-                return nativeFactory.CreateCanvas(xcanvas);
+                var nativeFactory = c.Resolve<ICanvasConverter>();
+                return nativeFactory.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 
             // resolve dependencies
@@ -136,6 +145,7 @@ namespace RxCanvas
             // handle keyboard input
             PreviewKeyDown += (sender, e) =>
             {
+                //MessageBox.Show(Keyboard.Modifiers.ToString());
                 Action action;
                 bool result = _shortcuts.TryGetValue(new Tuple<Key, ModifierKeys>(e.Key, Keyboard.Modifiers), out action);
                 if (result == true && action != null)
@@ -203,19 +213,28 @@ namespace RxCanvas
 
         private void SaveJson()
         {
-            var canvas = _drawingScope.Resolve<ICanvas>();
+            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
+
+            var modelFactory = new CoreToModelConverter();
+            var canvas = modelFactory.Convert(nativeCanvas);
+
             var dlg = new SaveFileDialog()
             {
                 Filter = "Json File (*.json)|*.json",
-                FileName = "children"
+                FileName = "canvas"
             };
 
             if (dlg.ShowDialog() == true)
             {
                 var path = dlg.FileName;
-                var json = JsonConvert.SerializeObject(canvas.Children,
+                var json = JsonConvert.SerializeObject(canvas,
                     Formatting.Indented,
-                    new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                    new JsonSerializerSettings() 
+                    { 
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+                    });
 
                 using (var fs = System.IO.File.Create(path))
                 {

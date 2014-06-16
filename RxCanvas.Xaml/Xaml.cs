@@ -949,39 +949,39 @@ namespace RxCanvas.Xaml
         }
     }
 
-    public class WpfNativeFactory : INativeFactory
+    public class ModelToWpfConverter : ICanvasConverter
     {
-        public ILine CreateLine(ILine line)
+        public ILine Convert(ILine line)
         {
             return new WpfLine(line);
         }
 
-        public IBezier CreateBezier(IBezier bezier)
+        public IBezier Convert(IBezier bezier)
         {
             return new WpfBezier(bezier);
         }
 
-        public IQuadraticBezier CreateQuadraticBezier(IQuadraticBezier quadraticBezier)
+        public IQuadraticBezier Convert(IQuadraticBezier quadraticBezier)
         {
             return new WpfQuadraticBezier(quadraticBezier);
         }
 
-        public IArc CreateArc(IArc arc)
+        public IArc Convert(IArc arc)
         {
             return new WpfArc(arc);
         }
 
-        public IRectangle CreateRectangle(IRectangle rectangle)
+        public IRectangle Convert(IRectangle rectangle)
         {
             return new WpfRectangle(rectangle);
         }
 
-        public IEllipse CreateEllipse(IEllipse ellipse)
+        public IEllipse Convert(IEllipse ellipse)
         {
             return new WpfEllipse(ellipse);
         }
 
-        public ICanvas CreateCanvas(ICanvas canvas)
+        public ICanvas Convert(ICanvas canvas)
         {
             return new WpfCanvas(canvas);
         }
