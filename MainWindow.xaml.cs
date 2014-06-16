@@ -328,26 +328,12 @@ namespace RxCanvas
                     TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
                 });
 
-            using (var fs = System.IO.File.Create(path))
-            {
-                using (var writer = new System.IO.StreamWriter(fs))
-                {
-                    writer.Write(json);
-                }
-            }
+            Save(path, json);
         }
 
         public ICanvas Deserialize(string path)
         {
-            string json;
-
-            using (var fs = System.IO.File.Open(path, System.IO.FileMode.Open))
-            {
-                using (var reader = new System.IO.StreamReader(fs))
-                {
-                    json = reader.ReadToEnd();
-                }
-            }
+            string json = Open(path);
 
             var canvas = JsonConvert.DeserializeObject<XCanvas>(json,
                 new JsonSerializerSettings()
@@ -358,6 +344,30 @@ namespace RxCanvas
                 });
 
             return canvas;
+        }
+
+        private static string Open(string path)
+        {
+            string json;
+            using (var fs = System.IO.File.Open(path, System.IO.FileMode.Open))
+            {
+                using (var reader = new System.IO.StreamReader(fs))
+                {
+                    json = reader.ReadToEnd();
+                }
+            }
+            return json;
+        }
+
+        private static void Save(string path, string json)
+        {
+            using (var fs = System.IO.File.Create(path))
+            {
+                using (var writer = new System.IO.StreamWriter(fs))
+                {
+                    writer.Write(json);
+                }
+            }
         }
     }
 }
