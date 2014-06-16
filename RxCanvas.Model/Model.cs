@@ -168,7 +168,7 @@ namespace RxCanvas.Model
         }
     }
 
-    public class CoreToModelConverter : ICanvasConverter
+    public class CoreToModelConverter : ICoreToModelConverter
     {
         public IColor Convert(IColor color)
         {

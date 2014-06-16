@@ -25,7 +25,7 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public PortableXLineEditor(ICanvasConverter nativeFactory, ICanvasFactory portableFactory, ICanvas canvas)
+        public PortableXLineEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -60,12 +60,12 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _xline = portableFactory.CreateLine();
+                    _xline = canvasFactory.CreateLine();
                     _xline.X1 = p.X;
                     _xline.Y1 = p.Y;
                     _xline.X2 = p.X;
                     _xline.Y2 = p.Y;
-                    _line = nativeFactory.Convert(_xline);
+                    _line = nativeConverter.Convert(_xline);
                     _canvas.Add(_line);
                     _canvas.Capture();
                     _state = State.End;
@@ -112,7 +112,7 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public PortableXBezierEditor(ICanvasConverter nativeFactory, ICanvasFactory portableFactory, ICanvas canvas)
+        public PortableXBezierEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -172,7 +172,7 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _xb = portableFactory.CreateBezier();
+                    _xb = canvasFactory.CreateBezier();
                     _xb.Start.X = p.X;
                     _xb.Start.Y = p.Y;
                     _xb.Point1.X = p.X;
@@ -181,7 +181,7 @@ namespace RxCanvas.Editors
                     _xb.Point2.Y = p.Y;
                     _xb.Point3.X = p.X;
                     _xb.Point3.Y = p.Y;
-                    _b = nativeFactory.Convert(_xb);
+                    _b = nativeConverter.Convert(_xb);
                     _canvas.Add(_b);
                     _canvas.Capture();
                     _state = State.Start;
@@ -242,7 +242,7 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public PortableXQuadraticBezierEditor(ICanvasConverter nativeFactory, ICanvasFactory portableFactory, ICanvas canvas)
+        public PortableXQuadraticBezierEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -291,14 +291,14 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _xqb = portableFactory.CreateQuadraticBezier();
+                    _xqb = canvasFactory.CreateQuadraticBezier();
                     _xqb.Start.X = p.X;
                     _xqb.Start.Y = p.Y;
                     _xqb.Point1.X = p.X;
                     _xqb.Point1.Y = p.Y;
                     _xqb.Point2.X = p.X;
                     _xqb.Point2.Y = p.Y;
-                    _qb = nativeFactory.Convert(_xqb);
+                    _qb = nativeConverter.Convert(_xqb);
                     _canvas.Add(_qb);
                     _canvas.Capture();
                     _state = State.Start;
@@ -351,7 +351,7 @@ namespace RxCanvas.Editors
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public PortableXArcEditor(ICanvasConverter nativeFactory, ICanvasFactory portableFactory, ICanvas canvas)
+        public PortableXArcEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -384,10 +384,10 @@ namespace RxCanvas.Editors
                 else
                 {
                     _start = new ImmutablePoint(p.X, p.Y);
-                    _xarc = portableFactory.CreateArc();
+                    _xarc = canvasFactory.CreateArc();
                     _xarc.X = _start.X;
                     _xarc.Y = _start.Y;
-                    _arc = nativeFactory.Convert(_xarc);
+                    _arc = nativeConverter.Convert(_xarc);
                     _canvas.Add(_arc);
                     _canvas.Capture();
                     _state = State.Size;
@@ -446,7 +446,7 @@ namespace RxCanvas.Editors
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public PortableXCanvasRectangleEditor(ICanvasConverter nativeFactory, ICanvasFactory portableFactory, ICanvas canvas)
+        public PortableXCanvasRectangleEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -479,10 +479,10 @@ namespace RxCanvas.Editors
                 else
                 {
                     _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
-                    _xrectangle = portableFactory.CreateRectangle();
+                    _xrectangle = canvasFactory.CreateRectangle();
                     _xrectangle.X = _start.X;
                     _xrectangle.Y = _start.Y;
-                    _rectangle = nativeFactory.Convert(_xrectangle);
+                    _rectangle = nativeConverter.Convert(_xrectangle);
                     _canvas.Add(_rectangle);
                     _canvas.Capture();
                     _state = State.BottomRight;
@@ -541,7 +541,7 @@ namespace RxCanvas.Editors
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public PortableXCanvasEllipseEditor(ICanvasConverter nativeFactory, ICanvasFactory portableFactory, ICanvas canvas)
+        public PortableXCanvasEllipseEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -574,10 +574,10 @@ namespace RxCanvas.Editors
                 else
                 {
                     _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
-                    _xellipse = portableFactory.CreateEllipse();
+                    _xellipse = canvasFactory.CreateEllipse();
                     _xellipse.X = _start.X;
                     _xellipse.Y = _start.Y;
-                    _elllipse = nativeFactory.Convert(_xellipse);
+                    _elllipse = nativeConverter.Convert(_xellipse);
                     _canvas.Add(_elllipse);
                     _canvas.Capture();
                     _state = State.BottomRight;

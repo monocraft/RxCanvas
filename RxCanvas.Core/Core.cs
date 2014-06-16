@@ -156,7 +156,18 @@ namespace RxCanvas.Core
         ICanvas CreateCanvas();
     }
 
-    public interface ICanvasConverter
+    public interface ICoreToModelConverter
+    {
+        ILine Convert(ILine line);
+        IBezier Convert(IBezier bezier);
+        IQuadraticBezier Convert(IQuadraticBezier quadraticBezier);
+        IArc Convert(IArc arc);
+        IRectangle Convert(IRectangle rectangle);
+        IEllipse Convert(IEllipse ellipse);
+        ICanvas Convert(ICanvas canvas);
+    }
+
+    public interface IModelToNativeConverter
     {
         ILine Convert(ILine line);
         IBezier Convert(IBezier bezier);

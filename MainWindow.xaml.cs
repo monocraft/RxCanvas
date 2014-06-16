@@ -62,26 +62,26 @@ namespace RxCanvas
             }
         }
 
-        private INative CreateGridLine(ICanvasConverter nf, ICanvasFactory pf, IColor stroke,  double thickness,  double x1, double y1,  double x2, double y2)
+        private INative CreateGridLine(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
         {
-            var xline = pf.CreateLine();
+            var xline = canvasFactory.CreateLine();
             xline.X1 = x1;
             xline.Y1 = y1;
             xline.X2 = x2;
             xline.Y2 = y2;
             xline.Stroke = stroke;
             xline.StrokeThickness = thickness;
-            return nf.Convert(xline);
+            return nativeConverter.Convert(xline);
         }
 
         private void CreateGrid(ICanvas canvas, double width, double height, double size, double originX, double originY)
         {
-            var nf = _backgroundScope.Resolve<ICanvasConverter>();
-            var pf = _backgroundScope.Resolve<ICanvasFactory>();
+            var nativeConverter = _backgroundScope.Resolve<IModelToNativeConverter>();
+            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
 
             double thickness = 2.0;
 
-            var stroke = pf.CreateColor();
+            var stroke = canvasFactory.CreateColor();
             stroke.A = 0xFF;
             stroke.R = 0xE8;
             stroke.G = 0xE8;
@@ -89,12 +89,12 @@ namespace RxCanvas
 
             for (double y = size; y < height; y += size)
             {
-                canvas.Add(CreateGridLine(nf, pf, stroke, thickness, originX, y, width, y));
+                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, originX, y, width, y));
             }
 
             for (double x = size; x < width; x += size)
             {
-                canvas.Add(CreateGridLine(nf, pf, stroke, thickness, x, originY, x, height));
+                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, x, originY, x, height));
             }
         }
 
@@ -109,15 +109,17 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            builder.Register<ICanvasConverter>(f => new ModelToWpfConverter()).InstancePerLifetimeScope();
+
+            builder.Register<ICoreToModelConverter>(f => new CoreToModelConverter()).InstancePerLifetimeScope();
+            builder.Register<IModelToNativeConverter>(f => new ModelToWpfConverter()).InstancePerLifetimeScope();
             builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).InstancePerLifetimeScope();
 
             builder.Register<ICanvas>(c =>
             {
                 var portableFactory = c.Resolve<ICanvasFactory>();
                 var xcanvas = portableFactory.CreateCanvas();
-                var nativeFactory = c.Resolve<ICanvasConverter>();
-                return nativeFactory.Convert(xcanvas);
+                var nativeConverter = c.Resolve<IModelToNativeConverter>();
+                return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 
             // resolve dependencies
@@ -183,6 +185,12 @@ namespace RxCanvas
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
                 () => ToggleSpan());
 
+            // open shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("O"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => OpenJson());
+
             // save shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
@@ -211,13 +219,21 @@ namespace RxCanvas
             canvas.EnableSnap = canvas.EnableSnap ? false : true;
         }
 
+        private void OpenJson()
+        {
+            var dlg = new OpenFileDialog()
+            {
+                Filter = "Json File (*.json)|*.json",
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                OpenJson(dlg.FileName);
+            }
+        }
+
         private void SaveJson()
         {
-            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
-
-            var modelFactory = new CoreToModelConverter();
-            var canvas = modelFactory.Convert(nativeCanvas);
-
             var dlg = new SaveFileDialog()
             {
                 Filter = "Json File (*.json)|*.json",
@@ -226,30 +242,113 @@ namespace RxCanvas
 
             if (dlg.ShowDialog() == true)
             {
-                var path = dlg.FileName;
-                var json = JsonConvert.SerializeObject(canvas,
-                    Formatting.Indented,
-                    new JsonSerializerSettings() 
-                    { 
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-                    });
+                SaveJson(dlg.FileName);
+            }
+        }
 
-                using (var fs = System.IO.File.Create(path))
+        private void OpenJson(string path)
+        {
+            string json;
+
+            using (var fs = System.IO.File.Open(path, System.IO.FileMode.Open))
+            {
+                using (var reader = new System.IO.StreamReader(fs))
                 {
-                    using (var writer = new System.IO.StreamWriter(fs))
-                    {
-                        writer.Write(json);
-                    }
+                    json = reader.ReadToEnd();
+                }
+            }
+
+            var canvas = JsonConvert.DeserializeObject<XCanvas>(json,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+                });
+
+            ConvertToNative(canvas);
+        }
+
+        private void SaveJson(string path)
+        {
+            var canvas = ConvertToModel();
+
+            var json = JsonConvert.SerializeObject(canvas,
+                Formatting.Indented,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+                });
+
+            using (var fs = System.IO.File.Create(path))
+            {
+                using (var writer = new System.IO.StreamWriter(fs))
+                {
+                    writer.Write(json);
                 }
             }
         }
 
+        private void ConvertToNative(ICanvas canvas)
+        {
+            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
+            var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
+
+            nativeCanvas.Clear();
+
+            foreach (var child in canvas.Children)
+            {
+                if (child is ILine)
+                {
+                    var native = nativeConverter.Convert(child as ILine);
+                    nativeCanvas.Add(native);
+                }
+                else if (child is IBezier)
+                {
+                    var native = nativeConverter.Convert(child as IBezier);
+                    nativeCanvas.Add(native);
+                }
+                else if (child is IQuadraticBezier)
+                {
+                    var native = nativeConverter.Convert(child as IQuadraticBezier);
+                    nativeCanvas.Add(native);
+                }
+                else if (child is IArc)
+                {
+                    var native = nativeConverter.Convert(child as IArc);
+                    nativeCanvas.Add(native);
+                }
+                else if (child is IRectangle)
+                {
+                    var native = nativeConverter.Convert(child as IRectangle);
+                    nativeCanvas.Add(native);
+                }
+                else if (child is IEllipse)
+                {
+                    var native = nativeConverter.Convert(child as IEllipse);
+                    nativeCanvas.Add(native);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+            }
+        }
+
+        private ICanvas ConvertToModel()
+        {
+            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
+            var modelConverter = _drawingScope.Resolve<ICoreToModelConverter>();
+            var canvas = modelConverter.Convert(nativeCanvas);
+            return canvas;
+        }
+
         private void Clear()
         {
-            var canvas = _drawingScope.Resolve<ICanvas>();
-            canvas.Clear();
+            var nativeCanvas = _drawingScope.Resolve<ICanvas>();
+            nativeCanvas.Clear();
         }
     }
 }
