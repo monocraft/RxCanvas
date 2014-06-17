@@ -1,6 +1,7 @@
 ﻿<Window x:Class="RxCanvas.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:RxCanvas"
         Title="MainWindow" Height="700" Width="920"
         Background="White"
         WindowStartupLocation="CenterScreen"
@@ -12,6 +13,8 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <ListBox x:Name="Children" ItemsSource="{Binding Children}" Grid.Column="0" BorderBrush="{x:Null}" BorderThickness="0" FocusVisualStyle="{x:Null}"/>
-        <Grid x:Name="Layout" Grid.Column="1"/>
+        <local:PanAndZoomBorder ClipToBounds="True" Background="Transparent" Grid.Column="1">
+            <Grid x:Name="Layout"/>
+        </local:PanAndZoomBorder>
     </Grid>
 </Window>

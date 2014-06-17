@@ -178,9 +178,9 @@ namespace RxCanvas.Core
         ICanvas Convert(ICanvas canvas);
     }
 
-    public interface ICanvasSerializer
+    public interface ISerializer<T> where T : class
     {
-        void Serialize(string path, ICanvas canvas);
-        ICanvas Deserialize(string path);
+        void Serialize(string path, T item);
+        T Deserialize(string path);
     }
 }
