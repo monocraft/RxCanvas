@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9DD40808-5705-4CA4-9672-A23E5F585A61}</ProjectGuid>
+    <ProjectGuid>{D80AF44A-F33F-441E-9FD4-25781AEB25AA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RxCanvas.Json</RootNamespace>
-    <AssemblyName>RxCanvas.Json</AssemblyName>
+    <RootNamespace>RxCanvas.Creators</RootNamespace>
+    <AssemblyName>RxCanvas.Creators</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,12 +30,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="PdfSharp">
+      <HintPath>..\packages\PDFsharp.1.32.3057.0\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting">
+      <HintPath>..\packages\PDFsharp.1.32.3057.0\lib\net20\PdfSharp.Charting.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,17 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Json.cs" />
+    <Compile Include="Creators.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RxCanvas.Core\RxCanvas.Core.csproj">
       <Project>{9bdd1a2b-3d2f-43ea-9df6-e79ea243b490}</Project>
       <Name>RxCanvas.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RxCanvas.Model\RxCanvas.Model.csproj">
-      <Project>{714a5c10-b8f4-49ec-bed6-1123ca7b7a04}</Project>
-      <Name>RxCanvas.Model</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

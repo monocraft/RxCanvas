@@ -180,7 +180,17 @@ namespace RxCanvas.Core
 
     public interface ISerializer<T> where T : class
     {
+        string Name { get; set; }
+        string Extension { get; set; }
         void Serialize(string path, T item);
         T Deserialize(string path);
+    }
+
+    public interface ICreator<T> where T : class
+    {
+        string Name { get; set; }
+        string Extension { get; set; }
+        void Save(string path, T item);
+        void Save(string path, IEnumerable<T> items);
     }
 }

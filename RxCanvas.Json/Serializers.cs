@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization;
 
-namespace RxCanvas.Json
+namespace RxCanvas.Serializers
 {
     public class XModelSerializationBinder : SerializationBinder
     {
@@ -28,6 +28,15 @@ namespace RxCanvas.Json
 
     public class JsonXModelSerializer : ISerializer<ICanvas>
     {
+        public string Name { get; set; }
+        public string Extension { get; set; }
+
+        public JsonXModelSerializer()
+        {
+            Name = "Json";
+            Extension = "json";
+        }
+
         public void Serialize(string path, ICanvas canvas)
         {
             var json = JsonSerialize(canvas);

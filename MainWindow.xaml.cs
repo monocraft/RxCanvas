@@ -33,8 +33,8 @@ using RxCanvas.Core;
 using RxCanvas.Model;
 using RxCanvas.Editors;
 using RxCanvas.Xaml;
-using RxCanvas.Json;
-using RxCanvas.Pdf;
+using RxCanvas.Serializers;
+using RxCanvas.Creators;
 
 namespace RxCanvas
 {
@@ -44,6 +44,8 @@ namespace RxCanvas
         private ILifetimeScope _backgroundScope;
         private ILifetimeScope _drawingScope;
         private ICollection<IEditor> _editors;
+        private IList<ISerializer<ICanvas>> _serializers;
+        private IList<ICreator<ICanvas>> _creators;
         private IDictionary<Tuple<Key, ModifierKeys>, Action> _shortcuts;
         private ICanvas _backgroundCanvas;
         private ICanvas _drawingCanvas;
@@ -59,33 +61,48 @@ namespace RxCanvas
             // register components
             var builder = new ContainerBuilder();
 
-            var assembly = Assembly.GetAssembly(typeof(PortableXDefaultsFactory));
-            builder.RegisterAssemblyTypes(assembly)
+            var editorAssembly = Assembly.GetAssembly(typeof(PortableXDefaultsFactory));
+            builder.RegisterAssemblyTypes(editorAssembly)
                 .Where(t => t.Name.EndsWith("Editor"))
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            builder.Register<ISerializer<ICanvas>>(f => new JsonXModelSerializer()).SingleInstance();
+            var serializerAssembly = Assembly.GetAssembly(typeof(JsonXModelSerializer));
+            builder.RegisterAssemblyTypes(serializerAssembly)
+                .Where(t => t.Name.EndsWith("Serializer"))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            var creatorAssembly = Assembly.GetAssembly(typeof(CoreCanvasPdfCreator));
+            builder.RegisterAssemblyTypes(creatorAssembly)
+                .Where(t => t.Name.EndsWith("Creator"))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
             builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
             builder.Register<IModelToNativeConverter>(f => new XModelToWpfConverter()).SingleInstance();
             builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).SingleInstance();
 
             builder.Register<ICanvas>(c =>
             {
-                var portableFactory = c.Resolve<ICanvasFactory>();
-                var xcanvas = portableFactory.CreateCanvas();
+                var canvasFactory = c.Resolve<ICanvasFactory>();
+                var xcanvas = canvasFactory.CreateCanvas();
                 var nativeConverter = c.Resolve<IModelToNativeConverter>();
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 
-            // resolve dependencies
+            // create container ans scopes
             _container = builder.Build();
             _backgroundScope = _container.BeginLifetimeScope();
             _drawingScope = _container.BeginLifetimeScope();
 
+            // resolve dependencies
             _backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
             _drawingCanvas = _drawingScope.Resolve<ICanvas>();
+
             _editors = _drawingScope.Resolve<ICollection<IEditor>>();
+            _serializers = _drawingScope.Resolve<IList<ISerializer<ICanvas>>>();
+            _creators = _drawingScope.Resolve<IList<ICreator<ICanvas>>>();
 
             // set default editor
             _editors.Where(e => e.Name == "Line").FirstOrDefault().IsEnabled = true;
@@ -139,19 +156,19 @@ namespace RxCanvas
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
-                () => ToggleSpan());
+                () => ToggleSnap());
 
             // open shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("O"),
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => OpenJson());
+                () => Open());
 
             // save shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => SaveJson());
+                () => Save());
 
             // export shortcut
             _shortcuts.Add(
@@ -215,24 +232,89 @@ namespace RxCanvas
             _editor.IsEnabled = true;
         }
 
-        private void ToggleSpan()
+        private void ToggleSnap()
         {
             var canvas = _drawingScope.Resolve<ICanvas>();
             canvas.EnableSnap = canvas.EnableSnap ? false : true;
         }
 
-        private void OpenJson()
+        private void Open()
         {
+            bool first = true;
+            string filter = string.Empty;
+            foreach (var serializer in _serializers)
+            {
+                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
+                if (first == true)
+                {
+                    first = false;
+                }
+            }
+
             var dlg = new OpenFileDialog()
             {
-                Filter = "Json File (*.json)|*.json",
+                Filter = filter,
             };
 
             if (dlg.ShowDialog() == true)
             {
-                var canvasSerializer = _drawingScope.Resolve<ISerializer<ICanvas>>();
-                var xcanvas = canvasSerializer.Deserialize(dlg.FileName);
+                var serializer = _serializers[dlg.FilterIndex - 1];
+                var xcanvas = serializer.Deserialize(dlg.FileName);
                 ConvertToNative(xcanvas);
+            }
+        }
+
+        private void Save()
+        {
+            bool first = true;
+            string filter = string.Empty;
+            foreach (var serializer in _serializers)
+            {
+                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
+                if (first == true)
+                {
+                    first = false;
+                }
+            }
+
+            var dlg = new SaveFileDialog()
+            {
+                Filter = filter,
+                FileName = "canvas"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                var canvas = ConvertToModel();
+                var serializer = _serializers[dlg.FilterIndex - 1];
+                serializer.Serialize(dlg.FileName, canvas);
+            }
+        }
+
+        private void Export()
+        {
+            bool first = true;
+            string filter = string.Empty;
+            foreach(var creator in _creators)
+            {
+                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, creator.Name, creator.Extension);
+                if (first == true)
+                {
+                    first = false;
+                }
+            }
+
+            var dlg = new SaveFileDialog()
+            {
+                Filter = filter,
+                FileName = "canvas"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                var canvas = ConvertToModel();
+                var creator = _creators[dlg.FilterIndex - 1];
+                creator.Save(dlg.FileName, canvas);
             }
         }
 
@@ -282,45 +364,12 @@ namespace RxCanvas
             }
         }
 
-        private void SaveJson()
-        {
-            var dlg = new SaveFileDialog()
-            {
-                Filter = "Json File (*.json)|*.json",
-                FileName = "canvas"
-            };
-
-            if (dlg.ShowDialog() == true)
-            {
-                var canvasSerializer = _drawingScope.Resolve<ISerializer<ICanvas>>();
-                var canvas = ConvertToModel();
-                canvasSerializer.Serialize(dlg.FileName, canvas);
-            }
-        }
-
         private ICanvas ConvertToModel()
         {
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
             var modelConverter = _drawingScope.Resolve<ICoreToModelConverter>();
             var canvas = modelConverter.Convert(drawingCanvas);
             return canvas;
-        }
-
-        private void Export()
-        {
-            var dlg = new SaveFileDialog()
-            {
-                Filter = "Pdf File (*.pdf)|*.pdf",
-                FileName = "canvas"
-            };
-
-            if (dlg.ShowDialog() == true)
-            {
-                var canvasSerializer = _drawingScope.Resolve<ISerializer<ICanvas>>();
-                var canvas = ConvertToModel();
-                var writer = new PdfCreator();
-                writer.Save(dlg.FileName, canvas);
-            }
         }
 
         private void Clear()

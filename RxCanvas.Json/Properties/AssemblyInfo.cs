@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RxCanvas.Json")]
+[assembly: AssemblyTitle("RxCanvas.Serializers")]
 [assembly: AssemblyDescription("Create and edit 2D graphics primitives.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Wiesław Šoltés")]
-[assembly: AssemblyProduct("RxCanvas.Json")]
+[assembly: AssemblyProduct("RxCanvas.Serializers")]
 [assembly: AssemblyCopyright("Copyright © Wiesław Šoltés 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

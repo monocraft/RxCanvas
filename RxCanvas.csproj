@@ -136,17 +136,17 @@
       <Project>{712f124c-a263-4c22-8369-b7f84cafd7a4}</Project>
       <Name>RxCanvas.Editors</Name>
     </ProjectReference>
-    <ProjectReference Include="RxCanvas.Json\RxCanvas.Json.csproj">
+    <ProjectReference Include="RxCanvas.Json\RxCanvas.Serializers.csproj">
       <Project>{9dd40808-5705-4ca4-9672-a23e5f585a61}</Project>
-      <Name>RxCanvas.Json</Name>
+      <Name>RxCanvas.Serializers</Name>
     </ProjectReference>
     <ProjectReference Include="RxCanvas.Model\RxCanvas.Model.csproj">
       <Project>{714a5c10-b8f4-49ec-bed6-1123ca7b7a04}</Project>
       <Name>RxCanvas.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="RxCanvas.Pdf\RxCanvas.Pdf.csproj">
+    <ProjectReference Include="RxCanvas.Creators\RxCanvas.Creators.csproj">
       <Project>{d80af44a-f33f-441e-9fd4-25781aeb25aa}</Project>
-      <Name>RxCanvas.Pdf</Name>
+      <Name>RxCanvas.Creators</Name>
     </ProjectReference>
     <ProjectReference Include="RxCanvas.Xaml\RxCanvas.Xaml.csproj">
       <Project>{1153080c-2d0c-42ed-9880-5762fb1717b1}</Project>

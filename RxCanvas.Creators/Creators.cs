@@ -8,12 +8,21 @@ using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 
-namespace RxCanvas.Pdf
+namespace RxCanvas.Creators
 {
-    public class PdfCreator
+    public class CoreCanvasPdfCreator : ICreator<ICanvas>
     {
+        public string Name { get; set; }
+        public string Extension { get; set; }
+
         private Func<double, double> X;
         private Func<double, double> Y;
+
+        public CoreCanvasPdfCreator()
+        {
+            Name = "Pdf";
+            Extension = "pdf";
+        }
 
         public void Save(string path, ICanvas canvas)
         {
@@ -159,6 +168,28 @@ namespace RxCanvas.Pdf
                     throw new NotSupportedException();
                 }
             }
+        }
+    }
+
+    public class CoreCanvasDxfCreator : ICreator<ICanvas>
+    {
+        public string Name { get; set; }
+        public string Extension { get; set; }
+
+        public CoreCanvasDxfCreator()
+        {
+            Name = "Dxf";
+            Extension = "dxf";
+        }
+
+        public void Save(string path, ICanvas canvas)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Save(string path, IEnumerable<ICanvas> canvases)
+        {
+            throw new NotImplementedException();
         }
     }
 }

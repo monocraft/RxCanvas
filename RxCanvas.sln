@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Xaml", "RxCanvas.X
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Editors", "RxCanvas.Editors\RxCanvas.Editors.csproj", "{712F124C-A263-4C22-8369-B7F84CAFD7A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Json", "RxCanvas.Json\RxCanvas.Json.csproj", "{9DD40808-5705-4CA4-9672-A23E5F585A61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Serializers", "RxCanvas.Json\RxCanvas.Serializers.csproj", "{9DD40808-5705-4CA4-9672-A23E5F585A61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Pdf", "RxCanvas.Pdf\RxCanvas.Pdf.csproj", "{D80AF44A-F33F-441E-9FD4-25781AEB25AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Creators", "RxCanvas.Creators\RxCanvas.Creators.csproj", "{D80AF44A-F33F-441E-9FD4-25781AEB25AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
