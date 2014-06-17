@@ -136,7 +136,7 @@
       <Project>{712f124c-a263-4c22-8369-b7f84cafd7a4}</Project>
       <Name>RxCanvas.Editors</Name>
     </ProjectReference>
-    <ProjectReference Include="RxCanvas.Json\RxCanvas.Serializers.csproj">
+    <ProjectReference Include="RxCanvas.Serializers\RxCanvas.Serializers.csproj">
       <Project>{9dd40808-5705-4ca4-9672-a23e5f585a61}</Project>
       <Name>RxCanvas.Serializers</Name>
     </ProjectReference>
