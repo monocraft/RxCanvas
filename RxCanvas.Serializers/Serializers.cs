@@ -45,11 +45,11 @@ namespace RxCanvas.Serializers
         {
             if (objectType == typeof(IColor))
             {
-                string value = (string)reader.Value;
-                return new XColor(byte.Parse(value.Substring(1, 2), NumberStyles.HexNumber),
-                    byte.Parse(value.Substring(3, 2), NumberStyles.HexNumber),
-                    byte.Parse(value.Substring(5, 2), NumberStyles.HexNumber),
-                    byte.Parse(value.Substring(7, 2), NumberStyles.HexNumber));
+                string str = (string)reader.Value;
+                return new XColor(byte.Parse(str.Substring(1, 2), NumberStyles.HexNumber),
+                    byte.Parse(str.Substring(3, 2), NumberStyles.HexNumber),
+                    byte.Parse(str.Substring(5, 2), NumberStyles.HexNumber),
+                    byte.Parse(str.Substring(7, 2), NumberStyles.HexNumber));
             }
             throw new ArgumentException("objectType");
         }
