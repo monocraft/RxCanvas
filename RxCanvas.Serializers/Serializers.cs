@@ -36,20 +36,14 @@ namespace RxCanvas.Serializers
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var color = (IColor)value;
-            string str = string.Concat('#', color.A.ToString("X2"), color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
-            writer.WriteValue(str);
+            writer.WriteValue(((IColor)value).ToHtml());
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (objectType == typeof(IColor))
             {
-                string str = (string)reader.Value;
-                return new XColor(byte.Parse(str.Substring(1, 2), NumberStyles.HexNumber),
-                    byte.Parse(str.Substring(3, 2), NumberStyles.HexNumber),
-                    byte.Parse(str.Substring(5, 2), NumberStyles.HexNumber),
-                    byte.Parse(str.Substring(7, 2), NumberStyles.HexNumber));
+                return ((string)reader.Value).FromHtml();
             }
             throw new ArgumentException("objectType");
         }
@@ -57,8 +51,6 @@ namespace RxCanvas.Serializers
 
     public class XPointConverter : JsonConverter
     {
-        private static char[] Separators = new char[] { ';' };
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(IPoint) || objectType == typeof(XPoint);
@@ -66,18 +58,14 @@ namespace RxCanvas.Serializers
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var point = (IPoint)value;
-            string str = string.Concat(point.X.ToString(), Separators[0], point.Y.ToString());
-            writer.WriteValue(str);
+            writer.WriteValue(((IPoint)value).ToText());
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (objectType == typeof(IPoint))
             {
-                string str = (string)reader.Value;
-                string[] values = str.Split(Separators);
-                return new XPoint(double.Parse(values[0]), double.Parse(values[1]));
+                return ((string)reader.Value).FromText();
             }
             throw new ArgumentException("objectType");
         }

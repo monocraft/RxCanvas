@@ -30,35 +30,25 @@ namespace RxCanvas
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var color = (IColor)value;
-            return string.Concat('#', color.A.ToString("X2"), color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
+            return ((IColor)value).ToHtml();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string str = (string)value;
-            return new XColor(byte.Parse(str.Substring(1, 2), NumberStyles.HexNumber),
-                byte.Parse(str.Substring(3, 2), NumberStyles.HexNumber),
-                byte.Parse(str.Substring(5, 2), NumberStyles.HexNumber),
-                byte.Parse(str.Substring(7, 2), NumberStyles.HexNumber));
+            return ((string)value).FromHtml();
         }
     }
 
     public class XPointValueConverter : IValueConverter
     {
-        private static char[] Separators = new char[] { ';' };
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var point = (IPoint)value;
-            return string.Concat(point.X.ToString(), Separators[0], point.Y.ToString());
+            return ((IPoint)value).ToText();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string str = (string)value;
-            string[] values = str.Split(Separators);
-            return new XPoint(double.Parse(values[0]), double.Parse(values[1]));
+            return ((string)value).FromText();
         }
     }
 }
