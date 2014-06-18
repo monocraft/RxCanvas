@@ -135,6 +135,38 @@ namespace RxCanvas.Creators
             }
         }
 
+        private void DrawText(XGraphics gfx, IText text)
+        {
+            XPdfFontOptions options = new XPdfFontOptions(PdfFontEncoding.Unicode, PdfFontEmbedding.Always);
+            XFont font = new XFont("Calibri", Y(text.Size), XFontStyle.Regular, options);
+            XStringFormat format = new XStringFormat();
+            XRect rect = new XRect(X(text.X), Y(text.Y), X(text.Width), Y(text.Height));
+
+            switch (text.HorizontalAlignment)
+            {
+                case 0: format.Alignment = XStringAlignment.Near; break;
+                case 1: format.Alignment = XStringAlignment.Center; break;
+                case 2: format.Alignment = XStringAlignment.Far; break;
+            }
+
+            switch (text.VerticalAlignment)
+            {
+                case 0: format.LineAlignment = XLineAlignment.Near; break;
+                case 1: format.LineAlignment = XLineAlignment.Center; break;
+                case 2: format.LineAlignment = XLineAlignment.Far; break;
+            }
+
+            if (text.Backgroud.A != 0x00)
+            {
+                var brushBackground = new XSolidBrush(XColor.FromArgb(text.Backgroud.A, text.Backgroud.R, text.Backgroud.G, text.Backgroud.B));
+                gfx.DrawRectangle(brushBackground, rect);
+            }
+
+            var brushForeground = new XSolidBrush(XColor.FromArgb(text.Foreground.A, text.Foreground.R, text.Foreground.G, text.Foreground.B));
+            gfx.DrawString(text.Text, font, brushForeground, rect, format);
+
+        }
+
         private void DrawCanvas(XGraphics gfx, ICanvas canvas)
         {
             foreach (var child in canvas.Children)
@@ -162,6 +194,10 @@ namespace RxCanvas.Creators
                 else if (child is IEllipse)
                 {
                     DrawEllipse(gfx, child as IEllipse);
+                }
+                else if (child is IText)
+                {
+                    DrawText(gfx, child as IText);
                 }
                 else
                 {
