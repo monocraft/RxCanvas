@@ -37,8 +37,8 @@ namespace RxCanvas.Serializers
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var color = (IColor)value;
-            string hex = string.Concat('#', color.A.ToString("X2"), color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
-            writer.WriteValue(hex);
+            string str = string.Concat('#', color.A.ToString("X2"), color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
+            writer.WriteValue(str);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -67,16 +67,16 @@ namespace RxCanvas.Serializers
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var point = (IPoint)value;
-            string hex = string.Concat(point.X.ToString(), Separators[0], point.Y.ToString());
-            writer.WriteValue(hex);
+            string str = string.Concat(point.X.ToString(), Separators[0], point.Y.ToString());
+            writer.WriteValue(str);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (objectType == typeof(IPoint))
             {
-                string value = (string)reader.Value;
-                string[] values = value.Split(Separators);
+                string str = (string)reader.Value;
+                string[] values = str.Split(Separators);
                 return new XPoint(double.Parse(values[0]), double.Parse(values[1]));
             }
             throw new ArgumentException("objectType");
