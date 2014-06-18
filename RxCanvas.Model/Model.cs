@@ -284,6 +284,23 @@ namespace RxCanvas.Model
             };
         }
 
+        public IText Convert(IText text)
+        {
+            return new XText()
+            {
+                X = text.X,
+                Y = text.Y,
+                Width = text.Width,
+                Height = text.Height,
+                HorizontalAlignment = text.HorizontalAlignment,
+                VerticalAlignment = text.VerticalAlignment,
+                Size = text.Size,
+                Text = text.Text,
+                Backgroud = Convert(text.Backgroud),
+                Foreground = Convert(text.Foreground)
+            };
+        }
+
         public INative Convert(INative native)
         {
             if (native is ILine)
@@ -309,6 +326,10 @@ namespace RxCanvas.Model
             else if (native is IEllipse)
             {
                 return Convert(native as IEllipse);
+            }
+            else if (native is IText)
+            {
+                return Convert(native as IText);
             }
             else
             {

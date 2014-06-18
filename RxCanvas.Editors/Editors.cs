@@ -619,6 +619,101 @@ namespace RxCanvas.Editors
         }
     }
 
+    public class PortableXCanvasTextEditor : IEditor, IDisposable
+    {
+        public enum State { None, TopLeft, TopRight, BottomLeft, BottomRight }
+
+        public string Name { get; set; }
+        public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
+
+        private ICanvas _canvas;
+        private IText _xtext;
+        private IText _text;
+        private State _state = State.None;
+        private IDisposable _downs;
+        private IDisposable _drag;
+        private ImmutablePoint _start;
+
+        public PortableXCanvasTextEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        {
+            _canvas = canvas;
+
+            Name = "Text";
+            Key = "T";
+            Modifiers = "";
+
+            var dragMoves = from move in _canvas.Moves
+                            where _canvas.IsCaptured
+                            select move;
+
+            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
+
+            var dragPositions = from move in allPositions
+                                select move;
+
+            _downs = _canvas.Downs.Subscribe(p =>
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                if (_canvas.IsCaptured)
+                {
+                    UpdatePositionAndSize(p);
+                    _state = State.None;
+                    _canvas.ReleaseCapture();
+                }
+                else
+                {
+                    _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
+                    _xtext = canvasFactory.CreateText();
+                    _xtext.X = _start.X;
+                    _xtext.Y = _start.Y;
+                    _text = nativeConverter.Convert(_xtext);
+                    _canvas.Add(_text);
+                    _canvas.Capture();
+                    _state = State.BottomRight;
+                }
+            });
+
+            _drag = dragPositions.Subscribe(p =>
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                if (_state == State.BottomRight)
+                {
+                    UpdatePositionAndSize(p);
+                }
+            });
+        }
+
+        private void UpdatePositionAndSize(ImmutablePoint p)
+        {
+            double width = Math.Abs(p.X - _start.X);
+            double height = Math.Abs(p.Y - _start.Y);
+            _xtext.X = Math.Min(_start.X, p.X);
+            _xtext.Y = Math.Min(_start.Y, p.Y);
+            _xtext.Width = width + 1.0;
+            _xtext.Height = height + 1.0;
+            _text.X = _xtext.X;
+            _text.Y = _xtext.Y;
+            _text.Width = _xtext.Width;
+            _text.Height = _xtext.Height;
+        }
+
+        public void Dispose()
+        {
+            _downs.Dispose();
+            _drag.Dispose();
+        }
+    }
+
     public class PortableXDefaultsFactory : ICanvasFactory
     {
         public IColor CreateColor()
@@ -717,6 +812,23 @@ namespace RxCanvas.Editors
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 IsFilled = false
+            };
+        }
+
+        public IText CreateText()
+        {
+            return new XText()
+            {
+                X = 0.0,
+                Y = 0.0,
+                Width = 0.0,
+                Height = 0.0,
+                HorizontalAlignment = 1,
+                VerticalAlignment = 1,
+                Size = 11.0,
+                Text = "Text",
+                Foreground = new XColor(0xFF, 0x00, 0x00, 0x00),
+                Backgroud = new XColor(0x00, 0xFF, 0xFF, 0xFF),
             };
         }
 

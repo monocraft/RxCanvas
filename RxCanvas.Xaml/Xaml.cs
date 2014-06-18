@@ -809,6 +809,124 @@ namespace RxCanvas.Xaml
         }
     }
 
+    public class WpfText : IText
+    {
+        public object Native { get; set; }
+
+        private SolidColorBrush _foregroundBrush;
+        private SolidColorBrush _backgroundBrush;
+        private Grid _grid;
+        private TextBlock _tb;
+
+        private IColor _foreground;
+        private IColor _background;
+
+        public WpfText(IText text)
+        {
+            _foreground = text.Foreground;
+            _background = text.Backgroud;
+
+            _foregroundBrush = new SolidColorBrush(Color.FromArgb(_foreground.A, _foreground.R, _foreground.G, _foreground.B));
+            _foregroundBrush.Freeze();
+            _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+            _backgroundBrush.Freeze();
+
+            _grid = new Grid();
+            _grid.Background = _backgroundBrush;
+            _grid.Width = text.Width;
+            _grid.Height = text.Height;
+
+            _tb = new TextBlock();
+            _tb.HorizontalAlignment = (HorizontalAlignment)text.HorizontalAlignment;
+            _tb.VerticalAlignment = (VerticalAlignment)text.VerticalAlignment;
+            _tb.Background = _backgroundBrush;
+            _tb.Foreground = _foregroundBrush;
+            _tb.FontSize = text.Size;
+            _tb.FontFamily = new FontFamily("Calibri");
+            _tb.Text = text.Text;
+
+            _grid.Children.Add(_tb);
+
+            Canvas.SetLeft(_grid, text.X);
+            Canvas.SetTop(_grid, text.Y);
+
+            Native = _grid;
+        }
+
+        public double X
+        {
+            get { return Canvas.GetLeft(_grid); }
+            set { Canvas.SetLeft(_grid, value); }
+        }
+
+        public double Y
+        {
+            get { return Canvas.GetTop(_grid); }
+            set { Canvas.SetTop(_grid, value); }
+        }
+
+        public double Width
+        {
+            get { return _grid.Width; }
+            set { _grid.Width = value; }
+        }
+
+        public double Height
+        {
+            get { return _grid.Height; }
+            set { _grid.Height = value; }
+        }
+
+        public int HorizontalAlignment
+        {
+            get { return (int)_tb.HorizontalAlignment; }
+            set { _tb.HorizontalAlignment = (HorizontalAlignment)value; }
+        }
+
+        public int VerticalAlignment
+        {
+            get { return (int)_tb.VerticalAlignment; }
+            set { _tb.VerticalAlignment = (VerticalAlignment)value; }
+        }
+
+        public double Size
+        {
+            get { return _tb.FontSize; }
+            set { _tb.FontSize = value; }
+        }
+
+        public string Text
+        {
+            get { return _tb.Text; }
+            set { _tb.Text = value; }
+        }
+
+        public IColor Foreground
+        {
+            get { return _foreground; }
+            set
+            {
+                _foreground = value;
+                _foregroundBrush = new SolidColorBrush(Color.FromArgb(_foreground.A, _foreground.R, _foreground.G, _foreground.B));
+                _foregroundBrush.Freeze();
+                _tb.Foreground = _foregroundBrush;
+            }
+        }
+
+        public IColor Backgroud
+        {
+            get { return _background; }
+            set
+            {
+                _background = value;
+                _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+                _backgroundBrush.Freeze();
+                _grid.Background = _backgroundBrush;
+                _tb.Background = _backgroundBrush;
+            }
+        }
+    }
+
     public class WpfCanvas : ICanvas
     {
         public object Native { get; set; }
@@ -979,6 +1097,11 @@ namespace RxCanvas.Xaml
         public IEllipse Convert(IEllipse ellipse)
         {
             return new WpfEllipse(ellipse);
+        }
+
+        public IText Convert(IText text)
+        {
+            return new WpfText(text);
         }
 
         public ICanvas Convert(ICanvas canvas)

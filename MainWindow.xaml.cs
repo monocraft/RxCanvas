@@ -357,6 +357,11 @@ namespace RxCanvas
                     var native = nativeConverter.Convert(child as IEllipse);
                     drawingCanvas.Add(native);
                 }
+                else if (child is IText)
+                {
+                    var native = nativeConverter.Convert(child as IText);
+                    drawingCanvas.Add(native);
+                }
                 else
                 {
                     throw new NotSupportedException();
