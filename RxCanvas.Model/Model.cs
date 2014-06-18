@@ -117,6 +117,21 @@ namespace RxCanvas.Model
         public bool IsFilled { get; set; }
     }
 
+    public class XText : IText
+    {
+        public object Native { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public int HorizontalAlignment { get; set; }
+        public int VerticalAlignment { get; set; }
+        public double Size { get; set; }
+        public string Text { get; set; }
+        public IColor Foreground { get; set; }
+        public IColor Backgroud { get; set; }
+    }
+
     public class XCanvas : ICanvas
     {
         public object Native { get; set; }
