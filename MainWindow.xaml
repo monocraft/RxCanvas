@@ -12,7 +12,14 @@
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="Children" ItemsSource="{Binding Children}" Grid.Column="0" BorderBrush="{x:Null}" BorderThickness="0" FocusVisualStyle="{x:Null}"/>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ListBox x:Name="Children" Grid.Row="0" ItemsSource="{Binding Children}" HorizontalContentAlignment="Stretch" BorderBrush="{x:Null}" BorderThickness="0" FocusVisualStyle="{x:Null}"/>
+            <local:SelectedItemControl Grid.Row="1"  DataContext="{Binding ElementName=Children, Path=SelectedItem}"/>
+        </Grid>
         <local:PanAndZoomBorder ClipToBounds="True" Background="Transparent" Grid.Column="1">
             <Grid x:Name="Layout"/>
         </local:PanAndZoomBorder>
