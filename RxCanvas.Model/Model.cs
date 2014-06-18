@@ -1,10 +1,11 @@
-﻿using System;
+﻿using RxCanvas.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RxCanvas.Core;
 
 namespace RxCanvas.Model
 {
@@ -355,6 +356,35 @@ namespace RxCanvas.Model
             }
             xcanvas.Children = children;
             return xcanvas;
+        }
+    }
+
+    public static class ModelExtenstion
+    {
+        private static char[] Separators = new char[] { ';' };
+
+        public static IColor FromHtml(this string str)
+        {
+            return new XColor(byte.Parse(str.Substring(1, 2), NumberStyles.HexNumber),
+                byte.Parse(str.Substring(3, 2), NumberStyles.HexNumber),
+                byte.Parse(str.Substring(5, 2), NumberStyles.HexNumber),
+                byte.Parse(str.Substring(7, 2), NumberStyles.HexNumber));
+        }
+
+        public static string ToHtml(this IColor color)
+        {
+            return string.Concat('#', color.A.ToString("X2"), color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
+        }
+
+        public static string ToText(this IPoint point)
+        {
+            return string.Concat(point.X.ToString(), Separators[0], point.Y.ToString());
+        }
+
+        public static IPoint FromText(this string str)
+        {
+            string[] values = str.Split(Separators);
+            return new XPoint(double.Parse(values[0]), double.Parse(values[1]));
         }
     }
 }
