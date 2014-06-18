@@ -109,6 +109,20 @@ namespace RxCanvas.Core
         bool IsFilled { get; set; }
     }
 
+    public interface IText : INative
+    {
+        double X { get; set; }
+        double Y { get; set; }
+        double Width { get; set; }
+        double Height { get; set; }
+        int HorizontalAlignment { get; set; }
+        int VerticalAlignment { get; set; }
+        double Size { get; set; }
+        string Text { get; set; }
+        IColor Foreground { get; set; }
+        IColor Backgroud { get; set; }
+    }
+
     public interface ICanvas : INative
     {
         IObservable<ImmutablePoint> Downs { get; set; }
