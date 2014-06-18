@@ -65,7 +65,7 @@ namespace RxCanvas
             builder.RegisterAssemblyTypes(editorAssembly)
                 .Where(t => t.Name.EndsWith("Editor"))
                 .AsImplementedInterfaces()
-                .SingleInstance();
+                .InstancePerLifetimeScope();
 
             var serializerAssembly = Assembly.GetAssembly(typeof(JsonXModelSerializer));
             builder.RegisterAssemblyTypes(serializerAssembly)
