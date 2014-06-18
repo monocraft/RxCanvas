@@ -182,6 +182,10 @@ namespace RxCanvas.Model
         {
             Children.Clear();
         }
+
+        public void Render(INative context)
+        {
+        }
     }
 
     public class CoreToXModelConverter : ICoreToModelConverter

@@ -55,6 +55,7 @@ namespace RxCanvas.Editors
                     _xline.Y2 = p.Y;
                     _line.X2 = _xline.X2;
                     _line.Y2 = _xline.Y2;
+                    _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
                 }
@@ -68,6 +69,7 @@ namespace RxCanvas.Editors
                     _line = nativeConverter.Convert(_xline);
                     _canvas.Add(_line);
                     _canvas.Capture();
+                    _canvas.Render(null);
                     _state = State.End;
                 }
             });
@@ -85,6 +87,7 @@ namespace RxCanvas.Editors
                     _xline.Y2 = p.Y;
                     _line.X2 = _xline.X2;
                     _line.Y2 = _xline.Y2;
+                    _canvas.Render(null);
                 }
             });
         }
@@ -148,6 +151,7 @@ namespace RxCanvas.Editors
                                 _xb.Point2.X = p.X;
                                 _xb.Point2.Y = p.Y;
                                 _b.Point2 = _xb.Point2;
+                                _canvas.Render(null);
                                 _state = State.Point1;
                             }
                             break;
@@ -156,6 +160,7 @@ namespace RxCanvas.Editors
                                 _xb.Point1.X = p.X;
                                 _xb.Point1.Y = p.Y;
                                 _b.Point1 = _xb.Point1;
+                                _canvas.Render(null);
                                 _state = State.Point2;
                             }
                             break;
@@ -164,6 +169,7 @@ namespace RxCanvas.Editors
                                 _xb.Point2.X = p.X;
                                 _xb.Point2.Y = p.Y;
                                 _b.Point2 = _xb.Point2;
+                                _canvas.Render(null);
                                 _state = State.None;
                                 _canvas.ReleaseCapture();
                             }
@@ -183,6 +189,7 @@ namespace RxCanvas.Editors
                     _xb.Point3.Y = p.Y;
                     _b = nativeConverter.Convert(_xb);
                     _canvas.Add(_b);
+                    _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.Start;
                 }
@@ -203,18 +210,21 @@ namespace RxCanvas.Editors
                     _xb.Point2.X = p.X;
                     _xb.Point2.Y = p.Y;
                     _b.Point2 = _xb.Point2;
+                    _canvas.Render(null);
                 }
                 else if (_state == State.Point1)
                 {
                     _xb.Point1.X = p.X;
                     _xb.Point1.Y = p.Y;
                     _b.Point1 = _xb.Point1;
+                    _canvas.Render(null);
                 }
                 else if (_state == State.Point2)
                 {
                     _xb.Point2.X = p.X;
                     _xb.Point2.Y = p.Y;
                     _b.Point2 = _xb.Point2;
+                    _canvas.Render(null);
                 }
             });
         }
@@ -275,6 +285,7 @@ namespace RxCanvas.Editors
                                 _xqb.Point2.X = p.X;
                                 _xqb.Point2.Y = p.Y;
                                 _qb.Point2 = _xqb.Point2;
+                                _canvas.Render(null);
                                 _state = State.Point1;
                             }
                             break;
@@ -283,6 +294,7 @@ namespace RxCanvas.Editors
                                 _xqb.Point1.X = p.X;
                                 _xqb.Point1.Y = p.Y;
                                 _qb.Point1 = _xqb.Point1;
+                                _canvas.Render(null);
                                 _state = State.None;
                                 _canvas.ReleaseCapture();
                             }
@@ -300,6 +312,7 @@ namespace RxCanvas.Editors
                     _xqb.Point2.Y = p.Y;
                     _qb = nativeConverter.Convert(_xqb);
                     _canvas.Add(_qb);
+                    _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.Start;
                 }
@@ -317,12 +330,14 @@ namespace RxCanvas.Editors
                     _xqb.Point2.X = p.X;
                     _xqb.Point2.Y = p.Y;
                     _qb.Point2 = _xqb.Point2;
+                    _canvas.Render(null);
                 }
                 else if (_state == State.Point1)
                 {
                     _xqb.Point1.X = p.X;
                     _xqb.Point1.Y = p.Y;
                     _qb.Point1 = _xqb.Point1;
+                    _canvas.Render(null);
                 }
             });
         }
@@ -378,6 +393,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
                 }
@@ -389,6 +405,7 @@ namespace RxCanvas.Editors
                     _xarc.Y = _start.Y;
                     _arc = nativeConverter.Convert(_xarc);
                     _canvas.Add(_arc);
+                    _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.Size;
                 }
@@ -404,6 +421,7 @@ namespace RxCanvas.Editors
                 if (_state == State.Size)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                 }
             });
         }
@@ -473,6 +491,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
                 }
@@ -484,6 +503,7 @@ namespace RxCanvas.Editors
                     _xrectangle.Y = _start.Y;
                     _rectangle = nativeConverter.Convert(_xrectangle);
                     _canvas.Add(_rectangle);
+                    _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.BottomRight;
                 }
@@ -499,6 +519,7 @@ namespace RxCanvas.Editors
                 if (_state == State.BottomRight)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                 }
             });
         }
@@ -568,6 +589,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
                 }
@@ -579,6 +601,7 @@ namespace RxCanvas.Editors
                     _xellipse.Y = _start.Y;
                     _elllipse = nativeConverter.Convert(_xellipse);
                     _canvas.Add(_elllipse);
+                    _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.BottomRight;
                 }
@@ -594,6 +617,7 @@ namespace RxCanvas.Editors
                 if (_state == State.BottomRight)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                 }
             });
         }
@@ -663,6 +687,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
                 }
@@ -674,6 +699,7 @@ namespace RxCanvas.Editors
                     _xtext.Y = _start.Y;
                     _text = nativeConverter.Convert(_xtext);
                     _canvas.Add(_text);
+                    _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.BottomRight;
                 }
@@ -689,6 +715,7 @@ namespace RxCanvas.Editors
                 if (_state == State.BottomRight)
                 {
                     UpdatePositionAndSize(p);
+                    _canvas.Render(null);
                 }
             });
         }

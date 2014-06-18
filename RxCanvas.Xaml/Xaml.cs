@@ -1065,6 +1065,10 @@ namespace RxCanvas.Xaml
             _canvas.Children.Clear();
             Children.Clear();
         }
+
+        public void Render(INative context)
+        {
+        }
     }
 
     public class XModelToWpfConverter : IModelToNativeConverter

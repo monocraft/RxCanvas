@@ -147,6 +147,7 @@ namespace RxCanvas.Core
         void Add(INative value);
         void Remove(INative value);
         void Clear();
+        void Render(INative context);
     }
 
     public interface IEditor
