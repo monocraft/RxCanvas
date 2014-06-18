@@ -88,72 +88,29 @@ namespace RxCanvas.Serializers
         public string Name { get; set; }
         public string Extension { get; set; }
 
+        private JsonSerializerSettings Settings = new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.Auto,
+            Binder = new XModelSerializationBinder(),
+            NullValueHandling = NullValueHandling.Ignore,
+            Converters =  { new XColorConverter(), new XPointConverter() }
+        };
+
         public JsonXModelSerializer()
         {
             Name = "Json";
             Extension = "json";
         }
 
-        public void Serialize(string path, ICanvas canvas)
+        public string Serialize(ICanvas canvas)
         {
-            var json = JsonSerialize(canvas);
-            Save(path, json);
+            return JsonConvert.SerializeObject(canvas, Formatting.Indented, Settings);
         }
 
-        public ICanvas Deserialize(string path)
+        public ICanvas Deserialize(string json)
         {
-            string json = Open(path);
-            var canvas = JsonDeserialize(json);
-            return canvas;
-        }
-
-        private static string JsonSerialize(ICanvas canvas)
-        {
-            var binder = new XModelSerializationBinder();
-            var json = JsonConvert.SerializeObject(canvas,
-                Formatting.Indented,
-                new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    TypeNameHandling = TypeNameHandling.Auto,
-                    Binder = binder,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    Converters = { new XColorConverter(), new XPointConverter() }
-                });
-            return json;
-        }
-
-        private static ICanvas JsonDeserialize(string json)
-        {
-            var binder = new XModelSerializationBinder();
-            var canvas = JsonConvert.DeserializeObject<XCanvas>(json,
-                new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    TypeNameHandling = TypeNameHandling.Auto,
-                    Binder = binder,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    Converters = { new XColorConverter(), new XPointConverter() }
-                });
-            return canvas;
-        }
-
-        private static string Open(string path)
-        {
-            string json;
-            using (var ts = System.IO.File.OpenText(path))
-            {
-                json = ts.ReadToEnd();
-            }
-            return json;
-        }
-
-        private static void Save(string path, string json)
-        {
-            using (var ts = System.IO.File.CreateText(path))
-            {
-                ts.Write(json);
-            }
+            return JsonConvert.DeserializeObject<XCanvas>(json, Settings);
         }
     }
 }

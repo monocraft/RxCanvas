@@ -195,8 +195,8 @@ namespace RxCanvas.Core
     {
         string Name { get; set; }
         string Extension { get; set; }
-        void Serialize(string path, T item);
-        T Deserialize(string path);
+        string Serialize(T item);
+        T Deserialize(string text);
     }
 
     public interface ICreator<T> where T : class
@@ -205,5 +205,11 @@ namespace RxCanvas.Core
         string Extension { get; set; }
         void Save(string path, T item);
         void Save(string path, IEnumerable<T> items);
+    }
+
+    public interface ITextFile
+    {
+        string Open(string path);
+        void Save(string path, string text);
     }
 }

@@ -65,19 +65,19 @@ namespace RxCanvas
             builder.RegisterAssemblyTypes(editorAssembly)
                 .Where(t => t.Name.EndsWith("Editor"))
                 .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
+                .SingleInstance();
 
             var serializerAssembly = Assembly.GetAssembly(typeof(JsonXModelSerializer));
             builder.RegisterAssemblyTypes(serializerAssembly)
                 .Where(t => t.Name.EndsWith("Serializer"))
                 .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
+                .SingleInstance();
 
             var creatorAssembly = Assembly.GetAssembly(typeof(CoreCanvasPdfCreator));
             builder.RegisterAssemblyTypes(creatorAssembly)
                 .Where(t => t.Name.EndsWith("Creator"))
                 .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
+                .SingleInstance();
 
             builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
             builder.Register<IModelToNativeConverter>(f => new XModelToWpfConverter()).SingleInstance();
@@ -90,6 +90,8 @@ namespace RxCanvas
                 var nativeConverter = c.Resolve<IModelToNativeConverter>();
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
+
+            builder.Register<ITextFile>(f => new Utf8TextFile()).SingleInstance();
 
             // create container ans scopes
             _container = builder.Build();
@@ -260,8 +262,10 @@ namespace RxCanvas
 
             if (dlg.ShowDialog() == true)
             {
+                var file = _drawingScope.Resolve<ITextFile>();
                 var serializer = _serializers[dlg.FilterIndex - 1];
-                var xcanvas = serializer.Deserialize(dlg.FileName);
+                var json = file.Open(dlg.FileName);
+                var xcanvas = serializer.Deserialize(json);
                 ConvertToNative(xcanvas);
             }
         }
@@ -290,8 +294,10 @@ namespace RxCanvas
             if (dlg.ShowDialog() == true)
             {
                 var canvas = ConvertToModel();
+                var file = _drawingScope.Resolve<ITextFile>();
                 var serializer = _serializers[dlg.FilterIndex - 1];
-                serializer.Serialize(dlg.FileName, canvas);
+                var json = serializer.Serialize(canvas);
+                file.Save(dlg.FileName, json);
             }
         }
 
