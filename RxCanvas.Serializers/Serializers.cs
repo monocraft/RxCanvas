@@ -8,6 +8,7 @@ using RxCanvas.Model;
 using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization;
+using System.Globalization;
 
 namespace RxCanvas.Serializers
 {
@@ -23,6 +24,62 @@ namespace RxCanvas.Serializers
         {
             string resolvedTypeName = string.Format("RxCanvas.Model.{0}, RxCanvas.Model", 'X' + typeName);
             return Type.GetType(resolvedTypeName, true);
+        }
+    }
+
+    public class XColorConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(IColor) || objectType == typeof(XColor);
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            var color = (IColor)value;
+            string hex = string.Concat('#', color.A.ToString("X2"), color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
+            writer.WriteValue(hex);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (objectType == typeof(IColor))
+            {
+                string value = (string)reader.Value;
+                return new XColor(byte.Parse(value.Substring(1, 2), NumberStyles.HexNumber),
+                    byte.Parse(value.Substring(3, 2), NumberStyles.HexNumber),
+                    byte.Parse(value.Substring(5, 2), NumberStyles.HexNumber),
+                    byte.Parse(value.Substring(7, 2), NumberStyles.HexNumber));
+            }
+            throw new ArgumentException("objectType");
+        }
+    }
+
+    public class XPointConverter : JsonConverter
+    {
+        private static char[] Separators = new char[] { ';' };
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(IPoint) || objectType == typeof(XPoint);
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            var point = (IPoint)value;
+            string hex = string.Concat(point.X.ToString(), Separators[0], point.Y.ToString());
+            writer.WriteValue(hex);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (objectType == typeof(IPoint))
+            {
+                string value = (string)reader.Value;
+                string[] values = value.Split(Separators);
+                return new XPoint(double.Parse(values[0]), double.Parse(values[1]));
+            }
+            throw new ArgumentException("objectType");
         }
     }
 
@@ -60,7 +117,8 @@ namespace RxCanvas.Serializers
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     TypeNameHandling = TypeNameHandling.Auto,
                     Binder = binder,
-                    NullValueHandling = NullValueHandling.Ignore
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Converters = { new XColorConverter(), new XPointConverter() }
                 });
             return json;
         }
@@ -74,7 +132,8 @@ namespace RxCanvas.Serializers
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     TypeNameHandling = TypeNameHandling.Auto,
                     Binder = binder,
-                    NullValueHandling = NullValueHandling.Ignore
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Converters = { new XColorConverter(), new XPointConverter() }
                 });
             return canvas;
         }
@@ -82,24 +141,18 @@ namespace RxCanvas.Serializers
         private static string Open(string path)
         {
             string json;
-            using (var fs = System.IO.File.Open(path, System.IO.FileMode.Open))
+            using (var ts = System.IO.File.OpenText(path))
             {
-                using (var reader = new System.IO.StreamReader(fs))
-                {
-                    json = reader.ReadToEnd();
-                }
+                json = ts.ReadToEnd();
             }
             return json;
         }
 
         private static void Save(string path, string json)
         {
-            using (var fs = System.IO.File.Create(path))
+            using (var ts = System.IO.File.CreateText(path))
             {
-                using (var writer = new System.IO.StreamWriter(fs))
-                {
-                    writer.Write(json);
-                }
+                ts.Write(json);
             }
         }
     }
