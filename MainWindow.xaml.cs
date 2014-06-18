@@ -251,9 +251,11 @@ namespace RxCanvas
                 }
             }
 
+            int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
             var dlg = new OpenFileDialog()
             {
                 Filter = filter,
+                FilterIndex = defaultFilterIndex
             };
 
             if (dlg.ShowDialog() == true)
@@ -277,9 +279,11 @@ namespace RxCanvas
                 }
             }
 
+            int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
             var dlg = new SaveFileDialog()
             {
                 Filter = filter,
+                FilterIndex = defaultFilterIndex,
                 FileName = "canvas"
             };
 
@@ -304,9 +308,11 @@ namespace RxCanvas
                 }
             }
 
+            int defaultFilterIndex = _creators.IndexOf(_creators.Where(c => c.Name == "Pdf").FirstOrDefault()) + 1;
             var dlg = new SaveFileDialog()
             {
                 Filter = filter,
+                FilterIndex = defaultFilterIndex,
                 FileName = "canvas"
             };
 
