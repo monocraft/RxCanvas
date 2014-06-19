@@ -43,10 +43,8 @@ namespace RxCanvas.Model
     public class XLine : ILine
     {
         public object Native { get; set; }
-        public double X1 { get; set; }
-        public double Y1 { get; set; }
-        public double X2 { get; set; }
-        public double Y2 { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
     }
@@ -204,10 +202,8 @@ namespace RxCanvas.Model
         {
             return new XLine()
             {
-                X1 = line.X1,
-                Y1 = line.Y1,
-                X2 = line.X2,
-                Y2 = line.Y2,
+                Point1 = Convert(line.Point1),
+                Point2 = Convert(line.Point2),
                 Stroke = Convert(line.Stroke),
                 StrokeThickness = line.StrokeThickness
             };
@@ -366,7 +362,7 @@ namespace RxCanvas.Model
 
     public static class ModelExtenstion
     {
-        private static char[] Separators = new char[] { ';' };
+        private static char[] Separators = new char[] { ',' };
 
         public static IColor FromHtml(this string str)
         {
@@ -378,18 +374,27 @@ namespace RxCanvas.Model
 
         public static string ToHtml(this IColor color)
         {
-            return string.Concat('#', color.A.ToString("X2"), color.R.ToString("X2"), color.G.ToString("X2"), color.B.ToString("X2"));
+            return string.Concat('#', 
+                color.A.ToString("X2"), 
+                color.R.ToString("X2"), 
+                color.G.ToString("X2"), 
+                color.B.ToString("X2"));
         }
 
         public static string ToText(this IPoint point)
         {
-            return string.Concat(point.X.ToString(), Separators[0], point.Y.ToString());
+            return string.Concat(
+                point.X.ToString(CultureInfo.GetCultureInfo("en-GB")), 
+                Separators[0], 
+                point.Y.ToString(CultureInfo.GetCultureInfo("en-GB")));
         }
 
         public static IPoint FromText(this string str)
         {
             string[] values = str.Split(Separators);
-            return new XPoint(double.Parse(values[0]), double.Parse(values[1]));
+            return new XPoint(
+                double.Parse(values[0], CultureInfo.GetCultureInfo("en-GB")),
+                double.Parse(values[1], CultureInfo.GetCultureInfo("en-GB")));
         }
     }
 }

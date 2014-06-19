@@ -22,20 +22,24 @@ namespace RxCanvas.Xaml
         private SolidColorBrush _strokeBrush;
         private IColor _stroke;
         private Line _line;
+        private IPoint _point1;
+        private IPoint _point2;
 
         public WpfLine(ILine line)
         {
             _stroke = line.Stroke;
+            _point1 = line.Point1;
+            _point2 = line.Point2;
 
             _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
 
             _line = new Line()
             {
-                X1 = line.X1,
-                Y1 = line.Y1,
-                X2 = line.X2,
-                Y2 = line.Y2,
+                X1 = _point1.X,
+                Y1 = _point1.Y,
+                X2 = _point2.X,
+                Y2 = _point2.Y,
                 Stroke = _strokeBrush,
                 StrokeThickness = line.StrokeThickness
             };
@@ -43,28 +47,26 @@ namespace RxCanvas.Xaml
             Native = _line;
         }
 
-        public double X1
+        public IPoint Point1
         {
-            get { return _line.X1; }
-            set { _line.X1 = value; }
+            get { return _point1; }
+            set
+            {
+                _point1 = value;
+                _line.X1 = _point1.X;
+                _line.Y1 = _point1.Y;
+            }
         }
 
-        public double Y1
+        public IPoint Point2
         {
-            get { return _line.Y1; }
-            set { _line.Y1 = value; }
-        }
-
-        public double X2
-        {
-            get { return _line.X2; }
-            set { _line.X2 = value; }
-        }
-
-        public double Y2
-        {
-            get { return _line.Y2; }
-            set { _line.Y2 = value; }
+            get { return _point2; }
+            set
+            {
+                _point2 = value;
+                _line.X2 = _point2.X;
+                _line.Y2 = _point2.Y;
+            }
         }
 
         public IColor Stroke

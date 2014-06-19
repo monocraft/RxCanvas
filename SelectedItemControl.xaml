@@ -22,22 +22,16 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="Line" FontWeight="Bold" Margin="1"/>
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="X1" Margin="1,1,4,1"/>
-                <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding X1}" Margin="1"/>
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Y1" Margin="1,1,4,1"/>
-                <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Y1}" Margin="1"/>
-                <TextBlock Grid.Column="0" Grid.Row="3" Text="X2"  Margin="1,1,4,1"/>
-                <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding X2}" Margin="1"/>
-                <TextBlock Grid.Column="0" Grid.Row="4" Text="Y2" Margin="1,1,4,1"/>
-                <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Y2}" Margin="1"/>
-                <TextBlock Grid.Column="0" Grid.Row="5" Text="Stroke" Margin="1,1,4,1"/>
-                <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding Stroke, Converter={StaticResource XColorValueConverter}}" Margin="1"/>
-                <TextBlock Grid.Column="0" Grid.Row="6" Text="StrokeThickness" Margin="1,1,4,1"/>
-                <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding StrokeThickness}" Margin="1"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Point1" Margin="1,1,4,1"/>
+                <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Point1, Converter={StaticResource XPointValueConverter}}" Margin="1"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Point2"  Margin="1,1,4,1"/>
+                <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Point2, Converter={StaticResource XPointValueConverter}}" Margin="1"/>
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Stroke" Margin="1,1,4,1"/>
+                <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Stroke, Converter={StaticResource XColorValueConverter}}" Margin="1"/>
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="StrokeThickness" Margin="1,1,4,1"/>
+                <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding StrokeThickness}" Margin="1"/>
             </Grid>
         </DataTemplate>
         <DataTemplate DataType="{x:Type model:WpfBezier}">

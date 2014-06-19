@@ -64,7 +64,7 @@ namespace RxCanvas.Creators
         private void DrawLine(XGraphics gfx, ILine line)
         {
             var pen = new XPen(XColor.FromArgb(line.Stroke.A, line.Stroke.R, line.Stroke.G, line.Stroke.B), X(line.StrokeThickness));
-            gfx.DrawLine(pen, X(line.X1), Y(line.Y1), X(line.X2), Y(line.Y2));
+            gfx.DrawLine(pen, X(line.Point1.X), Y(line.Point1.Y), X(line.Point2.X), Y(line.Point2.Y));
         }
 
         private void DrawBezier(XGraphics gfx, IBezier bezier)

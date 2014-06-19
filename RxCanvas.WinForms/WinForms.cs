@@ -46,7 +46,7 @@ namespace RxCanvas.WinForms
                 {
                     var line = child as ILine;
                     Pen pen = new Pen(Color.FromArgb(line.Stroke.A, line.Stroke.R, line.Stroke.G, line.Stroke.B), (float)line.StrokeThickness);
-                    g.DrawLine(pen, (float)line.X1, (float)line.Y1, (float)line.X2, (float)line.Y2);
+                    g.DrawLine(pen, (float)line.Point1.X, (float)line.Point1.Y, (float)line.Point2.X, (float)line.Point2.Y);
                     pen.Dispose();
                 }
                 else if (child is IBezier)

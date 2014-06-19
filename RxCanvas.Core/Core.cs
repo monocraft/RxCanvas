@@ -39,10 +39,8 @@ namespace RxCanvas.Core
 
     public interface ILine : INative
     {
-        double X1 { get; set; }
-        double Y1 { get; set; }
-        double X2 { get; set; }
-        double Y2 { get; set; }
+        IPoint Point1 { get; set; }
+        IPoint Point2 { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
     }

@@ -343,10 +343,10 @@ namespace RxCanvas.WinForms
         private INative CreateGridLine(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
         {
             var xline = canvasFactory.CreateLine();
-            xline.X1 = x1;
-            xline.Y1 = y1;
-            xline.X2 = x2;
-            xline.Y2 = y2;
+            xline.Point1.X = x1;
+            xline.Point1.Y = y1;
+            xline.Point2.X = x2;
+            xline.Point2.Y = y2;
             xline.Stroke = stroke;
             xline.StrokeThickness = thickness;
             return nativeConverter.Convert(xline);

@@ -51,10 +51,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    _xline.X2 = p.X;
-                    _xline.Y2 = p.Y;
-                    _line.X2 = _xline.X2;
-                    _line.Y2 = _xline.Y2;
+                    _xline.Point2.X = p.X;
+                    _xline.Point2.Y = p.Y;
+                    _line.Point2 = _xline.Point2;
                     _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
@@ -62,10 +61,10 @@ namespace RxCanvas.Editors
                 else
                 {
                     _xline = canvasFactory.CreateLine();
-                    _xline.X1 = p.X;
-                    _xline.Y1 = p.Y;
-                    _xline.X2 = p.X;
-                    _xline.Y2 = p.Y;
+                    _xline.Point1.X = p.X;
+                    _xline.Point1.Y = p.Y;
+                    _xline.Point2.X = p.X;
+                    _xline.Point2.Y = p.Y;
                     _line = nativeConverter.Convert(_xline);
                     _canvas.Add(_line);
                     _canvas.Capture();
@@ -83,10 +82,9 @@ namespace RxCanvas.Editors
 
                 if (_state == State.End)
                 {
-                    _xline.X2 = p.X;
-                    _xline.Y2 = p.Y;
-                    _line.X2 = _xline.X2;
-                    _line.Y2 = _xline.Y2;
+                    _xline.Point2.X = p.X;
+                    _xline.Point2.Y = p.Y;
+                    _line.Point2 = _xline.Point2;
                     _canvas.Render(null);
                 }
             });
@@ -757,10 +755,8 @@ namespace RxCanvas.Editors
         {
             return new XLine()
             {
-                X1 = 0.0,
-                Y1 = 0.0,
-                X2 = 0.0,
-                Y2 = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
             };
