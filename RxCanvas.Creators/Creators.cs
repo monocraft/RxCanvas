@@ -105,7 +105,7 @@ namespace RxCanvas.Creators
         {
             double st = rectangle.StrokeThickness;
             double hst = st / 2.0;
-            if (rectangle.IsFilled)
+            if (rectangle.Fill.A > 0x00)
             {
                 var pen = new XPen(XColor.FromArgb(rectangle.Stroke.A, rectangle.Stroke.R, rectangle.Stroke.G, rectangle.Stroke.B), X(rectangle.StrokeThickness));
                 var brush = new XSolidBrush(XColor.FromArgb(rectangle.Fill.A, rectangle.Fill.R, rectangle.Fill.G, rectangle.Fill.B));
@@ -122,7 +122,7 @@ namespace RxCanvas.Creators
         {
             double st = ellipse.StrokeThickness;
             double hst = st / 2.0;
-            if (ellipse.IsFilled)
+            if (ellipse.Fill.A > 0x00)
             {
                 var pen = new XPen(XColor.FromArgb(ellipse.Stroke.A, ellipse.Stroke.R, ellipse.Stroke.G, ellipse.Stroke.B), X(ellipse.StrokeThickness));
                 var brush = new XSolidBrush(XColor.FromArgb(ellipse.Fill.A, ellipse.Fill.R, ellipse.Fill.G, ellipse.Fill.B));

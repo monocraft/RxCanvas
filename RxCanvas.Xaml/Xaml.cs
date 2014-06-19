@@ -125,6 +125,7 @@ namespace RxCanvas.Xaml
             _pg = new PathGeometry();
             _pf = new PathFigure();
             _pf.StartPoint = new Point(b.Start.X, b.Start.Y);
+            _pf.IsFilled = b.IsFilled;
             _pf.IsClosed = b.IsClosed;
             _bs = new BezierSegment();
             _bs.Point1 = new Point(b.Point1.X, b.Point1.Y);
@@ -207,6 +208,12 @@ namespace RxCanvas.Xaml
             set { _path.StrokeThickness = value; }
         }
 
+        public bool IsFilled
+        {
+            get { return _pf.IsFilled; }
+            set { _pf.IsFilled = value; }
+        }
+
         public bool IsClosed
         {
             get { return _pf.IsClosed; }
@@ -251,6 +258,7 @@ namespace RxCanvas.Xaml
             _pg = new PathGeometry();
             _pf = new PathFigure();
             _pf.StartPoint = new Point(qb.Start.X, qb.Start.Y);
+            _pf.IsFilled = qb.IsFilled;
             _pf.IsClosed = qb.IsClosed;
             _qbs = new QuadraticBezierSegment();
             _qbs.Point1 = new Point(qb.Point1.X, qb.Point1.Y);
@@ -322,6 +330,12 @@ namespace RxCanvas.Xaml
             set { _path.StrokeThickness = value; }
         }
 
+        public bool IsFilled
+        {
+            get { return _pf.IsFilled; }
+            set { _pf.IsFilled = value; }
+        }
+
         public bool IsClosed
         {
             get { return _pf.IsClosed; }
@@ -363,6 +377,7 @@ namespace RxCanvas.Xaml
             _path.StrokeThickness = arc.StrokeThickness;
             _pg = new PathGeometry();
             _pf = new PathFigure();
+            _pf.IsFilled = arc.IsFilled;
             _pf.IsClosed = arc.IsClosed;
             _start = new Point();
             _as = new ArcSegment();
@@ -692,18 +707,6 @@ namespace RxCanvas.Xaml
                 _rectangle.Fill = _fillBrush;
             }
         }
-
-        public bool IsFilled
-        {
-            get { return _fill.A == 0xFF; }
-            set
-            {
-                _fill.A = (value == true) ? (byte)0xFF : (byte)0x00;
-                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
-                _fillBrush.Freeze();
-                _rectangle.Fill = _fillBrush;
-            }
-        }
     }
 
     public class WpfEllipse : IEllipse
@@ -790,18 +793,6 @@ namespace RxCanvas.Xaml
             set
             {
                 _fill = value;
-                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
-                _fillBrush.Freeze();
-                _ellipse.Fill = _fillBrush;
-            }
-        }
-
-        public bool IsFilled
-        {
-            get { return _fill.A == 0xFF; }
-            set
-            {
-                _fill.A = (value == true) ? (byte)0xFF : (byte)0x00;
                 _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
                 _fillBrush.Freeze();
                 _ellipse.Fill = _fillBrush;

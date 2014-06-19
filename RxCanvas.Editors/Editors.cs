@@ -777,6 +777,7 @@ namespace RxCanvas.Editors
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
+                IsFilled = false,
                 IsClosed = false
             };
         }
@@ -791,6 +792,7 @@ namespace RxCanvas.Editors
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
+                IsFilled = false,
                 IsClosed = false
             };
         }
@@ -808,7 +810,8 @@ namespace RxCanvas.Editors
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
-                IsFilled = false
+                IsFilled = false,
+                IsClosed = false
             };
         }
 
@@ -822,8 +825,7 @@ namespace RxCanvas.Editors
                 Height = 0.0,
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
-                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
-                IsFilled = false
+                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)
             };
         }
 
@@ -837,8 +839,7 @@ namespace RxCanvas.Editors
                 Height = 0.0,
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
-                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
-                IsFilled = false
+                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)
             };
         }
 

@@ -61,6 +61,7 @@ namespace RxCanvas.Model
         public IColor Fill { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
+        public bool IsFilled { get; set; }
         public bool IsClosed { get; set; }
     }
 
@@ -73,6 +74,7 @@ namespace RxCanvas.Model
         public IColor Fill { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
+        public bool IsFilled { get; set; }
         public bool IsClosed { get; set; }
     }
 
@@ -102,7 +104,6 @@ namespace RxCanvas.Model
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
         public IColor Fill { get; set; }
-        public bool IsFilled { get; set; }
     }
 
     public class XEllipse : IEllipse
@@ -115,7 +116,6 @@ namespace RxCanvas.Model
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
         public IColor Fill { get; set; }
-        public bool IsFilled { get; set; }
     }
 
     public class XText : IText
@@ -224,6 +224,7 @@ namespace RxCanvas.Model
                 Fill = Convert(bezier.Fill),
                 Stroke = Convert(bezier.Stroke),
                 StrokeThickness = bezier.StrokeThickness,
+                IsFilled = bezier.IsFilled,
                 IsClosed = bezier.IsClosed
             };
         }
@@ -238,6 +239,7 @@ namespace RxCanvas.Model
                 Fill = Convert(quadraticBezier.Fill),
                 Stroke = Convert(quadraticBezier.Stroke),
                 StrokeThickness = quadraticBezier.StrokeThickness,
+                IsFilled = quadraticBezier.IsFilled,
                 IsClosed = quadraticBezier.IsClosed
             };
         }
@@ -255,7 +257,8 @@ namespace RxCanvas.Model
                 Stroke = Convert(arc.Stroke),
                 StrokeThickness = arc.StrokeThickness,
                 Fill = Convert(arc.Fill),
-                IsFilled = arc.IsFilled
+                IsFilled = arc.IsFilled,
+                IsClosed = arc.IsClosed
             };
         }
 
@@ -270,7 +273,6 @@ namespace RxCanvas.Model
                 Stroke = Convert(rectangle.Stroke),
                 StrokeThickness = rectangle.StrokeThickness,
                 Fill = Convert(rectangle.Fill),
-                IsFilled = rectangle.IsFilled
             };
         }
 
@@ -285,7 +287,6 @@ namespace RxCanvas.Model
                 Stroke = Convert(ellipse.Stroke),
                 StrokeThickness = ellipse.StrokeThickness,
                 Fill = Convert(ellipse.Fill),
-                IsFilled = ellipse.IsFilled
             };
         }
 

@@ -29,7 +29,9 @@
         private void InitializeComponent()
         {
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.canvasPanel1 = new RxCanvas.WinForms.CanvasPanel();
+            this.canvasPanel1 = new RxCanvas.WinForms.WinFormsCanvasPanel();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.saveFileDialog2 = new System.Windows.Forms.SaveFileDialog();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -39,9 +41,9 @@
             // canvasPanel1
             // 
             this.canvasPanel1.Canvas = null;
-            this.canvasPanel1.Location = new System.Drawing.Point(12, 12);
+            this.canvasPanel1.Location = new System.Drawing.Point(100, 12);
             this.canvasPanel1.Name = "canvasPanel1";
-            this.canvasPanel1.Size = new System.Drawing.Size(760, 600);
+            this.canvasPanel1.Size = new System.Drawing.Size(600, 600);
             this.canvasPanel1.TabIndex = 0;
             // 
             // Form1
@@ -60,7 +62,9 @@
         #endregion
 
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private CanvasPanel canvasPanel1;
+        private WinFormsCanvasPanel canvasPanel1;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog2;
     }
 }
 

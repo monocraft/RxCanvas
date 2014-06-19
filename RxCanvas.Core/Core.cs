@@ -56,6 +56,7 @@ namespace RxCanvas.Core
         IColor Fill { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
+        bool IsFilled { get; set; }
         bool IsClosed { get; set; }
     }
 
@@ -67,6 +68,7 @@ namespace RxCanvas.Core
         IColor Fill { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
+        bool IsFilled { get; set; }
         bool IsClosed { get; set; }
     }
 
@@ -94,7 +96,6 @@ namespace RxCanvas.Core
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
         IColor Fill { get; set; }
-        bool IsFilled { get; set; }
     }
 
     public interface IEllipse : INative
@@ -106,7 +107,6 @@ namespace RxCanvas.Core
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
         IColor Fill { get; set; }
-        bool IsFilled { get; set; }
     }
 
     public interface IText : INative

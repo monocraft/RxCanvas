@@ -80,8 +80,8 @@ namespace RxCanvas
                 .SingleInstance();
 
             builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
-            builder.Register<IModelToNativeConverter>(f => new XModelToWpfConverter()).SingleInstance();
             builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).SingleInstance();
+            builder.Register<IModelToNativeConverter>(f => new XModelToWpfConverter()).SingleInstance();
 
             builder.Register<ICanvas>(c =>
             {
@@ -93,7 +93,7 @@ namespace RxCanvas
 
             builder.Register<ITextFile>(f => new Utf8TextFile()).SingleInstance();
 
-            // create container ans scopes
+            // create container and scopes
             _container = builder.Build();
             _backgroundScope = _container.BeginLifetimeScope();
             _drawingScope = _container.BeginLifetimeScope();
@@ -150,14 +150,14 @@ namespace RxCanvas
                 var _editor = editor;
                 _shortcuts.Add(
                     new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key),
-                                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
+                                                 editor.Modifiers == "" ? ModifierKeys.None : (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
                     () => EnableEditor(_editor));
             }
 
             // snap shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("")),
+                                             ModifierKeys.None),
                 () => ToggleSnap());
 
             // open shortcut
@@ -185,74 +185,9 @@ namespace RxCanvas
                 () => Clear());
         }
 
-        private void CreateGrid()
-        {
-            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
-            var nativeConverter = _backgroundScope.Resolve<IModelToNativeConverter>();
-            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
-            CreateGrid(nativeConverter, canvasFactory, backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
-        }
-
-        private INative CreateGridLine(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
-        {
-            var xline = canvasFactory.CreateLine();
-            xline.X1 = x1;
-            xline.Y1 = y1;
-            xline.X2 = x2;
-            xline.Y2 = y2;
-            xline.Stroke = stroke;
-            xline.StrokeThickness = thickness;
-            return nativeConverter.Convert(xline);
-        }
-
-        private void CreateGrid(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas, double width, double height, double size, double originX, double originY)
-        {
-            double thickness = 2.0;
-            var stroke = canvasFactory.CreateColor();
-            stroke.A = 0xFF;
-            stroke.R = 0xE8;
-            stroke.G = 0xE8;
-            stroke.B = 0xE8;
-
-            for (double y = size; y < height; y += size)
-            {
-                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, originX, y, width, y));
-            }
-
-            for (double x = size; x < width; x += size)
-            {
-                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, x, originY, x, height));
-            }
-        }
-
-        private void EnableEditor(IEditor _editor)
-        {
-            foreach (var editor in _editors)
-            {
-                editor.IsEnabled = false;
-            };
-            _editor.IsEnabled = true;
-        }
-
-        private void ToggleSnap()
-        {
-            var canvas = _drawingScope.Resolve<ICanvas>();
-            canvas.EnableSnap = canvas.EnableSnap ? false : true;
-        }
-
         private void Open()
         {
-            bool first = true;
-            string filter = string.Empty;
-            foreach (var serializer in _serializers)
-            {
-                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
-                if (first == true)
-                {
-                    first = false;
-                }
-            }
-
+            string filter = CreateSerializersFilter();
             int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
             var dlg = new OpenFileDialog()
             {
@@ -262,27 +197,15 @@ namespace RxCanvas
 
             if (dlg.ShowDialog() == true)
             {
-                var file = _drawingScope.Resolve<ITextFile>();
-                var serializer = _serializers[dlg.FilterIndex - 1];
-                var json = file.Open(dlg.FileName);
-                var xcanvas = serializer.Deserialize(json);
-                ConvertToNative(xcanvas);
+                string path = dlg.FileName;
+                int filterIndex = dlg.FilterIndex;
+                Open(path, filterIndex - 1);
             }
         }
 
         private void Save()
         {
-            bool first = true;
-            string filter = string.Empty;
-            foreach (var serializer in _serializers)
-            {
-                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
-                if (first == true)
-                {
-                    first = false;
-                }
-            }
-
+            string filter = CreateSerializersFilter();
             int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
             var dlg = new SaveFileDialog()
             {
@@ -293,27 +216,15 @@ namespace RxCanvas
 
             if (dlg.ShowDialog() == true)
             {
-                var canvas = ConvertToModel();
-                var file = _drawingScope.Resolve<ITextFile>();
-                var serializer = _serializers[dlg.FilterIndex - 1];
-                var json = serializer.Serialize(canvas);
-                file.Save(dlg.FileName, json);
+                string path = dlg.FileName;
+                int filterIndex = dlg.FilterIndex;
+                Save(path, filterIndex - 1);
             }
         }
 
         private void Export()
         {
-            bool first = true;
-            string filter = string.Empty;
-            foreach(var creator in _creators)
-            {
-                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, creator.Name, creator.Extension);
-                if (first == true)
-                {
-                    first = false;
-                }
-            }
-
+            string filter = CreateCreatorsFilter();
             int defaultFilterIndex = _creators.IndexOf(_creators.Where(c => c.Name == "Pdf").FirstOrDefault()) + 1;
             var dlg = new SaveFileDialog()
             {
@@ -324,10 +235,65 @@ namespace RxCanvas
 
             if (dlg.ShowDialog() == true)
             {
-                var canvas = ConvertToModel();
-                var creator = _creators[dlg.FilterIndex - 1];
-                creator.Save(dlg.FileName, canvas);
+                string path = dlg.FileName;
+                int filterIndex = dlg.FilterIndex;
+                Export(path, filterIndex - 1);
             }
+        }
+
+        private string CreateSerializersFilter()
+        {
+            bool first = true;
+            string filter = string.Empty;
+            foreach (var serializer in _serializers)
+            {
+                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
+                if (first == true)
+                {
+                    first = false;
+                }
+            }
+            return filter;
+        }
+
+        private string CreateCreatorsFilter()
+        {
+            bool first = true;
+            string filter = string.Empty;
+            foreach (var creator in _creators)
+            {
+                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, creator.Name, creator.Extension);
+                if (first == true)
+                {
+                    first = false;
+                }
+            }
+            return filter;
+        }
+
+        private void Open(string path, int index)
+        {
+            var file = _drawingScope.Resolve<ITextFile>();
+            var serializer = _serializers[index];
+            var json = file.Open(path);
+            var xcanvas = serializer.Deserialize(json);
+            ConvertToNative(xcanvas);
+        }
+
+        private void Save(string path, int index)
+        {
+            var canvas = ConvertToModel();
+            var file = _drawingScope.Resolve<ITextFile>();
+            var serializer = _serializers[index];
+            var json = serializer.Serialize(canvas);
+            file.Save(path, json);
+        }
+
+        private void Export(string path, int index)
+        {
+            var canvas = ConvertToModel();
+            var creator = _creators[index];
+            creator.Save(path, canvas);
         }
 
         private void ConvertToNative(ICanvas xcanvas)
@@ -387,6 +353,61 @@ namespace RxCanvas
             var modelConverter = _drawingScope.Resolve<ICoreToModelConverter>();
             var canvas = modelConverter.Convert(drawingCanvas);
             return canvas;
+        }
+
+        private void CreateGrid()
+        {
+            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
+            var nativeConverter = _backgroundScope.Resolve<IModelToNativeConverter>();
+            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
+            CreateGrid(nativeConverter, canvasFactory, backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
+        }
+
+        private INative CreateGridLine(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
+        {
+            var xline = canvasFactory.CreateLine();
+            xline.X1 = x1;
+            xline.Y1 = y1;
+            xline.X2 = x2;
+            xline.Y2 = y2;
+            xline.Stroke = stroke;
+            xline.StrokeThickness = thickness;
+            return nativeConverter.Convert(xline);
+        }
+
+        private void CreateGrid(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas, double width, double height, double size, double originX, double originY)
+        {
+            double thickness = 2.0;
+            var stroke = canvasFactory.CreateColor();
+            stroke.A = 0xFF;
+            stroke.R = 0xE8;
+            stroke.G = 0xE8;
+            stroke.B = 0xE8;
+
+            for (double y = size; y < height; y += size)
+            {
+                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, originX, y, width, y));
+            }
+
+            for (double x = size; x < width; x += size)
+            {
+                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, x, originY, x, height));
+            }
+        }
+
+        private void EnableEditor(IEditor _editor)
+        {
+            foreach (var editor in _editors)
+            {
+                editor.IsEnabled = false;
+            };
+            _editor.IsEnabled = true;
+        }
+
+        private void ToggleSnap()
+        {
+            var canvas = _drawingScope.Resolve<ICanvas>();
+            canvas.EnableSnap = canvas.EnableSnap ? false : true;
         }
 
         private void Clear()
