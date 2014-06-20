@@ -35,6 +35,30 @@ namespace RxCanvas.Model
         }
     }
 
+    public class XPolygon : IPolygon
+    {
+        public IPoint[] Points { get; set; }
+
+        public bool Contains(IPoint point)
+        {
+            return Contains(point.X, point.Y);
+        }
+
+        public bool Contains(double x, double y)
+        {
+            bool contains = false;
+            for (int i = 0, j = Points.Length - 1; i < Points.Length; j = i++)
+            {
+                if (((Points[i].Y > y) != (Points[j].Y > y))
+                    && (x < (Points[j].X - Points[i].X) * (y - Points[i].Y) / (Points[j].Y - Points[i].Y) + Points[i].X))
+                {
+                    contains = !contains;
+                }
+            }
+            return contains;
+        }
+    }
+
     public abstract class XNative : INative
     {
         public object Native { get; set; }
