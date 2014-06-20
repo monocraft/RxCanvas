@@ -35,6 +35,7 @@ namespace RxCanvas.Core
     public interface IPolygon
     {
         IPoint[] Points { get; set; }
+        ILine[] Lines { get; set; }
         bool Contains(IPoint point);
         bool Contains(double x, double y);
     }

@@ -38,6 +38,7 @@ namespace RxCanvas.Model
     public class XPolygon : IPolygon
     {
         public IPoint[] Points { get; set; }
+        public ILine[] Lines { get; set; }
 
         public bool Contains(IPoint point)
         {
