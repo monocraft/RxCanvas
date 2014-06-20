@@ -32,6 +32,13 @@ namespace RxCanvas.Core
         double Y { get; set; }
     }
 
+    public interface IPolygon
+    {
+        IPoint[] Points { get; set; }
+        bool Contains(IPoint point);
+        bool Contains(double x, double y);
+    }
+
     public interface INative
     {
         object Native { get; set; }
