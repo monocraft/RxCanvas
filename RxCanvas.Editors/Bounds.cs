@@ -1,5 +1,4 @@
 ﻿using RxCanvas.Core;
-using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,11 +27,9 @@ namespace RxCanvas.Editors
             _offset = offset;
             _canvas = canvas;
 
-            _polygon = new XPolygon()
-            {
-                Points = new XPoint[4],
-                Lines = new XLine[4]
-            };
+            _polygon = canvasFactory.CreatePolygon();
+            _polygon.Points = new IPoint[4];
+            _polygon.Lines = new ILine[4];
 
             for (int i = 0; i < 4; i++)
             {
@@ -40,7 +37,7 @@ namespace RxCanvas.Editors
 
                 var _xline = canvasFactory.CreateLine();
                 _xline.Stroke = canvasFactory.CreateColor();
-                _xline.Stroke.A = 0xFF;
+                _xline.Stroke.A = 0x80;
                 _xline.Stroke.R = 0x00;
                 _xline.Stroke.G = 0xBF;
                 _xline.Stroke.B = 0xFF;
@@ -82,10 +79,8 @@ namespace RxCanvas.Editors
 
         private void Move(ILine line, IPoint point1, IPoint point2)
         {
-            line.Point1.X = point1.X;
-            line.Point1.Y = point1.Y;
-            line.Point2.X = point2.X;
-            line.Point2.Y = point2.Y;
+            line.Point1 = point1;
+            line.Point2 = point2;
         }
 
         public bool IsVisible()
