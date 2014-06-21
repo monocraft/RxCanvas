@@ -52,6 +52,7 @@ namespace RxCanvas.Core
     public interface INative
     {
         object Native { get; set; }
+        IBounds Bounds { get; set; }
     }
 
     public interface ILine : INative
@@ -177,6 +178,7 @@ namespace RxCanvas.Core
     {
         IColor CreateColor();
         IPoint CreatePoint();
+        IPolygon CreatePolygon();
         ILine CreateLine();
         IBezier CreateBezier();
         IQuadraticBezier CreateQuadraticBezier();
@@ -200,11 +202,11 @@ namespace RxCanvas.Core
     }
 
     public interface ICoreToModelConverter : IConverter
-    {
+    { 
     }
 
     public interface IModelToNativeConverter : IConverter
-    {
+    { 
     }
 
     public interface ISerializer<T> where T : class

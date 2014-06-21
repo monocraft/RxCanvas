@@ -121,6 +121,7 @@ namespace RxCanvas.WinForms
     public class WinFormsCanvas : ICanvas
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
