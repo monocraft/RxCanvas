@@ -20,7 +20,6 @@ namespace RxCanvas.WinForms
 {
     public partial class Form1 : Form
     {
-        private IContainer _container;
         private ILifetimeScope _backgroundScope;
         private ILifetimeScope _drawingScope;
         private ICollection<IEditor> _editors;
@@ -39,45 +38,12 @@ namespace RxCanvas.WinForms
 
         private void RegisterAndBuild()
         {
-            // register components
-            var builder = new ContainerBuilder();
+            var bootstrapper = new Bootstrapper();
+            var container = bootstrapper.Build(this.canvasPanel1);
 
-            var editorAssembly = Assembly.GetAssembly(typeof(PortableXDefaultsFactory));
-            builder.RegisterAssemblyTypes(editorAssembly)
-                .Where(t => t.Name.EndsWith("Editor"))
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-
-            var serializerAssembly = Assembly.GetAssembly(typeof(JsonXModelSerializer));
-            builder.RegisterAssemblyTypes(serializerAssembly)
-                .Where(t => t.Name.EndsWith("Serializer"))
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
-            var creatorAssembly = Assembly.GetAssembly(typeof(CoreCanvasPdfCreator));
-            builder.RegisterAssemblyTypes(creatorAssembly)
-                .Where(t => t.Name.EndsWith("Creator"))
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
-            builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).SingleInstance();
-            builder.Register<IModelToNativeConverter>(f => new XModelToWinFormsConverter(this.canvasPanel1)).SingleInstance();
-
-            builder.Register<ICanvas>(c =>
-            {
-                var canvasFactory = c.Resolve<ICanvasFactory>();
-                var xcanvas = canvasFactory.CreateCanvas();
-                var nativeConverter = c.Resolve<IModelToNativeConverter>();
-                return nativeConverter.Convert(xcanvas);
-            }).InstancePerLifetimeScope();
-
-            builder.Register<ITextFile>(f => new Utf8TextFile()).SingleInstance();
-
-            // create container and scopes
-            _container = builder.Build();
-            _backgroundScope = _container.BeginLifetimeScope();
-            _drawingScope = _container.BeginLifetimeScope();
+            // create scopes
+            _backgroundScope = container.BeginLifetimeScope();
+            _drawingScope = container.BeginLifetimeScope();
 
             // resolve dependencies
             _backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
