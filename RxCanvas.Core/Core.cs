@@ -40,6 +40,15 @@ namespace RxCanvas.Core
         bool Contains(double x, double y);
     }
 
+    public interface IBounds
+    {
+        void Update();
+        bool IsVisible();
+        void Show();
+        void Hide();
+        bool Contains(double x, double y);
+    }
+
     public interface INative
     {
         object Native { get; set; }
