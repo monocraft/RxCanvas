@@ -39,9 +39,9 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .SingleInstance();
 
-            builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).SingleInstance();
-            builder.Register<IModelToNativeConverter>(f => new XModelToWpfConverter()).SingleInstance();
+            builder.Register<ICoreToModelConverter>(c => new CoreToXModelConverter()).SingleInstance();
+            builder.Register<ICanvasFactory>(c => new PortableXDefaultsFactory()).SingleInstance();
+            builder.Register<IModelToNativeConverter>(c => new XModelToWpfConverter()).SingleInstance();
 
             builder.Register<ICanvas>(c =>
             {

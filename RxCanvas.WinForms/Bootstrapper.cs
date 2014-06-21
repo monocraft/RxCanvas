@@ -38,9 +38,9 @@ namespace RxCanvas.WinForms
                 .AsImplementedInterfaces()
                 .SingleInstance();
 
-            builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).SingleInstance();
-            builder.Register<IModelToNativeConverter>(f => new XModelToWinFormsConverter(panel)).SingleInstance();
+            builder.Register<ICoreToModelConverter>(c => new CoreToXModelConverter()).SingleInstance();
+            builder.Register<ICanvasFactory>(c => new PortableXDefaultsFactory()).SingleInstance();
+            builder.Register<IModelToNativeConverter>(c => new XModelToWinFormsConverter(panel)).SingleInstance();
 
             builder.Register<ICanvas>(c =>
             {
