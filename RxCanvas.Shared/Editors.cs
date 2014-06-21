@@ -3,6 +3,7 @@ using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -10,6 +11,243 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Editors
 {
+    public class XSelectionEditor : IEditor, IDisposable
+    {
+        public enum State 
+        { 
+            None = 0,
+            Hover = 1,
+            Selected = 2,
+            Move = 4,
+            HoverSelected = Hover | Selected,
+            HoverMove = Hover | Move,
+            SelectedMove = Selected | Move,
+            HoverSelectedMove = Hover | Selected | Move,
+        }
+
+        public string Name { get; set; }
+
+        private bool _isEnabled;
+        public bool IsEnabled 
+        {
+            get { return _isEnabled; }
+            set 
+            {
+                if (_isEnabled)
+                {
+                    Reset();
+                }
+                _isEnabled = value; 
+            }
+        }
+
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
+
+        private ICanvas _canvas;
+        private ImmutablePoint _start;
+        private INative _selected;
+        private INative _hover;
+        private State _state = State.None;
+        private IDisposable _downs;
+        private IDisposable _ups;
+        private IDisposable _drag;
+
+        public XSelectionEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
+        {
+            _canvas = canvas;
+
+            Name = "Selection";
+            Key = "H";
+            Modifiers = "";
+
+            var dragMoves = from move in _canvas.Moves
+                            //where _canvas.IsCaptured
+                            select move;
+
+            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
+
+            var dragPositions = from move in allPositions
+                                select move;
+
+            _downs = _canvas.Downs.Subscribe(p =>
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                bool render = false;
+
+                if (_selected != null)
+                {
+                    _selected.Bounds.Hide();
+                    _selected = null;
+                    _state = _state & ~State.Selected;
+                    Debug.Print("_state: {0}", _state);
+                    render = true;
+                }
+
+                if (_hover != null)
+                {
+                    _hover.Bounds.Hide();
+                    _hover = null;
+                    _state = _state & ~State.Hover;
+                    Debug.Print("_state: {0}", _state);
+                    render = true;
+                }
+
+                _selected = HitTest(p.X, p.Y);
+                if (_selected != null)
+                {
+                    _selected.Bounds.Show();
+                    _state |= State.Selected;
+                    Debug.Print("_state: {0}", _state);
+                    _start = p;
+                    _canvas.Capture();
+                    _state |= State.Move;
+                    Debug.Print("_state: {0}", _state);
+                    render = true;
+                }
+
+                if (render)
+                {
+                    _canvas.Render(null);
+                }
+            });
+
+            _ups = _canvas.Ups.Subscribe(p =>
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                if (_canvas.IsCaptured)
+                {
+                    _state = _state & ~State.Move;
+                    Debug.Print("_state: {0}", _state);
+                    _canvas.ReleaseCapture();
+                }
+            });
+
+            _drag = dragPositions.Subscribe(p =>
+            {
+                if (!IsEnabled)
+                {
+                    return;
+                }
+
+                if (_canvas.IsCaptured)
+                {
+                    double dx = _start.X - p.X;
+                    double dy = _start.Y - p.Y;
+                    _start = p;
+
+                    if (_selected is IEllipse)
+                    {
+                        var ellipse = _selected as IEllipse;
+                        ellipse.X -= dx;
+                        ellipse.Y -= dy;
+                    }
+                    else if (_selected is IRectangle)
+                    {
+                        var rectangle = _selected as IRectangle;
+                        rectangle.X -= dx;
+                        rectangle.Y -= dy;
+                    }
+
+                    // TODO: Add Move(double dx, double dy) method to INative interface.
+
+                    _selected.Bounds.Update();
+                    _canvas.Render(null);
+                }
+
+                if (!_canvas.IsCaptured)
+                {
+                    bool render = false;
+
+                    if (_hover != null 
+                        && ((_selected != _hover) || (_selected == null)))
+                    {
+                        _hover.Bounds.Hide();
+                        _hover = null;
+                        _state = _state & ~State.Hover;
+                        Debug.Print("_state: {0}", _state);
+                        render = true;
+                    }
+
+                    _hover = HitTest(p.X, p.Y);
+                    if (_hover != null)
+                    {
+                        _hover.Bounds.Show();
+                        _state |= State.Hover;
+                        Debug.Print("_state: {0}", _state);
+                        render = true;
+                    }
+
+                    if (render)
+                    {
+                        _canvas.Render(null);
+                    }
+                }
+            });
+        }
+
+        private INative HitTest(double x, double y)
+        {
+            foreach (var child in _canvas.Children)
+            {
+                if (child.Bounds != null)
+                {
+                    var bounds = child.Bounds;
+                    if (bounds.Contains(x, y))
+                    {
+                        return child;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private void Reset()
+        {
+            bool render = false;
+
+            if (_hover != null)
+            {
+                _hover.Bounds.Hide();
+                _hover = null;
+                render = true;
+            }
+
+            if (_selected != null)
+            {
+                _selected.Bounds.Hide();
+                _selected = null;
+                render = true;
+            }
+
+            _state = State.None;
+            Debug.Print("_state: {0}", _state);
+
+            if (render)
+            {
+                _canvas.Render(null);
+            }
+        }
+
+        public void Dispose()
+        {
+            _downs.Dispose();
+            _ups.Dispose();
+            _drag.Dispose();
+        }
+    }
+
     public class XLineEditor : IEditor, IDisposable
     {
         public enum State { None, Start, End }
@@ -26,7 +264,10 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public XLineEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        public XLineEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -114,7 +355,10 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public XBezierEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        public XBezierEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -251,7 +495,10 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drag;
 
-        public XQuadraticBezierEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        public XQuadraticBezierEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -365,7 +612,10 @@ namespace RxCanvas.Editors
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public XArcEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        public XArcEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -463,7 +713,10 @@ namespace RxCanvas.Editors
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public XCanvasRectangleEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        public XCanvasRectangleEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -561,7 +814,10 @@ namespace RxCanvas.Editors
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public XCanvasEllipseEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        public XCanvasEllipseEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
         {
             _canvas = canvas;
 
@@ -664,7 +920,10 @@ namespace RxCanvas.Editors
         private IDisposable _drag;
         private ImmutablePoint _start;
 
-        public XCanvasTextEditor(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas)
+        public XCanvasTextEditor(
+            IModelToNativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas)
         {
             _canvas = canvas;
 
