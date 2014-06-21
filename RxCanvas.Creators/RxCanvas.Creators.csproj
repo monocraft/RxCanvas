@@ -50,13 +50,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RxCanvas.Core\RxCanvas.Core.csproj">
-      <Project>{9bdd1a2b-3d2f-43ea-9df6-e79ea243b490}</Project>
-      <Name>RxCanvas.Core</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\RxCanvas.Shared\RxCanvas.Shared.csproj">
+      <Project>{bfc8b726-f060-4582-bc73-6463323c403f}</Project>
+      <Name>RxCanvas.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

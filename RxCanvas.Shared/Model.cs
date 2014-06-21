@@ -1,4 +1,4 @@
-﻿using RxCanvas.Core;
+﻿using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

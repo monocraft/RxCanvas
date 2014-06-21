@@ -1,10 +1,4 @@
-﻿using Autofac;
-using RxCanvas.Core;
-using RxCanvas.Creators;
-using RxCanvas.Editors;
-using RxCanvas.Model;
-using RxCanvas.Serializers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -15,6 +9,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autofac;
+using RxCanvas.Interfaces;
 
 namespace RxCanvas.WinForms
 {

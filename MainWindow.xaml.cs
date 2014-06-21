@@ -13,28 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Reflection;
-using System.Reactive;
-using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
-using System.Reactive.Joins;
-using System.Reactive.Linq;
-using System.Reactive.PlatformServices;
-using System.Reactive.Subjects;
-using System.Reactive.Threading;
 using Autofac;
-using Autofac.Builder;
-using Autofac.Core;
-using Autofac.Features;
-using Autofac.Util;
-using RxCanvas.Core;
-using RxCanvas.Model;
-using RxCanvas.Editors;
-using RxCanvas.Xaml;
-using RxCanvas.Serializers;
-using RxCanvas.Creators;
+using RxCanvas.Interfaces;
 
 namespace RxCanvas
 {

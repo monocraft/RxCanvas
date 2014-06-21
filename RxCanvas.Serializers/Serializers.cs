@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RxCanvas.Core;
-using RxCanvas.Model;
 using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization;
 using System.Globalization;
+using RxCanvas.Interfaces;
+using RxCanvas.Model;
 
 namespace RxCanvas.Serializers
 {
@@ -22,7 +22,7 @@ namespace RxCanvas.Serializers
 
         public override Type BindToType(string assemblyName, string typeName)
         {
-            string resolvedTypeName = string.Format("RxCanvas.Model.{0}, RxCanvas.Model", 'X' + typeName);
+            string resolvedTypeName = string.Format("RxCanvas.Model.{0}, RxCanvas.Shared", 'X' + typeName);
             return Type.GetType(resolvedTypeName, true);
         }
     }

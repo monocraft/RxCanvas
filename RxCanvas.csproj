@@ -91,6 +91,7 @@
       <DependentUpon>SelectedItemControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utf8TextFile.cs" />
+    <Compile Include="Xaml.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -138,29 +139,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="RxCanvas.Core\RxCanvas.Core.csproj">
-      <Project>{9bdd1a2b-3d2f-43ea-9df6-e79ea243b490}</Project>
-      <Name>RxCanvas.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="RxCanvas.Editors\RxCanvas.Editors.csproj">
-      <Project>{712f124c-a263-4c22-8369-b7f84cafd7a4}</Project>
-      <Name>RxCanvas.Editors</Name>
-    </ProjectReference>
     <ProjectReference Include="RxCanvas.Serializers\RxCanvas.Serializers.csproj">
       <Project>{9dd40808-5705-4ca4-9672-a23e5f585a61}</Project>
       <Name>RxCanvas.Serializers</Name>
-    </ProjectReference>
-    <ProjectReference Include="RxCanvas.Model\RxCanvas.Model.csproj">
-      <Project>{714a5c10-b8f4-49ec-bed6-1123ca7b7a04}</Project>
-      <Name>RxCanvas.Model</Name>
     </ProjectReference>
     <ProjectReference Include="RxCanvas.Creators\RxCanvas.Creators.csproj">
       <Project>{d80af44a-f33f-441e-9fd4-25781aeb25aa}</Project>
       <Name>RxCanvas.Creators</Name>
     </ProjectReference>
-    <ProjectReference Include="RxCanvas.Xaml\RxCanvas.Xaml.csproj">
-      <Project>{1153080c-2d0c-42ed-9880-5762fb1717b1}</Project>
-      <Name>RxCanvas.Xaml</Name>
+    <ProjectReference Include="RxCanvas.Shared\RxCanvas.Shared.csproj">
+      <Project>{bfc8b726-f060-4582-bc73-6463323c403f}</Project>
+      <Name>RxCanvas.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

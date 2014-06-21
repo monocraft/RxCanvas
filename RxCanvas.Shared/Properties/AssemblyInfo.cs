@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RxCanvas.Model")]
-[assembly: AssemblyDescription("Create and edit 2D graphics primitives.")]
+[assembly: AssemblyTitle("RxCanvas.Shared")]
+[assembly: AssemblyDescription("Portable 2D graphics editor. Shared module.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Wiesław Šoltés")]
-[assembly: AssemblyProduct("RxCanvas.Model")]
+[assembly: AssemblyProduct("RxCanvas.Shared")]
 [assembly: AssemblyCopyright("Copyright © Wiesław Šoltés 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("77858a1b-440e-4694-9350-e447c07d63de")]
+[assembly: Guid("a3d7db18-37a4-4e67-ba46-f0b1264eee37")]
 
 // Version information for an assembly consists of the following four values:
 //

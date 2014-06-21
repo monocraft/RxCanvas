@@ -1,4 +1,4 @@
-﻿using RxCanvas.Core;
+﻿using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RxCanvas.Editors
+namespace RxCanvas.Bounds
 {
     public class EllipseBounds : IBounds
     {

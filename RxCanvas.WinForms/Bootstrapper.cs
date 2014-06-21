@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using RxCanvas.Core;
 using RxCanvas.Creators;
 using RxCanvas.Editors;
+using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using RxCanvas.Serializers;
 using System;
@@ -20,7 +20,7 @@ namespace RxCanvas.WinForms
             // register components
             var builder = new ContainerBuilder();
 
-            var editorAssembly = Assembly.GetAssembly(typeof(PortableXDefaultsFactory));
+            var editorAssembly = Assembly.GetAssembly(typeof(XModelFactory));
             builder.RegisterAssemblyTypes(editorAssembly)
                 .Where(t => t.Name.EndsWith("Editor"))
                 .AsImplementedInterfaces()
@@ -39,7 +39,7 @@ namespace RxCanvas.WinForms
                 .SingleInstance();
 
             builder.Register<ICoreToModelConverter>(c => new CoreToXModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(c => new PortableXDefaultsFactory()).SingleInstance();
+            builder.Register<ICanvasFactory>(c => new XModelFactory()).SingleInstance();
             builder.Register<IModelToNativeConverter>(c => new XModelToWinFormsConverter(panel)).SingleInstance();
 
             builder.Register<ICanvas>(c =>
