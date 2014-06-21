@@ -37,7 +37,7 @@ namespace RxCanvas.Editors
 
                 var _xline = canvasFactory.CreateLine();
                 _xline.Stroke = canvasFactory.CreateColor();
-                _xline.Stroke.A = 0x80;
+                _xline.Stroke.A = 0xFF;
                 _xline.Stroke.R = 0x00;
                 _xline.Stroke.G = 0xBF;
                 _xline.Stroke.B = 0xFF;
