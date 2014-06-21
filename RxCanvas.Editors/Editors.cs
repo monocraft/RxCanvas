@@ -587,6 +587,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    //_elllipse.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
@@ -599,6 +600,9 @@ namespace RxCanvas.Editors
                     _xellipse.Y = _start.Y;
                     _elllipse = nativeConverter.Convert(_xellipse);
                     _canvas.Add(_elllipse);
+                    _elllipse.Bounds = new EllipseBounds(nativeConverter, canvasFactory, canvas, _elllipse, 5.0);
+                    _elllipse.Bounds.Update();
+                    //_elllipse.Bounds.Show();
                     _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.BottomRight;
@@ -615,6 +619,7 @@ namespace RxCanvas.Editors
                 if (_state == State.BottomRight)
                 {
                     UpdatePositionAndSize(p);
+                    _elllipse.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
@@ -749,6 +754,11 @@ namespace RxCanvas.Editors
         public IPoint CreatePoint()
         {
             return new XPoint(0.0, 0.0);
+        }
+
+        public IPolygon CreatePolygon()
+        {
+            return new XPolygon();
         }
 
         public ILine CreateLine()
