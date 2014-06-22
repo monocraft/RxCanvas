@@ -147,11 +147,14 @@ namespace RxCanvas.Editors
                     double dy = _start.Y - p.Y;
                     _start = p;
 
-                    if (_selected is IEllipse)
+                    if (_selected is ILine)
                     {
-                        var ellipse = _selected as IEllipse;
-                        ellipse.X -= dx;
-                        ellipse.Y -= dy;
+                        // TODO: Move entire line or line Start or line End.
+                        var line = _selected as ILine;
+                        line.Point1.X -= dx;
+                        line.Point1.Y -= dy;
+                        line.Point2.X -= dx;
+                        line.Point2.Y -= dy;
                     }
                     else if (_selected is IRectangle)
                     {
@@ -159,7 +162,20 @@ namespace RxCanvas.Editors
                         rectangle.X -= dx;
                         rectangle.Y -= dy;
                     }
+                    else if (_selected is IEllipse)
+                    {
+                        var ellipse = _selected as IEllipse;
+                        ellipse.X -= dx;
+                        ellipse.Y -= dy;
+                    }
+                    else if (_selected is IText)
+                    {
+                        var text = _selected as IText;
+                        text.X -= dx;
+                        text.Y -= dy;
+                    }
 
+                    // TODO: Add missing elements.
                     // TODO: Add Move(double dx, double dy) method to INative interface.
 
                     _selected.Bounds.Update();
