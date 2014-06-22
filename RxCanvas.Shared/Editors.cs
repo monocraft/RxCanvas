@@ -253,41 +253,108 @@ namespace RxCanvas.Editors
 
             if (_selected is ILine)
             {
-                // TODO: Move entire line or line Start or line End.
                 var line = _selected as ILine;
-
-                line.Point1.X -= dx;
-                line.Point1.Y -= dy;
-                line.Point2.X -= dx;
-                line.Point2.Y -= dy;
-
-                // TODO: Add Move(double dx, double dy) method to INative interface.
-                line.Point1 = line.Point1;
-                line.Point2 = line.Point2;
+                MoveLine(line, dx, dy);
+            }
+            else if (_selected is IBezier)
+            {
+                var bezier = _selected as IBezier;
+                MoveBezier(bezier, dx, dy);
+            }
+            else if (_selected is IQuadraticBezier)
+            {
+                var quadraticBezier = _selected as IQuadraticBezier;
+                MoveQuadraticBezier(quadraticBezier, dx, dy);
+            }
+            else if (_selected is IArc)
+            {
+                var arc = _selected as IArc;
+                MoveArc(arc, dx, dy);
             }
             else if (_selected is IRectangle)
             {
                 var rectangle = _selected as IRectangle;
-                rectangle.X -= dx;
-                rectangle.Y -= dy;
+                MoveRectangle(rectangle, dx, dy);
             }
             else if (_selected is IEllipse)
             {
                 var ellipse = _selected as IEllipse;
-                ellipse.X -= dx;
-                ellipse.Y -= dy;
+                MoveEllipse(ellipse, dx, dy);
             }
             else if (_selected is IText)
             {
                 var text = _selected as IText;
-                text.X -= dx;
-                text.Y -= dy;
+                MoveText(text, dx, dy);
             }
-
-            // TODO: Add missing elements.
 
             _selected.Bounds.Update();
             _canvas.Render(null);
+        }
+
+        private void MoveLine(ILine line, double dx, double dy)
+        {
+            line.Point1.X -= dx;
+            line.Point1.Y -= dy;
+            line.Point2.X -= dx;
+            line.Point2.Y -= dy;
+
+            line.Point1 = line.Point1;
+            line.Point2 = line.Point2;
+        }
+
+        private void MoveBezier(IBezier bezier, double dx, double dy)
+        {
+            bezier.Start.X -= dx;
+            bezier.Start.Y -= dy;
+            bezier.Point1.X -= dx;
+            bezier.Point1.Y -= dy;
+            bezier.Point2.X -= dx;
+            bezier.Point2.Y -= dy;
+            bezier.Point3.X -= dx;
+            bezier.Point3.Y -= dy;
+
+            bezier.Start = bezier.Start;
+            bezier.Point1 = bezier.Point1;
+            bezier.Point2 = bezier.Point2;
+            bezier.Point3 = bezier.Point3;
+        }
+
+        private void MoveQuadraticBezier(IQuadraticBezier quadraticBezier, double dx, double dy)
+        {
+            quadraticBezier.Start.X -= dx;
+            quadraticBezier.Start.Y -= dy;
+            quadraticBezier.Point1.X -= dx;
+            quadraticBezier.Point1.Y -= dy;
+            quadraticBezier.Point2.X -= dx;
+            quadraticBezier.Point2.Y -= dy;
+
+            quadraticBezier.Start = quadraticBezier.Start;
+            quadraticBezier.Point1 = quadraticBezier.Point1;
+            quadraticBezier.Point2 = quadraticBezier.Point2;
+        }
+
+        private void MoveArc(IArc arc, double dx, double dy)
+        {
+            arc.X -= dx;
+            arc.Y -= dy;
+        }
+
+        private void MoveRectangle(IRectangle rectangle, double dx, double dy)
+        {
+            rectangle.X -= dx;
+            rectangle.Y -= dy;
+        }
+
+        private void MoveEllipse(IEllipse ellipse, double dx, double dy)
+        {
+            ellipse.X -= dx;
+            ellipse.Y -= dy;
+        }
+
+        private void MoveText(IText text, double dx, double dy)
+        {
+            text.X -= dx;
+            text.Y -= dy;
         }
 
         private INative HitTest(double x, double y)
