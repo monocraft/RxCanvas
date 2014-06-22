@@ -355,6 +355,23 @@ namespace RxCanvas.Bounds
             Helper.UpdatePointBounds(_bezier.Point3, ps, ls, _size, _offset);
         }
 
+        private int k;
+        private XPoint[] convexHull;
+
+        public bool ConvexHullAsPolygonContains(double x, double y)
+        {
+            bool contains = false;
+            for (int i = 0, j = k - 2; i < k - 1; j = i++)
+            {
+                if (((convexHull[i].Y > y) != (convexHull[j].Y > y))
+                    && (x < (convexHull[j].X - convexHull[i].X) * (y - convexHull[i].Y) / (convexHull[j].Y - convexHull[i].Y) + convexHull[i].X))
+                {
+                    contains = !contains;
+                }
+            }
+            return contains;
+        }
+
         private void UpdateBezierBounds()
         {
             var ps = _polygonBezier.Points.Select(p => p as XPoint).ToArray();
@@ -369,35 +386,33 @@ namespace RxCanvas.Bounds
             ps[3].X = _bezier.Point3.X;
             ps[3].Y = _bezier.Point3.Y;
 
-            XPoint[] hull;
-            int k;
-            MonotoneChain.ConvexHull(ps, out hull, out k);
-            Debug.Print("k: {0}", k);
+            MonotoneChain.ConvexHull(ps, out convexHull, out k);
+            //Debug.Print("k: {0}", k);
 
             if (k == 3)
             {
-                Helper.MoveLine(ls[0], hull[0], hull[1]);
-                Helper.MoveLine(ls[1], hull[1], hull[2]);
+                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
+                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
 
                 // not used
-                Helper.MoveLine(ls[2], hull[0], hull[0]);
-                Helper.MoveLine(ls[3], hull[0], hull[0]);
+                Helper.MoveLine(ls[2], convexHull[0], convexHull[0]);
+                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
             }
             else if (k == 4)
             {
-                Helper.MoveLine(ls[0], hull[0], hull[1]);
-                Helper.MoveLine(ls[1], hull[1], hull[2]);
-                Helper.MoveLine(ls[2], hull[2], hull[3]);
+                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
+                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
+                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
 
                 // not used
-                Helper.MoveLine(ls[3], hull[0], hull[0]);
+                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
             }
             else if (k == 5)
             {
-                Helper.MoveLine(ls[0], hull[0], hull[1]);
-                Helper.MoveLine(ls[1], hull[1], hull[2]);
-                Helper.MoveLine(ls[2], hull[2], hull[3]);
-                Helper.MoveLine(ls[3], hull[3], hull[4]);
+                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
+                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
+                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
+                Helper.MoveLine(ls[3], convexHull[3], convexHull[4]);
             }
         }
 
@@ -473,7 +488,7 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygonBezier.Contains(x, y)
+            return ConvexHullAsPolygonContains(x, y) //_polygonBezier.Contains(x, y)
                 || _polygonStart.Contains(x, y)
                 || _polygonPoint1.Contains(x, y)
                 || _polygonPoint2.Contains(x, y)
@@ -540,6 +555,23 @@ namespace RxCanvas.Bounds
             Helper.UpdatePointBounds(_quadraticBezier.Point2, ps, ls, _size, _offset);
         }
 
+        private int k;
+        private XPoint[] convexHull;
+
+        public bool ConvexHullAsPolygonContains(double x, double y)
+        {
+            bool contains = false;
+            for (int i = 0, j = k - 2; i < k - 1; j = i++)
+            {
+                if (((convexHull[i].Y > y) != (convexHull[j].Y > y))
+                    && (x < (convexHull[j].X - convexHull[i].X) * (y - convexHull[i].Y) / (convexHull[j].Y - convexHull[i].Y) + convexHull[i].X))
+                {
+                    contains = !contains;
+                }
+            }
+            return contains;
+        }
+
         private void UpdateQuadraticBezierBounds()
         {
             var ps = _polygonQuadraticBezier.Points.Select(p => p as XPoint).ToArray();
@@ -556,35 +588,33 @@ namespace RxCanvas.Bounds
             ps[3].X = _quadraticBezier.Point2.X;
             ps[3].Y = _quadraticBezier.Point2.Y;
 
-            XPoint[] hull;
-            int k;
-            MonotoneChain.ConvexHull(ps, out hull, out k);
-            Debug.Print("k: {0}", k);
+            MonotoneChain.ConvexHull(ps, out convexHull, out k);
+            //Debug.Print("k: {0}", k);
 
             if (k == 3)
             {
-                Helper.MoveLine(ls[0], hull[0], hull[1]);
-                Helper.MoveLine(ls[1], hull[1], hull[2]);
+                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
+                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
 
                 // not used
-                Helper.MoveLine(ls[2], hull[0], hull[0]);
-                Helper.MoveLine(ls[3], hull[0], hull[0]);
+                Helper.MoveLine(ls[2], convexHull[0], convexHull[0]);
+                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
             }
             else if (k == 4)
             {
-                Helper.MoveLine(ls[0], hull[0], hull[1]);
-                Helper.MoveLine(ls[1], hull[1], hull[2]);
-                Helper.MoveLine(ls[2], hull[2], hull[3]);
+                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
+                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
+                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
 
                 // not used
-                Helper.MoveLine(ls[3], hull[0], hull[0]);
+                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
             }
             else if (k == 5)
             {
-                Helper.MoveLine(ls[0], hull[0], hull[1]);
-                Helper.MoveLine(ls[1], hull[1], hull[2]);
-                Helper.MoveLine(ls[2], hull[2], hull[3]);
-                Helper.MoveLine(ls[3], hull[3], hull[4]);
+                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
+                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
+                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
+                Helper.MoveLine(ls[3], convexHull[3], convexHull[4]);
             }
         }
 
@@ -651,7 +681,7 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygonQuadraticBezier.Contains(x, y)
+            return ConvexHullAsPolygonContains(x, y) //_polygonQuadraticBezier.Contains(x, y)
                 || _polygonStart.Contains(x, y)
                 || _polygonPoint1.Contains(x, y)
                 || _polygonPoint2.Contains(x, y);
