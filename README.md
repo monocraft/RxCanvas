@@ -3,7 +3,7 @@ RxCanvas
 
 Portable 2D graphics editor.
 
-Platfoms:
+Platforms:
 
     WPF
     Windows Forms
@@ -15,20 +15,20 @@ Platfoms:
 Keyboard Shortcuts:
 
     (Create)
-    T -> Text
-    E -> Ellipse
-    R -> Rectangle
-    A -> Arc
-    Q -> Quadratic Bézier
+	L -> Line
     B -> Bézier
-    L -> Line
-    H -> Selection
-    S -> Snap
+    Q -> Quadratic Bézier
+    A -> Arc
+    R -> Rectangle
+    E -> Ellipse
+    T -> Text
     (File)
     Control+O -> Open
     Control+S -> Save
     Control+E -> Export
     (Canvas)
+    H -> Selection
+    S -> Snap
     Control+Delete -> Clear
 
 Mouse:
