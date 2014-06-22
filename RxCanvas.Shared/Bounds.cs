@@ -29,10 +29,10 @@ namespace RxCanvas.Bounds
             int points)
         {
             var polygon = canvasFactory.CreatePolygon();
-            polygon.Points = new IPoint[PointBoundVertexCount];
-            polygon.Lines = new ILine[PointBoundVertexCount];
+            polygon.Points = new IPoint[points];
+            polygon.Lines = new ILine[points];
 
-            for (int i = 0; i < PointBoundVertexCount; i++)
+            for (int i = 0; i < points; i++)
             {
                 polygon.Points[i] = canvasFactory.CreatePoint();
 
