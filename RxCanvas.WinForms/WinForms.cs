@@ -1,8 +1,10 @@
-﻿using RxCanvas.Core;
+﻿using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -17,7 +19,11 @@ namespace RxCanvas.WinForms
 
         public WinFormsCanvasPanel()
         {
-            this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            this.SetStyle(
+                ControlStyles.UserPaint 
+                | ControlStyles.AllPaintingInWmPaint 
+                | ControlStyles.OptimizedDoubleBuffer,
+                true);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -25,13 +31,18 @@ namespace RxCanvas.WinForms
             Draw(e.Graphics, Canvas);
         }
 
+        private Color ToColor(IColor color)
+        {
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+       
         private void Draw(Graphics g, ICanvas canvas)
         {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.SmoothingMode = SmoothingMode.HighQuality;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+            g.CompositingQuality = CompositingQuality.HighQuality;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
             g.Clear(Color.White);
 
@@ -45,25 +56,46 @@ namespace RxCanvas.WinForms
                 if (child is ILine)
                 {
                     var line = child as ILine;
-                    Pen pen = new Pen(Color.FromArgb(line.Stroke.A, line.Stroke.R, line.Stroke.G, line.Stroke.B), (float)line.StrokeThickness);
-                    g.DrawLine(pen, (float)line.Point1.X, (float)line.Point1.Y, (float)line.Point2.X, (float)line.Point2.Y);
+                    Pen pen = new Pen(
+                        ToColor(line.Stroke), 
+                        (float)line.StrokeThickness);
+
+                    g.DrawLine(
+                        pen, 
+                        (float)line.Point1.X, 
+                        (float)line.Point1.Y, 
+                        (float)line.Point2.X, 
+                        (float)line.Point2.Y);
+
                     pen.Dispose();
                 }
                 else if (child is IBezier)
                 {
                     var bezier = child as IBezier;
-                    Pen pen = new Pen(Color.FromArgb(bezier.Stroke.A, bezier.Stroke.R, bezier.Stroke.G, bezier.Stroke.B), (float)bezier.StrokeThickness);
-                    g.DrawBezier(pen,
-                        (float)bezier.Start.X, (float)bezier.Start.Y,
-                        (float)bezier.Point1.X, (float)bezier.Point1.Y,
-                        (float)bezier.Point2.X, (float)bezier.Point2.Y,
-                        (float)bezier.Point3.X, (float)bezier.Point3.Y);
+                    Pen pen = new Pen(
+                        ToColor(bezier.Stroke), 
+                        (float)bezier.StrokeThickness);
+
+                    g.DrawBezier(
+                        pen,
+                        (float)bezier.Start.X, 
+                        (float)bezier.Start.Y,
+                        (float)bezier.Point1.X, 
+                        (float)bezier.Point1.Y,
+                        (float)bezier.Point2.X, 
+                        (float)bezier.Point2.Y,
+                        (float)bezier.Point3.X, 
+                        (float)bezier.Point3.Y);
+
                     pen.Dispose();
                 }
                 else if (child is IQuadraticBezier)
                 {
                     var quadraticBezier = child as IQuadraticBezier;
-                    Pen pen = new Pen(Color.FromArgb(quadraticBezier.Stroke.A, quadraticBezier.Stroke.R, quadraticBezier.Stroke.G, quadraticBezier.Stroke.B), (float)quadraticBezier.StrokeThickness);
+                    Pen pen = new Pen(
+                        ToColor(quadraticBezier.Stroke), 
+                        (float)quadraticBezier.StrokeThickness);
+
                     double x1 = quadraticBezier.Start.X;
                     double y1 = quadraticBezier.Start.Y;
                     double x2 = quadraticBezier.Start.X + (2.0 * (quadraticBezier.Point1.X - quadraticBezier.Start.X)) / 3.0;
@@ -72,11 +104,18 @@ namespace RxCanvas.WinForms
                     double y3 = y2 + (quadraticBezier.Point2.Y - quadraticBezier.Start.Y) / 3.0;
                     double x4 = quadraticBezier.Point2.X;
                     double y4 = quadraticBezier.Point2.Y;
-                    g.DrawBezier(pen,
-                        (float)x1, (float)y1,
-                        (float)x2, (float)y2,
-                        (float)x3, (float)y3,
-                        (float)x4, (float)y4);
+
+                    g.DrawBezier(
+                        pen,
+                        (float)x1, 
+                        (float)y1,
+                        (float)x2, 
+                        (float)y2,
+                        (float)x3, 
+                        (float)y3,
+                        (float)x4, 
+                        (float)y4);
+
                     pen.Dispose();
                 }
                 else if (child is IArc)
@@ -84,33 +123,80 @@ namespace RxCanvas.WinForms
                     var arc = child as IArc;
                     if (arc.Width > 0.0 && arc.Height > 0.0)
                     {
-                        Pen pen = new Pen(Color.FromArgb(arc.Stroke.A, arc.Stroke.R, arc.Stroke.G, arc.Stroke.B), (float)arc.StrokeThickness);
-                        g.DrawArc(pen, (float)arc.X, (float)arc.Y, (float)arc.Width, (float)arc.Height, (float)arc.StartAngle, (float)arc.SweepAngle);
+                        Pen pen = new Pen(
+                            ToColor(arc.Stroke), 
+                            (float)arc.StrokeThickness);
+
+                        g.DrawArc(
+                            pen, 
+                            (float)arc.X, 
+                            (float)arc.Y, 
+                            (float)arc.Width, 
+                            (float)arc.Height, 
+                            (float)arc.StartAngle, 
+                            (float)arc.SweepAngle);
+
                         pen.Dispose();
                     }
                 }
                 else if (child is IRectangle)
                 {
                     var rectangle = child as IRectangle;
-                    Pen pen = new Pen(Color.FromArgb(rectangle.Stroke.A, rectangle.Stroke.R, rectangle.Stroke.G, rectangle.Stroke.B), (float)rectangle.StrokeThickness);
-                    g.DrawRectangle(pen, (float)rectangle.X, (float)rectangle.Y, (float)rectangle.Width, (float)rectangle.Height);
+                    double st = rectangle.StrokeThickness;
+                    double hst = st / 2.0;
+                    Pen pen = new Pen(
+                        ToColor(rectangle.Stroke), 
+                        (float)rectangle.StrokeThickness);
+
+                    g.DrawRectangle(
+                        pen, 
+                        (float)(rectangle.X + hst), 
+                        (float)(rectangle.Y + hst),
+                        (float)(rectangle.Width - st),
+                        (float)(rectangle.Height - st));
+
                     pen.Dispose();
                 }
                 else if (child is IEllipse)
                 {
                     var ellipse = child as IEllipse;
-                    Pen pen = new Pen(Color.FromArgb(ellipse.Stroke.A, ellipse.Stroke.R, ellipse.Stroke.G, ellipse.Stroke.B), (float)ellipse.StrokeThickness);
-                    g.DrawEllipse(pen, (float)ellipse.X, (float)ellipse.Y, (float)ellipse.Width, (float)ellipse.Height);
+                    double st = ellipse.StrokeThickness;
+                    double hst = st / 2.0;
+                    Pen pen = new Pen(
+                        ToColor(ellipse.Stroke), 
+                        (float)ellipse.StrokeThickness);
+                    
+                    g.DrawEllipse(
+                        pen,
+                        (float)(ellipse.X + hst),
+                        (float)(ellipse.Y + hst),
+                        (float)(ellipse.Width - st),
+                        (float)(ellipse.Height - st));
+
                     pen.Dispose();
                 }
                 else if (child is IText)
                 {
                     var text = child as IText;
-                    Brush brush = new SolidBrush(Color.FromArgb(text.Foreground.A, text.Foreground.R, text.Foreground.G, text.Foreground.B));
+                    Brush brush = new SolidBrush(ToColor(text.Foreground));
                     Font font = new Font("Callibri", (float)text.Size);
-                    g.DrawString(text.Text, font, brush,
-                        new RectangleF((float)text.X, (float)text.Y, (float)text.Width, (float)text.Height),
-                        new StringFormat() { Alignment = (StringAlignment)text.HorizontalAlignment, LineAlignment = (StringAlignment)text.VerticalAlignment });
+                    
+
+                    g.DrawString(
+                        text.Text, 
+                        font, 
+                        brush,
+                        new RectangleF(
+                            (float)text.X, 
+                            (float)text.Y, 
+                            (float)text.Width, 
+                            (float)text.Height),
+                        new StringFormat() 
+                        { 
+                            Alignment = (StringAlignment)text.HorizontalAlignment, 
+                            LineAlignment = (StringAlignment)text.VerticalAlignment 
+                        });
+                    
                     brush.Dispose();
                     font.Dispose();
                 }
@@ -121,6 +207,7 @@ namespace RxCanvas.WinForms
     public class WinFormsCanvas : ICanvas
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
@@ -225,7 +312,7 @@ namespace RxCanvas.WinForms
 
     public class XModelToWinFormsConverter : IModelToNativeConverter
     {
-        private WinFormsCanvasPanel _control;
+        private readonly WinFormsCanvasPanel _control;
 
         public XModelToWinFormsConverter(WinFormsCanvasPanel control)
         {

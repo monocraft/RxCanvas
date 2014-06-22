@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RxCanvas.Core;
 using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
+using RxCanvas.Interfaces;
 
 namespace RxCanvas.Creators
 {
@@ -61,15 +61,29 @@ namespace RxCanvas.Creators
             }
         }
 
+        private XColor ToXColor(IColor color)
+        {
+            return XColor.FromArgb(color.A, color.R, color.G, color.B);
+        }
+
         private void DrawLine(XGraphics gfx, ILine line)
         {
-            var pen = new XPen(XColor.FromArgb(line.Stroke.A, line.Stroke.R, line.Stroke.G, line.Stroke.B), X(line.StrokeThickness));
-            gfx.DrawLine(pen, X(line.Point1.X), Y(line.Point1.Y), X(line.Point2.X), Y(line.Point2.Y));
+            var pen = new XPen(ToXColor(line.Stroke), X(line.StrokeThickness));
+
+            gfx.DrawLine(
+                pen, 
+                X(line.Point1.X), 
+                Y(line.Point1.Y), 
+                X(line.Point2.X), 
+                Y(line.Point2.Y));
         }
 
         private void DrawBezier(XGraphics gfx, IBezier bezier)
         {
-            var pen = new XPen(XColor.FromArgb(bezier.Stroke.A, bezier.Stroke.R, bezier.Stroke.G, bezier.Stroke.B), X(bezier.StrokeThickness));
+            var pen = new XPen(
+                ToXColor(bezier.Stroke), 
+                X(bezier.StrokeThickness));
+
             gfx.DrawBezier(pen,
                 X(bezier.Start.X), Y(bezier.Start.Y),
                 X(bezier.Point1.X), Y(bezier.Point1.Y),
@@ -87,7 +101,11 @@ namespace RxCanvas.Creators
             double y3 = y2 + (quadraticBezier.Point2.Y - quadraticBezier.Start.Y) / 3.0;
             double x4 = quadraticBezier.Point2.X;
             double y4 = quadraticBezier.Point2.Y;
-            var pen = new XPen(XColor.FromArgb(quadraticBezier.Stroke.A, quadraticBezier.Stroke.R, quadraticBezier.Stroke.G, quadraticBezier.Stroke.B), X(quadraticBezier.StrokeThickness));
+
+            var pen = new XPen(
+                ToXColor(quadraticBezier.Stroke), 
+                X(quadraticBezier.StrokeThickness));
+
             gfx.DrawBezier(pen,
                 X(x1), Y(y1),
                 X(x2), Y(y2),
@@ -97,8 +115,18 @@ namespace RxCanvas.Creators
 
         private void DrawArc(XGraphics gfx, IArc arc)
         {
-            var pen = new XPen(XColor.FromArgb(arc.Stroke.A, arc.Stroke.R, arc.Stroke.G, arc.Stroke.B), X(arc.StrokeThickness));
-            gfx.DrawArc(pen, X(arc.X), Y(arc.Y), X(arc.Width), Y(arc.Height), arc.StartAngle, arc.SweepAngle);
+            var pen = new XPen(
+                ToXColor(arc.Stroke), 
+                X(arc.StrokeThickness));
+
+            gfx.DrawArc(
+                pen, 
+                X(arc.X), 
+                Y(arc.Y), 
+                X(arc.Width), 
+                Y(arc.Height), 
+                arc.StartAngle, 
+                arc.SweepAngle);
         }
 
         private void DrawRectangle(XGraphics gfx, IRectangle rectangle)
@@ -107,14 +135,32 @@ namespace RxCanvas.Creators
             double hst = st / 2.0;
             if (rectangle.Fill.A > 0x00)
             {
-                var pen = new XPen(XColor.FromArgb(rectangle.Stroke.A, rectangle.Stroke.R, rectangle.Stroke.G, rectangle.Stroke.B), X(rectangle.StrokeThickness));
-                var brush = new XSolidBrush(XColor.FromArgb(rectangle.Fill.A, rectangle.Fill.R, rectangle.Fill.G, rectangle.Fill.B));
-                gfx.DrawRectangle(pen, brush, X(rectangle.X + hst), Y(rectangle.Y + hst), X(rectangle.Width - st), Y(rectangle.Height - st));
+                var pen = new XPen(
+                    ToXColor(rectangle.Stroke), 
+                    X(rectangle.StrokeThickness));
+
+                var brush = new XSolidBrush(ToXColor(rectangle.Fill));
+                
+                gfx.DrawRectangle(
+                    pen, 
+                    brush, 
+                    X(rectangle.X + hst), 
+                    Y(rectangle.Y + hst), 
+                    X(rectangle.Width - st), 
+                    Y(rectangle.Height - st));
             }
             else
             {
-                var pen = new XPen(XColor.FromArgb(rectangle.Stroke.A, rectangle.Stroke.R, rectangle.Stroke.G, rectangle.Stroke.B), X(rectangle.StrokeThickness));
-                gfx.DrawRectangle(pen, X(rectangle.X + hst), Y(rectangle.Y + hst), X(rectangle.Width - st), Y(rectangle.Height - st));
+                var pen = new XPen(
+                    ToXColor(rectangle.Stroke), 
+                    X(rectangle.StrokeThickness));
+
+                gfx.DrawRectangle(
+                    pen, 
+                    X(rectangle.X + hst), 
+                    Y(rectangle.Y + hst), 
+                    X(rectangle.Width - st), 
+                    Y(rectangle.Height - st));
             }
         }
 
@@ -124,23 +170,53 @@ namespace RxCanvas.Creators
             double hst = st / 2.0;
             if (ellipse.Fill.A > 0x00)
             {
-                var pen = new XPen(XColor.FromArgb(ellipse.Stroke.A, ellipse.Stroke.R, ellipse.Stroke.G, ellipse.Stroke.B), X(ellipse.StrokeThickness));
-                var brush = new XSolidBrush(XColor.FromArgb(ellipse.Fill.A, ellipse.Fill.R, ellipse.Fill.G, ellipse.Fill.B));
-                gfx.DrawEllipse(pen, brush, X(ellipse.X + hst), Y(ellipse.Y + hst), X(ellipse.Width - st), Y(ellipse.Height - st));
+                var pen = new XPen(
+                    ToXColor(ellipse.Stroke), 
+                    X(ellipse.StrokeThickness));
+
+                var brush = new XSolidBrush(ToXColor(ellipse.Fill));
+                
+                gfx.DrawEllipse(
+                    pen, 
+                    brush, 
+                    X(ellipse.X + hst), 
+                    Y(ellipse.Y + hst), 
+                    X(ellipse.Width - st), 
+                    Y(ellipse.Height - st));
             }
             else
             {
-                var pen = new XPen(XColor.FromArgb(ellipse.Stroke.A, ellipse.Stroke.R, ellipse.Stroke.G, ellipse.Stroke.B), X(ellipse.StrokeThickness));
-                gfx.DrawEllipse(pen, X(ellipse.X + hst), Y(ellipse.Y + hst), X(ellipse.Width - st), Y(ellipse.Height - st));
+                var pen = new XPen(
+                    ToXColor(ellipse.Stroke), 
+                    X(ellipse.StrokeThickness));
+                
+                gfx.DrawEllipse(pen,
+                    X(ellipse.X + hst), 
+                    Y(ellipse.Y + hst), 
+                    X(ellipse.Width - st), 
+                    Y(ellipse.Height - st));
             }
         }
 
         private void DrawText(XGraphics gfx, IText text)
         {
-            XPdfFontOptions options = new XPdfFontOptions(PdfFontEncoding.Unicode, PdfFontEmbedding.Always);
-            XFont font = new XFont("Calibri", Y(text.Size), XFontStyle.Regular, options);
+            XPdfFontOptions options = new XPdfFontOptions(
+                PdfFontEncoding.Unicode, 
+                PdfFontEmbedding.Always);
+
+            XFont font = new XFont(
+                "Calibri", 
+                Y(text.Size), 
+                XFontStyle.Regular, 
+                options);
+
             XStringFormat format = new XStringFormat();
-            XRect rect = new XRect(X(text.X), Y(text.Y), X(text.Width), Y(text.Height));
+
+            XRect rect = new XRect(
+                X(text.X), 
+                Y(text.Y), 
+                X(text.Width), 
+                Y(text.Height));
 
             switch (text.HorizontalAlignment)
             {
@@ -158,13 +234,17 @@ namespace RxCanvas.Creators
 
             if (text.Backgroud.A != 0x00)
             {
-                var brushBackground = new XSolidBrush(XColor.FromArgb(text.Backgroud.A, text.Backgroud.R, text.Backgroud.G, text.Backgroud.B));
+                var brushBackground = new XSolidBrush(ToXColor(text.Backgroud));
                 gfx.DrawRectangle(brushBackground, rect);
             }
 
-            var brushForeground = new XSolidBrush(XColor.FromArgb(text.Foreground.A, text.Foreground.R, text.Foreground.G, text.Foreground.B));
-            gfx.DrawString(text.Text, font, brushForeground, rect, format);
-
+            var brushForeground = new XSolidBrush(ToXColor(text.Foreground));
+            gfx.DrawString(
+                text.Text, 
+                font, 
+                brushForeground, 
+                rect, 
+                format);
         }
 
         private void DrawCanvas(XGraphics gfx, ICanvas canvas)

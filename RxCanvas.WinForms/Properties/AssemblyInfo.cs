@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("RxCanvas.WinForms")]
-[assembly: AssemblyDescription("Create and edit 2D graphics primitives in WinForms with Rx.")]
+[assembly: AssemblyDescription("Portable 2D graphics editor. WinForms graphical user interface.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Wiesław Šoltés")]
 [assembly: AssemblyProduct("RxCanvas.WinForms")]

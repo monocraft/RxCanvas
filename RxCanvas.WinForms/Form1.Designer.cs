@@ -54,7 +54,7 @@
             this.Controls.Add(this.canvasPanel1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form1";
+            this.Text = "RxCanvas";
             this.ResumeLayout(false);
 
         }

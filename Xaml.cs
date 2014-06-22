@@ -1,4 +1,4 @@
-﻿using RxCanvas.Core;
+﻿using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +18,7 @@ namespace RxCanvas.Xaml
     public class WpfLine : ILine
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         private SolidColorBrush _strokeBrush;
         private IColor _stroke;
@@ -91,6 +92,7 @@ namespace RxCanvas.Xaml
     public class WpfBezier : IBezier
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
@@ -226,6 +228,7 @@ namespace RxCanvas.Xaml
     public class WpfQuadraticBezier : IQuadraticBezier
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
@@ -348,6 +351,7 @@ namespace RxCanvas.Xaml
     public class WpfArc : IArc
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
@@ -624,6 +628,7 @@ namespace RxCanvas.Xaml
     public class WpfRectangle : IRectangle
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
@@ -714,6 +719,7 @@ namespace RxCanvas.Xaml
     public class WpfEllipse : IEllipse
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
@@ -805,6 +811,7 @@ namespace RxCanvas.Xaml
     public class WpfText : IText
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         private SolidColorBrush _foregroundBrush;
         private SolidColorBrush _backgroundBrush;
@@ -923,6 +930,7 @@ namespace RxCanvas.Xaml
     public class WpfCanvas : ICanvas
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
@@ -1001,8 +1009,15 @@ namespace RxCanvas.Xaml
             set
             {
                 _background = value;
-                _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
-                _backgroundBrush.Freeze();
+                if (_background == null)
+                {
+                    _backgroundBrush = null;
+                }
+                else
+                {
+                    _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+                    _backgroundBrush.Freeze();
+                }
                 _canvas.Background = _backgroundBrush;
             }
         }

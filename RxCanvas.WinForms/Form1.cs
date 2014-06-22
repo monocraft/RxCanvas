@@ -1,10 +1,4 @@
-﻿using Autofac;
-using RxCanvas.Core;
-using RxCanvas.Creators;
-using RxCanvas.Editors;
-using RxCanvas.Model;
-using RxCanvas.Serializers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -15,12 +9,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autofac;
+using RxCanvas.Interfaces;
 
 namespace RxCanvas.WinForms
 {
     public partial class Form1 : Form
     {
-        private IContainer _container;
         private ILifetimeScope _backgroundScope;
         private ILifetimeScope _drawingScope;
         private ICollection<IEditor> _editors;
@@ -39,45 +34,12 @@ namespace RxCanvas.WinForms
 
         private void RegisterAndBuild()
         {
-            // register components
-            var builder = new ContainerBuilder();
+            var bootstrapper = new Bootstrapper();
+            var container = bootstrapper.Build(this.canvasPanel1);
 
-            var editorAssembly = Assembly.GetAssembly(typeof(PortableXDefaultsFactory));
-            builder.RegisterAssemblyTypes(editorAssembly)
-                .Where(t => t.Name.EndsWith("Editor"))
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-
-            var serializerAssembly = Assembly.GetAssembly(typeof(JsonXModelSerializer));
-            builder.RegisterAssemblyTypes(serializerAssembly)
-                .Where(t => t.Name.EndsWith("Serializer"))
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
-            var creatorAssembly = Assembly.GetAssembly(typeof(CoreCanvasPdfCreator));
-            builder.RegisterAssemblyTypes(creatorAssembly)
-                .Where(t => t.Name.EndsWith("Creator"))
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
-            builder.Register<ICoreToModelConverter>(f => new CoreToXModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(f => new PortableXDefaultsFactory()).SingleInstance();
-            builder.Register<IModelToNativeConverter>(f => new XModelToWinFormsConverter(this.canvasPanel1)).SingleInstance();
-
-            builder.Register<ICanvas>(c =>
-            {
-                var canvasFactory = c.Resolve<ICanvasFactory>();
-                var xcanvas = canvasFactory.CreateCanvas();
-                var nativeConverter = c.Resolve<IModelToNativeConverter>();
-                return nativeConverter.Convert(xcanvas);
-            }).InstancePerLifetimeScope();
-
-            builder.Register<ITextFile>(f => new Utf8TextFile()).SingleInstance();
-
-            // create container and scopes
-            _container = builder.Build();
-            _backgroundScope = _container.BeginLifetimeScope();
-            _drawingScope = _container.BeginLifetimeScope();
+            // create scopes
+            _backgroundScope = container.BeginLifetimeScope();
+            _drawingScope = container.BeginLifetimeScope();
 
             // resolve dependencies
             _backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
@@ -193,7 +155,7 @@ namespace RxCanvas.WinForms
 
             openFileDialog1.Filter = filter;
             openFileDialog1.FilterIndex = defaultFilterIndex;
-            openFileDialog1.ShowDialog();
+            openFileDialog1.ShowDialog(this);
         }
 
         private void Save()
@@ -204,7 +166,7 @@ namespace RxCanvas.WinForms
             saveFileDialog1.Filter = filter;
             saveFileDialog1.FilterIndex = defaultFilterIndex;
             saveFileDialog1.FileName = "canvas";
-            saveFileDialog1.ShowDialog();
+            saveFileDialog1.ShowDialog(this);
         }
 
         private void Export()
@@ -215,7 +177,7 @@ namespace RxCanvas.WinForms
             saveFileDialog2.Filter = filter;
             saveFileDialog2.FilterIndex = defaultFilterIndex;
             saveFileDialog2.FileName = "canvas";
-            saveFileDialog2.ShowDialog();
+            saveFileDialog2.ShowDialog(this);
         }
 
         private string CreateSerializersFilter()
@@ -275,8 +237,10 @@ namespace RxCanvas.WinForms
 
         private void ConvertToNative(ICanvas xcanvas)
         {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
             var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
+            var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var boundsFactory = _drawingScope.Resolve<IBoundsFactory>();
 
             drawingCanvas.Clear();
 
@@ -286,36 +250,78 @@ namespace RxCanvas.WinForms
                 {
                     var native = nativeConverter.Convert(child as ILine);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IBezier)
                 {
                     var native = nativeConverter.Convert(child as IBezier);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IQuadraticBezier)
                 {
                     var native = nativeConverter.Convert(child as IQuadraticBezier);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IArc)
                 {
                     var native = nativeConverter.Convert(child as IArc);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IRectangle)
                 {
                     var native = nativeConverter.Convert(child as IRectangle);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IEllipse)
                 {
                     var native = nativeConverter.Convert(child as IEllipse);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IText)
                 {
                     var native = nativeConverter.Convert(child as IText);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else
                 {

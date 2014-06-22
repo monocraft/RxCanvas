@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RxCanvas.Core
+namespace RxCanvas.Interfaces
 {
     public struct ImmutablePoint
     {
@@ -32,9 +32,27 @@ namespace RxCanvas.Core
         double Y { get; set; }
     }
 
+    public interface IPolygon
+    {
+        IPoint[] Points { get; set; }
+        ILine[] Lines { get; set; }
+        bool Contains(IPoint point);
+        bool Contains(double x, double y);
+    }
+
+    public interface IBounds
+    {
+        void Update();
+        bool IsVisible();
+        void Show();
+        void Hide();
+        bool Contains(double x, double y);
+    }
+
     public interface INative
     {
         object Native { get; set; }
+        IBounds Bounds { get; set; }
     }
 
     public interface ILine : INative
@@ -126,22 +144,16 @@ namespace RxCanvas.Core
         IObservable<ImmutablePoint> Downs { get; set; }
         IObservable<ImmutablePoint> Ups { get; set; }
         IObservable<ImmutablePoint> Moves { get; set; }
-
         IList<INative> Children { get; set; }
-
         double Width { get; set; }
         double Height { get; set; }
         IColor Background { get; set; }
-
         bool EnableSnap { get; set; }
         double SnapX { get; set; }
         double SnapY { get; set; }
-
         bool IsCaptured { get; set; }
-
         void Capture();
         void ReleaseCapture();
-
         void Add(INative value);
         void Remove(INative value);
         void Clear();
@@ -160,6 +172,7 @@ namespace RxCanvas.Core
     {
         IColor CreateColor();
         IPoint CreatePoint();
+        IPolygon CreatePolygon();
         ILine CreateLine();
         IBezier CreateBezier();
         IQuadraticBezier CreateQuadraticBezier();
@@ -183,11 +196,23 @@ namespace RxCanvas.Core
     }
 
     public interface ICoreToModelConverter : IConverter
-    {
+    { 
     }
 
     public interface IModelToNativeConverter : IConverter
+    { 
+    }
+
+    public interface IBoundsFactory
     {
+        IBounds Create(ICanvas canvas, IPoint point);
+        IBounds Create(ICanvas canvas, ILine line);
+        IBounds Create(ICanvas canvas, IBezier bezier);
+        IBounds Create(ICanvas canvas, IQuadraticBezier quadraticBezier);
+        IBounds Create(ICanvas canvas, IArc arc);
+        IBounds Create(ICanvas canvas, IRectangle rectangle);
+        IBounds Create(ICanvas canvas, IEllipse ellipse);
+        IBounds Create(ICanvas canvas, IText text);
     }
 
     public interface ISerializer<T> where T : class

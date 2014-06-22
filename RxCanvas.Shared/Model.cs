@@ -1,4 +1,4 @@
-﻿using RxCanvas.Core;
+﻿using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,25 +24,68 @@ namespace RxCanvas.Model
         }
     }
 
-    public class XPoint : IPoint
+    public class XPoint : IPoint, IComparable<XPoint>
     {
         public double X { get; set; }
         public double Y { get; set; }
+
         public XPoint(double x, double y)
         {
             X = x;
             Y = y;
+        }
+
+        public static bool operator <(XPoint p1, XPoint p2)
+        {
+            return p1.X < p2.X || (p1.X == p2.X && p1.Y < p2.Y);
+        }
+
+        public static bool operator >(XPoint p1, XPoint p2)
+        {
+            return p1.X > p2.X || (p1.X == p2.X && p1.Y > p2.Y);
+        }
+
+        public int CompareTo(XPoint other)
+        {
+            return (this > other) ? -1 : ((this < other) ? 1 : 0);
+        }
+    }
+
+    public class XPolygon : IPolygon
+    {
+        public IPoint[] Points { get; set; }
+        public ILine[] Lines { get; set; }
+
+        public bool Contains(IPoint point)
+        {
+            return Contains(point.X, point.Y);
+        }
+
+        public bool Contains(double x, double y)
+        {
+            bool contains = false;
+            for (int i = 0, j = Points.Length - 1; i < Points.Length; j = i++)
+            {
+                if (((Points[i].Y > y) != (Points[j].Y > y))
+                    && (x < (Points[j].X - Points[i].X) * (y - Points[i].Y) / (Points[j].Y - Points[i].Y) + Points[i].X))
+                {
+                    contains = !contains;
+                }
+            }
+            return contains;
         }
     }
 
     public abstract class XNative : INative
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
     }
 
     public class XLine : ILine
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
         public IColor Stroke { get; set; }
@@ -52,6 +95,7 @@ namespace RxCanvas.Model
     public class XBezier : IBezier
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
         public IPoint Start { get; set; }
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
@@ -66,6 +110,7 @@ namespace RxCanvas.Model
     public class XQuadraticBezier : IQuadraticBezier
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
         public IPoint Start { get; set; }
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
@@ -79,6 +124,7 @@ namespace RxCanvas.Model
     public class XArc : IArc
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
@@ -95,6 +141,7 @@ namespace RxCanvas.Model
     public class XRectangle : IRectangle
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
@@ -107,6 +154,7 @@ namespace RxCanvas.Model
     public class XEllipse : IEllipse
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
@@ -119,6 +167,7 @@ namespace RxCanvas.Model
     public class XText : IText
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
@@ -134,6 +183,7 @@ namespace RxCanvas.Model
     public class XCanvas : ICanvas
     {
         public object Native { get; set; }
+        public IBounds Bounds { get; set; }
 
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
