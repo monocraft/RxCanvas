@@ -551,32 +551,38 @@ namespace RxCanvas.Editors
                     return;
                 }
 
-                if (_state == State.Start)
+                switch (_state)
                 {
-                    _xb.Point3.X = p.X;
-                    _xb.Point3.Y = p.Y;
-                    _nb.Point3 = _xb.Point3;
-                    _xb.Point2.X = p.X;
-                    _xb.Point2.Y = p.Y;
-                    _nb.Point2 = _xb.Point2;
-                    _nb.Bounds.Update();
-                    _canvas.Render(null);
-                }
-                else if (_state == State.Point1)
-                {
-                    _xb.Point1.X = p.X;
-                    _xb.Point1.Y = p.Y;
-                    _nb.Point1 = _xb.Point1;
-                    _nb.Bounds.Update();
-                    _canvas.Render(null);
-                }
-                else if (_state == State.Point2)
-                {
-                    _xb.Point2.X = p.X;
-                    _xb.Point2.Y = p.Y;
-                    _nb.Point2 = _xb.Point2;
-                    _nb.Bounds.Update();
-                    _canvas.Render(null);
+                    case State.Start:
+                        {
+                            _xb.Point3.X = p.X;
+                            _xb.Point3.Y = p.Y;
+                            _nb.Point3 = _xb.Point3;
+                            _xb.Point2.X = p.X;
+                            _xb.Point2.Y = p.Y;
+                            _nb.Point2 = _xb.Point2;
+                            _nb.Bounds.Update();
+                            _canvas.Render(null);
+                        }
+                        break;
+                    case State.Point1:
+                        {
+                            _xb.Point1.X = p.X;
+                            _xb.Point1.Y = p.Y;
+                            _nb.Point1 = _xb.Point1;
+                            _nb.Bounds.Update();
+                            _canvas.Render(null);
+                        }
+                        break;
+                    case State.Point2:
+                        {
+                            _xb.Point2.X = p.X;
+                            _xb.Point2.Y = p.Y;
+                            _nb.Point2 = _xb.Point2;
+                            _nb.Bounds.Update();
+                            _canvas.Render(null);
+                        }
+                        break;
                 }
             });
         }
@@ -686,21 +692,26 @@ namespace RxCanvas.Editors
                     return;
                 }
 
-                if (_state == State.Start)
+                switch (_state)
                 {
-                    _xqb.Point2.X = p.X;
-                    _xqb.Point2.Y = p.Y;
-                    _nqb.Point2 = _xqb.Point2;
-                    _nqb.Bounds.Update();
-                    _canvas.Render(null);
-                }
-                else if (_state == State.Point1)
-                {
-                    _xqb.Point1.X = p.X;
-                    _xqb.Point1.Y = p.Y;
-                    _nqb.Point1 = _xqb.Point1;
-                    _nqb.Bounds.Update();
-                    _canvas.Render(null);
+                    case State.Start:
+                        {
+                            _xqb.Point2.X = p.X;
+                            _xqb.Point2.Y = p.Y;
+                            _nqb.Point2 = _xqb.Point2;
+                            _nqb.Bounds.Update();
+                            _canvas.Render(null);
+                        }
+                        break;
+                    case State.Point1:
+                        {
+                            _xqb.Point1.X = p.X;
+                            _xqb.Point1.Y = p.Y;
+                            _nqb.Point1 = _xqb.Point1;
+                            _nqb.Bounds.Update();
+                            _canvas.Render(null);
+                        }
+                        break;
                 }
             });
         }
