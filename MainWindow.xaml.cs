@@ -99,6 +99,8 @@ namespace RxCanvas
                     new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key),
                                                  editor.Modifiers == "" ? ModifierKeys.None : (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
                     () => EnableEditor(_editor));
+
+                //Debug.Print("{0}{1}{2} -> {3}", editor.Modifiers, editor.Modifiers == "" ? "" : "+", editor.Key, editor.Name);
             }
 
             // snap shortcut
@@ -107,11 +109,15 @@ namespace RxCanvas
                                              ModifierKeys.None),
                 () => ToggleSnap());
 
+            //Debug.Print("S -> Snap");
+
             // open shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("O"),
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Open());
+
+            //Debug.Print("Control+O -> Open");
 
             // save shortcut
             _shortcuts.Add(
@@ -119,17 +125,23 @@ namespace RxCanvas
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Save());
 
+            //Debug.Print("Control+S -> Save");
+
             // export shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("E"),
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Export());
 
+            //Debug.Print("Control+E -> Export");
+
             // clear shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Delete"),
                                              (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Clear());
+
+            //Debug.Print("Control+Delete -> Clear");
         }
 
         private void Open()
