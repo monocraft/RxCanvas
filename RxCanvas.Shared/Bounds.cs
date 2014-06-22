@@ -46,6 +46,12 @@ namespace RxCanvas.Bounds
 
             return polygon;
         }
+
+        public static void MoveLine(ILine line, IPoint point1, IPoint point2)
+        {
+            line.Point1 = point1;
+            line.Point2 = point2;
+        }
     }
 
     public class LineBounds : IBounds
@@ -109,10 +115,10 @@ namespace RxCanvas.Bounds
             ps[3].X = x - offset;
             ps[3].Y = (y + height) + offset;
 
-            Move(ls[0], ps[0], ps[1]);
-            Move(ls[1], ps[1], ps[2]);
-            Move(ls[2], ps[2], ps[3]);
-            Move(ls[3], ps[3], ps[0]);
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
         }
 
         private void UpdatePoint2Bounds()
@@ -140,10 +146,10 @@ namespace RxCanvas.Bounds
             ps[3].X = x - offset;
             ps[3].Y = (y + height) + offset;
 
-            Move(ls[0], ps[0], ps[1]);
-            Move(ls[1], ps[1], ps[2]);
-            Move(ls[2], ps[2], ps[3]);
-            Move(ls[3], ps[3], ps[0]);
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
         }
 
         private void UpdateLineBounds()
@@ -176,10 +182,10 @@ namespace RxCanvas.Bounds
                 ps[3].Y = Helper.Max(ps2[0].Y, ps2[1].Y, ps2[2].Y, ps2[3].Y);
             }
 
-            Move(ls[0], ps[0], ps[1]);
-            Move(ls[1], ps[1], ps[2]);
-            Move(ls[2], ps[2], ps[3]);
-            Move(ls[3], ps[3], ps[0]);
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
         }
 
         public void Update()
@@ -187,12 +193,6 @@ namespace RxCanvas.Bounds
             UpdatePoint1Bounds();
             UpdatePoint2Bounds();
             UpdateLineBounds();
-        }
-
-        private void Move(ILine line, IPoint point1, IPoint point2)
-        {
-            line.Point1 = point1;
-            line.Point2 = point2;
         }
 
         public bool IsVisible()
@@ -248,6 +248,548 @@ namespace RxCanvas.Bounds
         }
     }
 
+    public class BezierBounds : IBounds
+    {
+        private IBezier _bezier;
+        private double _size;
+        private double _offset;
+        private ICanvas _canvas;
+        private IPolygon _polygonBezier;
+        private IPolygon _polygonStart;
+        private IPolygon _polygonPoint1;
+        private IPolygon _polygonPoint2;
+        private IPolygon _polygonPoint3;
+        private bool _isVisible;
+
+        public BezierBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
+            ICanvas canvas,
+            IBezier bezier,
+            double size,
+            double offset)
+        {
+            _bezier = bezier;
+            _size = size;
+            _offset = offset;
+            _canvas = canvas;
+
+            InitBounds(nativeConverter, canvasFactory);
+        }
+
+        private void InitBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory)
+        {
+            _polygonStart = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint3 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        private void UpdateStartBounds()
+        {
+            var ps = _polygonStart.Points;
+            var ls = _polygonStart.Lines;
+            var size = _size;
+            var offset = _offset;
+
+            double x = _bezier.Start.X - (_size / 2.0);
+            double y = _bezier.Start.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        private void UpdatePoint1Bounds()
+        {
+            var ps = _polygonPoint1.Points;
+            var ls = _polygonPoint1.Lines;
+            var size = _size;
+            var offset = _offset;
+
+            double x = _bezier.Point1.X - (_size / 2.0);
+            double y = _bezier.Point1.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        private void UpdatePoint2Bounds()
+        {
+            var ps = _polygonPoint2.Points;
+            var ls = _polygonPoint2.Lines;
+            var size = _size;
+            var offset = _offset;
+
+            double x = _bezier.Point2.X - (_size / 2.0);
+            double y = _bezier.Point2.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        private void UpdatePoint3Bounds()
+        {
+            var ps = _polygonPoint3.Points;
+            var ls = _polygonPoint3.Lines;
+            var size = _size;
+            var offset = _offset;
+
+            double x = _bezier.Point3.X - (_size / 2.0);
+            double y = _bezier.Point3.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        private void UpdateBezierBounds()
+        {
+            // TODO:
+        }
+
+        public void Update()
+        {
+            UpdateStartBounds();
+            UpdatePoint1Bounds();
+            UpdatePoint2Bounds();
+            UpdatePoint3Bounds();
+            UpdateBezierBounds();
+        }
+
+        public bool IsVisible()
+        {
+            return _isVisible;
+        }
+
+        public void Show()
+        {
+            if (!_isVisible)
+            {
+                foreach (var line in _polygonBezier.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonStart.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint3.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                _isVisible = true;
+            }
+        }
+
+        public void Hide()
+        {
+            if (_isVisible)
+            {
+                foreach (var line in _polygonBezier.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonStart.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint3.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                _isVisible = false;
+            }
+        }
+
+        public bool Contains(double x, double y)
+        {
+            return _polygonBezier.Contains(x, y)
+                || _polygonStart.Contains(x, y)
+                || _polygonPoint1.Contains(x, y)
+                || _polygonPoint2.Contains(x, y)
+                || _polygonPoint3.Contains(x, y);
+        }
+    }
+
+    public class QuadraticBezierBounds : IBounds
+    {
+        private IQuadraticBezier _quadraticBezier;
+        private double _size;
+        private double _offset;
+        private ICanvas _canvas;
+        private IPolygon _polygonQuadraticBezier;
+        private IPolygon _polygonStart;
+        private IPolygon _polygonPoint1;
+        private IPolygon _polygonPoint2;
+        private bool _isVisible;
+
+        public QuadraticBezierBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
+            ICanvas canvas,
+            IQuadraticBezier quadraticBezier,
+            double size,
+            double offset)
+        {
+            _quadraticBezier = quadraticBezier;
+            _size = size;
+            _offset = offset;
+            _canvas = canvas;
+
+            InitBounds(nativeConverter, canvasFactory);
+        }
+
+        private void InitBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory)
+        {
+            _polygonStart = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonQuadraticBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        private void UpdateStartBounds()
+        {
+            var ps = _polygonStart.Points;
+            var ls = _polygonStart.Lines;
+            var size = _size;
+            var offset = _offset;
+
+            double x = _quadraticBezier.Start.X - (_size / 2.0);
+            double y = _quadraticBezier.Start.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        private void UpdatePoint1Bounds()
+        {
+            var ps = _polygonPoint1.Points;
+            var ls = _polygonPoint1.Lines;
+            var size = _size;
+            var offset = _offset;
+
+            double x = _quadraticBezier.Point1.X - (_size / 2.0);
+            double y = _quadraticBezier.Point1.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        private void UpdatePoint2Bounds()
+        {
+            var ps = _polygonPoint2.Points;
+            var ls = _polygonPoint2.Lines;
+            var size = _size;
+            var offset = _offset;
+
+            double x = _quadraticBezier.Point2.X - (_size / 2.0);
+            double y = _quadraticBezier.Point2.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        private void UpdateBezierBounds()
+        {
+            // TODO:
+        }
+
+        public void Update()
+        {
+            UpdateStartBounds();
+            UpdatePoint1Bounds();
+            UpdatePoint2Bounds();
+            UpdateBezierBounds();
+        }
+
+        public bool IsVisible()
+        {
+            return _isVisible;
+        }
+
+        public void Show()
+        {
+            if (!_isVisible)
+            {
+                foreach (var line in _polygonQuadraticBezier.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonStart.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                _isVisible = true;
+            }
+        }
+
+        public void Hide()
+        {
+            if (_isVisible)
+            {
+                foreach (var line in _polygonQuadraticBezier.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonStart.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                _isVisible = false;
+            }
+        }
+
+        public bool Contains(double x, double y)
+        {
+            return _polygonQuadraticBezier.Contains(x, y)
+                || _polygonStart.Contains(x, y)
+                || _polygonPoint1.Contains(x, y)
+                || _polygonPoint2.Contains(x, y);
+        }
+    }
+
+    public class ArcBounds : IBounds
+    {
+        private IArc _arc;
+        private double _offset;
+        private ICanvas _canvas;
+        private IPolygon _polygon;
+        private bool _isVisible;
+
+        public ArcBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
+            ICanvas canvas,
+            IArc arc,
+            double offset)
+        {
+            _arc = arc;
+            _offset = offset;
+            _canvas = canvas;
+
+            _polygon = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        public void Update()
+        {
+            var ps = _polygon.Points;
+            var ls = _polygon.Lines;
+            var offset = _offset;
+
+            double x = _arc.X;
+            double y = _arc.Y;
+            double width = _arc.Width;
+            double height = _arc.Height;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        public bool IsVisible()
+        {
+            return _isVisible;
+        }
+
+        public void Show()
+        {
+            if (!_isVisible)
+            {
+                foreach (var line in _polygon.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                _isVisible = true;
+            }
+        }
+
+        public void Hide()
+        {
+            if (_isVisible)
+            {
+                foreach (var line in _polygon.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                _isVisible = false;
+            }
+        }
+
+        public bool Contains(double x, double y)
+        {
+            return _polygon.Contains(x, y);
+        }
+    }
+
     public class RectangleBounds : IBounds
     {
         private IRectangle _rectangle;
@@ -294,16 +836,10 @@ namespace RxCanvas.Bounds
             ps[3].X = x - offset;
             ps[3].Y = (y + height) + offset;
 
-            Move(ls[0], ps[0], ps[1]);
-            Move(ls[1], ps[1], ps[2]);
-            Move(ls[2], ps[2], ps[3]);
-            Move(ls[3], ps[3], ps[0]);
-        }
-
-        private void Move(ILine line, IPoint point1, IPoint point2)
-        {
-            line.Point1 = point1;
-            line.Point2 = point2;
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
         }
 
         public bool IsVisible()
@@ -387,16 +923,10 @@ namespace RxCanvas.Bounds
             ps[3].X = x - offset;
             ps[3].Y = (y + height) + offset;
 
-            Move(ls[0], ps[0], ps[1]);
-            Move(ls[1], ps[1], ps[2]);
-            Move(ls[2], ps[2], ps[3]);
-            Move(ls[3], ps[3], ps[0]);
-        }
-
-        private void Move(ILine line, IPoint point1, IPoint point2)
-        {
-            line.Point1 = point1;
-            line.Point2 = point2;
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
         }
 
         public bool IsVisible()
@@ -480,16 +1010,10 @@ namespace RxCanvas.Bounds
             ps[3].X = x - offset;
             ps[3].Y = (y + height) + offset;
 
-            Move(ls[0], ps[0], ps[1]);
-            Move(ls[1], ps[1], ps[2]);
-            Move(ls[2], ps[2], ps[3]);
-            Move(ls[3], ps[3], ps[0]);
-        }
-
-        private void Move(ILine line, IPoint point1, IPoint point2)
-        {
-            line.Point1 = point1;
-            line.Point2 = point2;
+            Helper.MoveLine(ls[0], ps[0], ps[1]);
+            Helper.MoveLine(ls[1], ps[1], ps[2]);
+            Helper.MoveLine(ls[2], ps[2], ps[3]);
+            Helper.MoveLine(ls[3], ps[3], ps[0]);
         }
 
         public bool IsVisible()
@@ -551,20 +1075,17 @@ namespace RxCanvas.Bounds
 
         public IBounds Create(ICanvas canvas, IBezier bezier)
         {
-            // TODO: Create BezierBounds class.
-            throw new NotImplementedException();
+            return new BezierBounds(_nativeConverter, _canvasFactory, canvas, bezier, 15.0, 0.0);
         }
 
         public IBounds Create(ICanvas canvas, IQuadraticBezier quadraticBezier)
         {
-            // TODO: Create QuadraticBezierBounds class.
-            throw new NotImplementedException();
+            return new QuadraticBezierBounds(_nativeConverter, _canvasFactory, canvas, quadraticBezier, 15.0, 0.0);
         }
 
         public IBounds Create(ICanvas canvas, IArc arc)
         {
-            // TODO: Create ArcBounds class.
-            throw new NotImplementedException();
+            return new ArcBounds(_nativeConverter, _canvasFactory, canvas, arc, 5.0);
         }
 
         public IBounds Create(ICanvas canvas, IRectangle rectangle)
