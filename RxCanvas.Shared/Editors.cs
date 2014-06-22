@@ -151,10 +151,15 @@ namespace RxCanvas.Editors
                     {
                         // TODO: Move entire line or line Start or line End.
                         var line = _selected as ILine;
+
                         line.Point1.X -= dx;
                         line.Point1.Y -= dy;
                         line.Point2.X -= dx;
                         line.Point2.Y -= dy;
+
+                        // TODO: Add Move(double dx, double dy) method to INative interface.
+                        line.Point1 = line.Point1;
+                        line.Point2 = line.Point2;
                     }
                     else if (_selected is IRectangle)
                     {
@@ -176,8 +181,7 @@ namespace RxCanvas.Editors
                     }
 
                     // TODO: Add missing elements.
-                    // TODO: Add Move(double dx, double dy) method to INative interface.
-
+   
                     _selected.Bounds.Update();
                     _canvas.Render(null);
                 }
@@ -976,6 +980,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    _ntext.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
@@ -988,6 +993,9 @@ namespace RxCanvas.Editors
                     _xtext.Y = _start.Y;
                     _ntext = nativeConverter.Convert(_xtext);
                     _canvas.Add(_ntext);
+                    _ntext.Bounds = new TextBounds(nativeConverter, canvasFactory, canvas, _ntext, 5.0);
+                    _ntext.Bounds.Update();
+                    _ntext.Bounds.Show();
                     _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.BottomRight;
@@ -1004,6 +1012,7 @@ namespace RxCanvas.Editors
                 if (_state == State.BottomRight)
                 {
                     UpdatePositionAndSize(p);
+                    _ntext.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
