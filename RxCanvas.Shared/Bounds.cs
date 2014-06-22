@@ -540,9 +540,52 @@ namespace RxCanvas.Bounds
             Helper.UpdatePointBounds(_quadraticBezier.Point2, ps, ls, _size, _offset);
         }
 
-        private void UpdateBezierBounds()
+        private void UpdateQuadraticBezierBounds()
         {
-            // TODO:
+            var ps = _polygonQuadraticBezier.Points.Select(p => p as XPoint).ToArray();
+            var ls = _polygonQuadraticBezier.Lines;
+
+            ps[0].X = _quadraticBezier.Start.X;
+            ps[0].Y = _quadraticBezier.Start.Y;
+            ps[1].X = _quadraticBezier.Point1.X;
+            ps[1].Y = _quadraticBezier.Point1.Y;
+            ps[2].X = _quadraticBezier.Point2.X;
+            ps[2].Y = _quadraticBezier.Point2.Y;
+
+            // not used
+            ps[3].X = _quadraticBezier.Point2.X;
+            ps[3].Y = _quadraticBezier.Point2.Y;
+
+            XPoint[] hull;
+            int k;
+            MonotoneChain.ConvexHull(ps, out hull, out k);
+            Debug.Print("k: {0}", k);
+
+            if (k == 3)
+            {
+                Helper.MoveLine(ls[0], hull[0], hull[1]);
+                Helper.MoveLine(ls[1], hull[1], hull[2]);
+
+                // not used
+                Helper.MoveLine(ls[2], hull[0], hull[0]);
+                Helper.MoveLine(ls[3], hull[0], hull[0]);
+            }
+            else if (k == 4)
+            {
+                Helper.MoveLine(ls[0], hull[0], hull[1]);
+                Helper.MoveLine(ls[1], hull[1], hull[2]);
+                Helper.MoveLine(ls[2], hull[2], hull[3]);
+
+                // not used
+                Helper.MoveLine(ls[3], hull[0], hull[0]);
+            }
+            else if (k == 5)
+            {
+                Helper.MoveLine(ls[0], hull[0], hull[1]);
+                Helper.MoveLine(ls[1], hull[1], hull[2]);
+                Helper.MoveLine(ls[2], hull[2], hull[3]);
+                Helper.MoveLine(ls[3], hull[3], hull[4]);
+            }
         }
 
         public void Update()
@@ -550,7 +593,7 @@ namespace RxCanvas.Bounds
             UpdateStartBounds();
             UpdatePoint1Bounds();
             UpdatePoint2Bounds();
-            UpdateBezierBounds();
+            UpdateQuadraticBezierBounds();
         }
 
         public bool IsVisible()
