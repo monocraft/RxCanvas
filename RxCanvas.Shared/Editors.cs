@@ -12,6 +12,7 @@ namespace RxCanvas.Editors
 {
     public class XSelectionEditor : IEditor, IDisposable
     {
+        [Flags]
         public enum State 
         { 
             None = 0,
@@ -20,8 +21,7 @@ namespace RxCanvas.Editors
             Move = 4,
             HoverSelected = Hover | Selected,
             HoverMove = Hover | Move,
-            SelectedMove = Selected | Move,
-            HoverSelectedMove = Hover | Selected | Move,
+            SelectedMove = Selected | Move
         }
 
         public string Name { get; set; }
@@ -51,6 +51,11 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _ups;
         private IDisposable _drag;
+
+        private bool IsState(State state)
+        {
+            return (_state & state) == state;
+        }
 
         public XSelectionEditor(
             IModelToNativeConverter nativeConverter, 
@@ -82,34 +87,24 @@ namespace RxCanvas.Editors
 
                 bool render = false;
 
-                if (_selected != null)
+                if (IsState(State.Selected))
                 {
-                    _selected.Bounds.Hide();
-                    _selected = null;
-                    _state = _state & ~State.Selected;
-                    Debug.Print("_state: {0}", _state);
+                    HideSelected();
                     render = true;
                 }
 
-                if (_hover != null)
+                if (IsState(State.Hover))
                 {
-                    _hover.Bounds.Hide();
-                    _hover = null;
-                    _state = _state & ~State.Hover;
-                    Debug.Print("_state: {0}", _state);
+                    HideHover();
                     render = true;
                 }
 
                 _selected = HitTest(p.X, p.Y);
                 if (_selected != null)
                 {
-                    _selected.Bounds.Show();
-                    _state |= State.Selected;
-                    Debug.Print("_state: {0}", _state);
-                    _start = p;
+                    ShowSelected();
+                    InitMove(p);
                     _canvas.Capture();
-                    _state |= State.Move;
-                    Debug.Print("_state: {0}", _state);
                     render = true;
                 }
 
@@ -128,9 +123,11 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    _state = _state & ~State.Move;
-                    Debug.Print("_state: {0}", _state);
-                    _canvas.ReleaseCapture();
+                    if (IsState(State.Move))
+                    {
+                        FinishMove();
+                        _canvas.ReleaseCapture();
+                    }
                 }
             });
 
@@ -143,70 +140,58 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    double dx = _start.X - p.X;
-                    double dy = _start.Y - p.Y;
-                    _start = p;
-
-                    if (_selected is ILine)
-                    {
-                        // TODO: Move entire line or line Start or line End.
-                        var line = _selected as ILine;
-
-                        line.Point1.X -= dx;
-                        line.Point1.Y -= dy;
-                        line.Point2.X -= dx;
-                        line.Point2.Y -= dy;
-
-                        // TODO: Add Move(double dx, double dy) method to INative interface.
-                        line.Point1 = line.Point1;
-                        line.Point2 = line.Point2;
-                    }
-                    else if (_selected is IRectangle)
-                    {
-                        var rectangle = _selected as IRectangle;
-                        rectangle.X -= dx;
-                        rectangle.Y -= dy;
-                    }
-                    else if (_selected is IEllipse)
-                    {
-                        var ellipse = _selected as IEllipse;
-                        ellipse.X -= dx;
-                        ellipse.Y -= dy;
-                    }
-                    else if (_selected is IText)
-                    {
-                        var text = _selected as IText;
-                        text.X -= dx;
-                        text.Y -= dy;
-                    }
-
-                    // TODO: Add missing elements.
-   
-                    _selected.Bounds.Update();
-                    _canvas.Render(null);
+                    Move(p);
                 }
-
-                if (!_canvas.IsCaptured)
+                else
                 {
                     bool render = false;
+                    var result = HitTest(p.X, p.Y);
 
-                    if (_hover != null 
-                        && ((_selected != _hover) || (_selected == null)))
+                    if (IsState(State.Hover))
                     {
-                        _hover.Bounds.Hide();
-                        _hover = null;
-                        _state = _state & ~State.Hover;
-                        Debug.Print("_state: {0}", _state);
-                        render = true;
+                        if (IsState(State.Selected))
+                        {
+                            if (_selected != _hover)
+                            {
+                                HideHover();
+                                render = true;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            if (result != _hover)
+                            {
+                                HideHover();
+                                render = true;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
                     }
 
-                    _hover = HitTest(p.X, p.Y);
-                    if (_hover != null)
+                    if (result != null)
                     {
-                        _hover.Bounds.Show();
-                        _state |= State.Hover;
-                        Debug.Print("_state: {0}", _state);
-                        render = true;
+                        if (IsState(State.Selected))
+                        {
+                            if (result != _selected)
+                            {
+                                _hover = result;
+                                ShowHover();
+                                render = true;
+                            }
+                        }
+                        else
+                        {
+                            _hover = result;
+                            ShowHover();
+                            render = true;
+                        }
                     }
 
                     if (render)
@@ -215,6 +200,94 @@ namespace RxCanvas.Editors
                     }
                 }
             });
+        }
+
+        private void ShowHover()
+        {
+            _hover.Bounds.Show();
+            _state |= State.Hover;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void HideHover()
+        {
+            _hover.Bounds.Hide();
+            _hover = null;
+            _state = _state & ~State.Hover;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void ShowSelected()
+        {
+            _selected.Bounds.Show();
+            _state |= State.Selected;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void HideSelected()
+        {
+            _selected.Bounds.Hide();
+            _selected = null;
+            _state = _state & ~State.Selected;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void InitMove(ImmutablePoint p)
+        {
+            _start = p;
+            _state |= State.Move;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void FinishMove()
+        {
+            _state = _state & ~State.Move;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void Move(ImmutablePoint p)
+        {
+            double dx = _start.X - p.X;
+            double dy = _start.Y - p.Y;
+            _start = p;
+
+            if (_selected is ILine)
+            {
+                // TODO: Move entire line or line Start or line End.
+                var line = _selected as ILine;
+
+                line.Point1.X -= dx;
+                line.Point1.Y -= dy;
+                line.Point2.X -= dx;
+                line.Point2.Y -= dy;
+
+                // TODO: Add Move(double dx, double dy) method to INative interface.
+                line.Point1 = line.Point1;
+                line.Point2 = line.Point2;
+            }
+            else if (_selected is IRectangle)
+            {
+                var rectangle = _selected as IRectangle;
+                rectangle.X -= dx;
+                rectangle.Y -= dy;
+            }
+            else if (_selected is IEllipse)
+            {
+                var ellipse = _selected as IEllipse;
+                ellipse.X -= dx;
+                ellipse.Y -= dy;
+            }
+            else if (_selected is IText)
+            {
+                var text = _selected as IText;
+                text.X -= dx;
+                text.Y -= dy;
+            }
+
+            // TODO: Add missing elements.
+
+            _selected.Bounds.Update();
+            _canvas.Render(null);
         }
 
         private INative HitTest(double x, double y)
