@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using RxCanvas.Bounds;
 using RxCanvas.Creators;
 using RxCanvas.Editors;
 using RxCanvas.Interfaces;
@@ -42,11 +43,18 @@ namespace RxCanvas.WinForms
             builder.Register<ICanvasFactory>(c => new XModelFactory()).SingleInstance();
             builder.Register<IModelToNativeConverter>(c => new XModelToWinFormsConverter(panel)).SingleInstance();
 
+            builder.Register<IBoundsFactory>(c =>
+            {
+                var nativeConverter = c.Resolve<IModelToNativeConverter>();
+                var canvasFactory = c.Resolve<ICanvasFactory>();
+                return new BoundsFactory(nativeConverter, canvasFactory);
+            }).InstancePerLifetimeScope();
+
             builder.Register<ICanvas>(c =>
             {
+                var nativeConverter = c.Resolve<IModelToNativeConverter>();
                 var canvasFactory = c.Resolve<ICanvasFactory>();
                 var xcanvas = canvasFactory.CreateCanvas();
-                var nativeConverter = c.Resolve<IModelToNativeConverter>();
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 

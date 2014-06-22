@@ -16,7 +16,6 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using Autofac;
 using RxCanvas.Interfaces;
-using RxCanvas.Bounds;
 
 namespace RxCanvas
 {
@@ -249,6 +248,7 @@ namespace RxCanvas
             var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
             var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var boundsFactory = _drawingScope.Resolve<IBoundsFactory>();
 
             drawingCanvas.Clear();
 
@@ -259,47 +259,77 @@ namespace RxCanvas
                     var native = nativeConverter.Convert(child as ILine);
                     drawingCanvas.Add(native);
 
-                    native.Bounds = new LineBounds(nativeConverter, canvasFactory, drawingCanvas, native, 15.0, 0.0);
-                    native.Bounds.Update();
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IBezier)
                 {
                     var native = nativeConverter.Convert(child as IBezier);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IQuadraticBezier)
                 {
                     var native = nativeConverter.Convert(child as IQuadraticBezier);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IArc)
                 {
                     var native = nativeConverter.Convert(child as IArc);
                     drawingCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IRectangle)
                 {
                     var native = nativeConverter.Convert(child as IRectangle);
                     drawingCanvas.Add(native);
 
-                    native.Bounds = new RectangleBounds(nativeConverter, canvasFactory, drawingCanvas, native, 5.0);
-                    native.Bounds.Update();
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IEllipse)
                 {
                     var native = nativeConverter.Convert(child as IEllipse);
                     drawingCanvas.Add(native);
 
-                    native.Bounds = new EllipseBounds(nativeConverter, canvasFactory, drawingCanvas, native, 5.0);
-                    native.Bounds.Update();
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else if (child is IText)
                 {
                     var native = nativeConverter.Convert(child as IText);
                     drawingCanvas.Add(native);
 
-                    native.Bounds = new TextBounds(nativeConverter, canvasFactory, drawingCanvas, native, 5.0);
-                    native.Bounds.Update();
+                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
                 }
                 else
                 {

@@ -526,4 +526,60 @@ namespace RxCanvas.Bounds
             return _polygon.Contains(x, y);
         }
     }
+
+    public class BoundsFactory : IBoundsFactory
+    {
+        private readonly IModelToNativeConverter _nativeConverter;
+        private readonly ICanvasFactory _canvasFactory;
+
+        public BoundsFactory(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory)
+        {
+            _nativeConverter = nativeConverter;
+            _canvasFactory = canvasFactory;
+        }
+
+        public IBounds Create(ICanvas canvas, IPoint point)
+        {
+            // TODO: Create PointBounds class.
+            throw new NotImplementedException();
+        }
+
+        public IBounds Create(ICanvas canvas, ILine line)
+        {
+            return new LineBounds(_nativeConverter, _canvasFactory, canvas, line, 15.0, 0.0);
+        }
+
+        public IBounds Create(ICanvas canvas, IBezier bezier)
+        {
+            // TODO: Create BezierBounds class.
+            throw new NotImplementedException();
+        }
+
+        public IBounds Create(ICanvas canvas, IQuadraticBezier quadraticBezier)
+        {
+            // TODO: Create QuadraticBezierBounds class.
+            throw new NotImplementedException();
+        }
+
+        public IBounds Create(ICanvas canvas, IArc arc)
+        {
+            // TODO: Create ArcBounds class.
+            throw new NotImplementedException();
+        }
+
+        public IBounds Create(ICanvas canvas, IRectangle rectangle)
+        {
+            return new RectangleBounds(_nativeConverter, _canvasFactory, canvas, rectangle, 5.0);
+        }
+
+        public IBounds Create(ICanvas canvas, IEllipse ellipse)
+        {
+            return new EllipseBounds(_nativeConverter, _canvasFactory, canvas, ellipse, 5.0);
+        }
+
+        public IBounds Create(ICanvas canvas, IText text)
+        {
+            return new TextBounds(_nativeConverter, _canvasFactory, canvas, text, 5.0);
+        }
+    }
 }

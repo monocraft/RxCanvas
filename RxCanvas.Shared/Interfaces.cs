@@ -209,6 +209,18 @@ namespace RxCanvas.Interfaces
     { 
     }
 
+    public interface IBoundsFactory
+    {
+        IBounds Create(ICanvas canvas, IPoint point);
+        IBounds Create(ICanvas canvas, ILine line);
+        IBounds Create(ICanvas canvas, IBezier bezier);
+        IBounds Create(ICanvas canvas, IQuadraticBezier quadraticBezier);
+        IBounds Create(ICanvas canvas, IArc arc);
+        IBounds Create(ICanvas canvas, IRectangle rectangle);
+        IBounds Create(ICanvas canvas, IEllipse ellipse);
+        IBounds Create(ICanvas canvas, IText text);
+    }
+
     public interface ISerializer<T> where T : class
     {
         string Name { get; set; }

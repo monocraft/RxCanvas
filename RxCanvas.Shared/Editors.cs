@@ -1,5 +1,4 @@
-﻿using RxCanvas.Bounds;
-using RxCanvas.Interfaces;
+﻿using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
@@ -56,6 +55,7 @@ namespace RxCanvas.Editors
         public XSelectionEditor(
             IModelToNativeConverter nativeConverter, 
             ICanvasFactory canvasFactory, 
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -286,7 +286,8 @@ namespace RxCanvas.Editors
 
         public XLineEditor(
             IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -330,7 +331,7 @@ namespace RxCanvas.Editors
                     _xline.Point2.Y = p.Y;
                     _nline = nativeConverter.Convert(_xline);
                     _canvas.Add(_nline);
-                    _nline.Bounds = new LineBounds(nativeConverter, canvasFactory, canvas, _nline, 15.0, 0.0);
+                    _nline.Bounds = boundsFactory.Create(_canvas, _nline);
                     _nline.Bounds.Update();
                     _nline.Bounds.Show();
                     _canvas.Capture();
@@ -382,7 +383,8 @@ namespace RxCanvas.Editors
 
         public XBezierEditor(
             IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -419,6 +421,7 @@ namespace RxCanvas.Editors
                                 _xb.Point2.X = p.X;
                                 _xb.Point2.Y = p.Y;
                                 _nb.Point2 = _xb.Point2;
+                                _nb.Bounds.Update();
                                 _canvas.Render(null);
                                 _state = State.Point1;
                             }
@@ -428,6 +431,7 @@ namespace RxCanvas.Editors
                                 _xb.Point1.X = p.X;
                                 _xb.Point1.Y = p.Y;
                                 _nb.Point1 = _xb.Point1;
+                                _nb.Bounds.Update();
                                 _canvas.Render(null);
                                 _state = State.Point2;
                             }
@@ -437,6 +441,7 @@ namespace RxCanvas.Editors
                                 _xb.Point2.X = p.X;
                                 _xb.Point2.Y = p.Y;
                                 _nb.Point2 = _xb.Point2;
+                                _nb.Bounds.Hide();
                                 _canvas.Render(null);
                                 _state = State.None;
                                 _canvas.ReleaseCapture();
@@ -457,6 +462,9 @@ namespace RxCanvas.Editors
                     _xb.Point3.Y = p.Y;
                     _nb = nativeConverter.Convert(_xb);
                     _canvas.Add(_nb);
+                    _nb.Bounds = boundsFactory.Create(_canvas, _nb);
+                    _nb.Bounds.Update();
+                    _nb.Bounds.Show();
                     _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.Start;
@@ -478,6 +486,7 @@ namespace RxCanvas.Editors
                     _xb.Point2.X = p.X;
                     _xb.Point2.Y = p.Y;
                     _nb.Point2 = _xb.Point2;
+                    _nb.Bounds.Update();
                     _canvas.Render(null);
                 }
                 else if (_state == State.Point1)
@@ -485,6 +494,7 @@ namespace RxCanvas.Editors
                     _xb.Point1.X = p.X;
                     _xb.Point1.Y = p.Y;
                     _nb.Point1 = _xb.Point1;
+                    _nb.Bounds.Update();
                     _canvas.Render(null);
                 }
                 else if (_state == State.Point2)
@@ -492,6 +502,7 @@ namespace RxCanvas.Editors
                     _xb.Point2.X = p.X;
                     _xb.Point2.Y = p.Y;
                     _nb.Point2 = _xb.Point2;
+                    _nb.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
@@ -522,7 +533,8 @@ namespace RxCanvas.Editors
 
         public XQuadraticBezierEditor(
             IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -556,6 +568,7 @@ namespace RxCanvas.Editors
                                 _xqb.Point2.X = p.X;
                                 _xqb.Point2.Y = p.Y;
                                 _nqb.Point2 = _xqb.Point2;
+                                _nqb.Bounds.Update();
                                 _canvas.Render(null);
                                 _state = State.Point1;
                             }
@@ -565,6 +578,7 @@ namespace RxCanvas.Editors
                                 _xqb.Point1.X = p.X;
                                 _xqb.Point1.Y = p.Y;
                                 _nqb.Point1 = _xqb.Point1;
+                                _nqb.Bounds.Hide();
                                 _canvas.Render(null);
                                 _state = State.None;
                                 _canvas.ReleaseCapture();
@@ -583,6 +597,9 @@ namespace RxCanvas.Editors
                     _xqb.Point2.Y = p.Y;
                     _nqb = nativeConverter.Convert(_xqb);
                     _canvas.Add(_nqb);
+                    _nqb.Bounds = boundsFactory.Create(_canvas, _nqb);
+                    _nqb.Bounds.Update();
+                    _nqb.Bounds.Show();
                     _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.Start;
@@ -601,6 +618,7 @@ namespace RxCanvas.Editors
                     _xqb.Point2.X = p.X;
                     _xqb.Point2.Y = p.Y;
                     _nqb.Point2 = _xqb.Point2;
+                    _nqb.Bounds.Update();
                     _canvas.Render(null);
                 }
                 else if (_state == State.Point1)
@@ -608,6 +626,7 @@ namespace RxCanvas.Editors
                     _xqb.Point1.X = p.X;
                     _xqb.Point1.Y = p.Y;
                     _nqb.Point1 = _xqb.Point1;
+                    _nqb.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
@@ -639,7 +658,8 @@ namespace RxCanvas.Editors
 
         public XArcEditor(
             IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -667,6 +687,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    _narc.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
@@ -679,6 +700,9 @@ namespace RxCanvas.Editors
                     _xarc.Y = _start.Y;
                     _narc = nativeConverter.Convert(_xarc);
                     _canvas.Add(_narc);
+                    _narc.Bounds = boundsFactory.Create(_canvas, _narc);
+                    _narc.Bounds.Update();
+                    _narc.Bounds.Show();
                     _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.Size;
@@ -695,6 +719,7 @@ namespace RxCanvas.Editors
                 if (_state == State.Size)
                 {
                     UpdatePositionAndSize(p);
+                    _narc.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
@@ -740,7 +765,8 @@ namespace RxCanvas.Editors
 
         public XCanvasRectangleEditor(
             IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -781,7 +807,7 @@ namespace RxCanvas.Editors
                     _xrectangle.Y = _start.Y;
                     _nrectangle = nativeConverter.Convert(_xrectangle);
                     _canvas.Add(_nrectangle);
-                    _nrectangle.Bounds = new RectangleBounds(nativeConverter, canvasFactory, canvas, _nrectangle, 5.0);
+                    _nrectangle.Bounds = boundsFactory.Create(_canvas, _nrectangle);
                     _nrectangle.Bounds.Update();
                     _nrectangle.Bounds.Show();
                     _canvas.Render(null);
@@ -846,7 +872,8 @@ namespace RxCanvas.Editors
 
         public XCanvasEllipseEditor(
             IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -887,7 +914,7 @@ namespace RxCanvas.Editors
                     _xellipse.Y = _start.Y;
                     _nellipse = nativeConverter.Convert(_xellipse);
                     _canvas.Add(_nellipse);
-                    _nellipse.Bounds = new EllipseBounds(nativeConverter, canvasFactory, canvas, _nellipse, 5.0);
+                    _nellipse.Bounds = boundsFactory.Create(_canvas, _nellipse);
                     _nellipse.Bounds.Update();
                     _nellipse.Bounds.Show();
                     _canvas.Render(null);
@@ -952,7 +979,8 @@ namespace RxCanvas.Editors
 
         public XCanvasTextEditor(
             IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
             _canvas = canvas;
@@ -993,7 +1021,7 @@ namespace RxCanvas.Editors
                     _xtext.Y = _start.Y;
                     _ntext = nativeConverter.Convert(_xtext);
                     _canvas.Add(_ntext);
-                    _ntext.Bounds = new TextBounds(nativeConverter, canvasFactory, canvas, _ntext, 5.0);
+                    _ntext.Bounds = boundsFactory.Create(_canvas, _ntext);
                     _ntext.Bounds.Update();
                     _ntext.Bounds.Show();
                     _canvas.Render(null);
