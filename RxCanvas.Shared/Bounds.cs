@@ -96,7 +96,7 @@ namespace RxCanvas.Bounds
         }
     }
 
-    public static class MonotoneChain
+    internal static class MonotoneChain
     {
         // Implementation of Andrew's monotone chain 2D convex hull algorithm.
         // http://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
