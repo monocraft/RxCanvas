@@ -1,4 +1,5 @@
 ﻿using RxCanvas.Interfaces;
+using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -92,6 +93,53 @@ namespace RxCanvas.Bounds
         {
             line.Point1 = point1;
             line.Point2 = point2;
+        }
+    }
+
+    public static class MonotoneChain
+    {
+        // Implementation of Andrew's monotone chain 2D convex hull algorithm.
+        // http://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
+        // Asymptotic complexity O(n log n).
+
+        // 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
+        // Returns a positive value, if OAB makes a counter-clockwise turn,
+        // negative for clockwise turn, and zero if the points are collinear.
+        public static double Cross(XPoint p1, XPoint p2, XPoint p3)
+        {
+            return (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
+        }
+
+        // Returns a list of points on the convex hull in counter-clockwise order.
+        // Note: the last point in the returned list is the same as the first one.
+        public static void ConvexHull(XPoint[] points, out XPoint[] hull, out int k)
+        {
+            int n = points.Length;
+            int i, t;
+
+            k = 0;
+            hull = new XPoint[2 * n];
+
+            // sort points lexicographically
+            Array.Sort(points);
+
+            // lower hull
+            for (i = 0; i < n; i++)
+            {
+                while (k >= 2 && Cross(hull[k - 2], hull[k - 1], points[i]) <= 0)
+                    k--;
+
+                hull[k++] = points[i];
+            }
+
+            // upper hull
+            for (i = n - 2, t = k + 1; i >= 0; i--)
+            {
+                while (k >= t && Cross(hull[k - 2], hull[k - 1], points[i]) <= 0)
+                    k--;
+
+                hull[k++] = points[i];
+            }
         }
     }
 
@@ -309,7 +357,48 @@ namespace RxCanvas.Bounds
 
         private void UpdateBezierBounds()
         {
-            // TODO:
+            var ps = _polygonBezier.Points.Select(p => p as XPoint).ToArray();
+            var ls = _polygonBezier.Lines;
+
+            ps[0].X = _bezier.Start.X;
+            ps[0].Y = _bezier.Start.Y;
+            ps[1].X = _bezier.Point1.X;
+            ps[1].Y = _bezier.Point1.Y;
+            ps[2].X = _bezier.Point2.X;
+            ps[2].Y = _bezier.Point2.Y;
+            ps[3].X = _bezier.Point3.X;
+            ps[3].Y = _bezier.Point3.Y;
+
+            XPoint[] hull;
+            int k;
+            MonotoneChain.ConvexHull(ps, out hull, out k);
+            Debug.Print("k: {0}", k);
+
+            if (k == 3)
+            {
+                Helper.MoveLine(ls[0], hull[0], hull[1]);
+                Helper.MoveLine(ls[1], hull[1], hull[2]);
+
+                // not used
+                Helper.MoveLine(ls[2], hull[0], hull[0]);
+                Helper.MoveLine(ls[3], hull[0], hull[0]);
+            }
+            else if (k == 4)
+            {
+                Helper.MoveLine(ls[0], hull[0], hull[1]);
+                Helper.MoveLine(ls[1], hull[1], hull[2]);
+                Helper.MoveLine(ls[2], hull[2], hull[3]);
+
+                // not used
+                Helper.MoveLine(ls[3], hull[0], hull[0]);
+            }
+            else if (k == 5)
+            {
+                Helper.MoveLine(ls[0], hull[0], hull[1]);
+                Helper.MoveLine(ls[1], hull[1], hull[2]);
+                Helper.MoveLine(ls[2], hull[2], hull[3]);
+                Helper.MoveLine(ls[3], hull[3], hull[4]);
+            }
         }
 
         public void Update()
