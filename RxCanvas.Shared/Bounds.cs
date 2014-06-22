@@ -248,6 +248,99 @@ namespace RxCanvas.Bounds
         }
     }
 
+    public class RectangleBounds : IBounds
+    {
+        private IRectangle _rectangle;
+        private double _offset;
+        private ICanvas _canvas;
+        private IPolygon _polygon;
+        private bool _isVisible;
+
+        public RectangleBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
+            ICanvas canvas,
+            IRectangle rectangle,
+            double offset)
+        {
+            _rectangle = rectangle;
+            _offset = offset;
+            _canvas = canvas;
+
+            _polygon = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        public void Update()
+        {
+            var ps = _polygon.Points;
+            var ls = _polygon.Lines;
+            var offset = _offset;
+
+            double x = _rectangle.X;
+            double y = _rectangle.Y;
+            double width = _rectangle.Width;
+            double height = _rectangle.Height;
+
+            // top-left
+            ps[0].X = x - offset;
+            ps[0].Y = y - offset;
+            // top-right
+            ps[1].X = (x + width) + offset;
+            ps[1].Y = y - offset;
+            // botton-right
+            ps[2].X = (x + width) + offset;
+            ps[2].Y = (y + height) + offset;
+            // bottom-left
+            ps[3].X = x - offset;
+            ps[3].Y = (y + height) + offset;
+
+            Move(ls[0], ps[0], ps[1]);
+            Move(ls[1], ps[1], ps[2]);
+            Move(ls[2], ps[2], ps[3]);
+            Move(ls[3], ps[3], ps[0]);
+        }
+
+        private void Move(ILine line, IPoint point1, IPoint point2)
+        {
+            line.Point1 = point1;
+            line.Point2 = point2;
+        }
+
+        public bool IsVisible()
+        {
+            return _isVisible;
+        }
+
+        public void Show()
+        {
+            if (!_isVisible)
+            {
+                foreach (var line in _polygon.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                _isVisible = true;
+            }
+        }
+
+        public void Hide()
+        {
+            if (_isVisible)
+            {
+                foreach (var line in _polygon.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                _isVisible = false;
+            }
+        }
+
+        public bool Contains(double x, double y)
+        {
+            return _polygon.Contains(x, y);
+        }
+    }
+
     public class EllipseBounds : IBounds
     {
         private IEllipse _ellipse;
@@ -257,10 +350,10 @@ namespace RxCanvas.Bounds
         private bool _isVisible;
 
         public EllipseBounds(
-            IModelToNativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
-            ICanvas canvas, 
-            IEllipse ellipse, 
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
+            ICanvas canvas,
+            IEllipse ellipse,
             double offset)
         {
             _ellipse = ellipse;

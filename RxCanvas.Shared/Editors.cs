@@ -748,6 +748,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
+                    _nrectangle.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
@@ -760,6 +761,9 @@ namespace RxCanvas.Editors
                     _xrectangle.Y = _start.Y;
                     _nrectangle = nativeConverter.Convert(_xrectangle);
                     _canvas.Add(_nrectangle);
+                    _nrectangle.Bounds = new RectangleBounds(nativeConverter, canvasFactory, canvas, _nrectangle, 5.0);
+                    _nrectangle.Bounds.Update();
+                    _nrectangle.Bounds.Show();
                     _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.BottomRight;
@@ -776,6 +780,7 @@ namespace RxCanvas.Editors
                 if (_state == State.BottomRight)
                 {
                     UpdatePositionAndSize(p);
+                    _nrectangle.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
