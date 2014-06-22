@@ -296,6 +296,7 @@ namespace RxCanvas.Editors
                     _xline.Point2.X = p.X;
                     _xline.Point2.Y = p.Y;
                     _nline.Point2 = _xline.Point2;
+                    _nline.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
@@ -309,6 +310,9 @@ namespace RxCanvas.Editors
                     _xline.Point2.Y = p.Y;
                     _nline = nativeConverter.Convert(_xline);
                     _canvas.Add(_nline);
+                    _nline.Bounds = new LineBounds(nativeConverter, canvasFactory, canvas, _nline, 15.0, 0.0);
+                    _nline.Bounds.Update();
+                    _nline.Bounds.Show();
                     _canvas.Capture();
                     _canvas.Render(null);
                     _state = State.End;
@@ -327,6 +331,7 @@ namespace RxCanvas.Editors
                     _xline.Point2.X = p.X;
                     _xline.Point2.Y = p.Y;
                     _nline.Point2 = _xline.Point2;
+                    _nline.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
@@ -844,7 +849,7 @@ namespace RxCanvas.Editors
                 if (_canvas.IsCaptured)
                 {
                     UpdatePositionAndSize(p);
-                    //_nellipse.Bounds.Hide();
+                    _nellipse.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
                     _canvas.ReleaseCapture();
@@ -859,7 +864,7 @@ namespace RxCanvas.Editors
                     _canvas.Add(_nellipse);
                     _nellipse.Bounds = new EllipseBounds(nativeConverter, canvasFactory, canvas, _nellipse, 5.0);
                     _nellipse.Bounds.Update();
-                    //_nellipse.Bounds.Show();
+                    _nellipse.Bounds.Show();
                     _canvas.Render(null);
                     _canvas.Capture();
                     _state = State.BottomRight;
