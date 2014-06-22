@@ -920,10 +920,12 @@ namespace RxCanvas.Editors
         {
             double width = Math.Abs(p.X - _start.X);
             double height = Math.Abs(p.Y - _start.Y);
-            _xrectangle.X = Math.Min(_start.X, p.X);
-            _xrectangle.Y = Math.Min(_start.Y, p.Y);
-            _xrectangle.Width = width + 1.0;
-            _xrectangle.Height = height + 1.0;
+            double x = Math.Min(_start.X, p.X);
+            double y = Math.Min(_start.Y, p.Y);
+            _xrectangle.X = _start.X <= p.X ? x : x - 1.0;
+            _xrectangle.Y =  _start.Y <= p.Y ? y : y - 1.0;
+            _xrectangle.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
+            _xrectangle.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
             _nrectangle.X = _xrectangle.X;
             _nrectangle.Y = _xrectangle.Y;
             _nrectangle.Width = _xrectangle.Width;
@@ -1027,10 +1029,12 @@ namespace RxCanvas.Editors
         {
             double width = Math.Abs(p.X - _start.X);
             double height = Math.Abs(p.Y - _start.Y);
-            _xellipse.X = Math.Min(_start.X, p.X);
-            _xellipse.Y = Math.Min(_start.Y, p.Y);
-            _xellipse.Width = width + 1.0;
-            _xellipse.Height = height + 1.0;
+            double x = Math.Min(_start.X, p.X);
+            double y = Math.Min(_start.Y, p.Y);
+            _xellipse.X = _start.X <= p.X ? x : x - 1.0;
+            _xellipse.Y = _start.Y <= p.Y ? y : y - 1.0;
+            _xellipse.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
+            _xellipse.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
             _nellipse.X = _xellipse.X;
             _nellipse.Y = _xellipse.Y;
             _nellipse.Width = _xellipse.Width;
@@ -1134,10 +1138,12 @@ namespace RxCanvas.Editors
         {
             double width = Math.Abs(p.X - _start.X);
             double height = Math.Abs(p.Y - _start.Y);
-            _xtext.X = Math.Min(_start.X, p.X);
-            _xtext.Y = Math.Min(_start.Y, p.Y);
-            _xtext.Width = width + 1.0;
-            _xtext.Height = height + 1.0;
+            double x = Math.Min(_start.X, p.X);
+            double y = Math.Min(_start.Y, p.Y);
+            _xtext.X = _start.X <= p.X ? x : x - 1.0;
+            _xtext.Y = _start.Y <= p.Y ? y : y - 1.0;
+            _xtext.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
+            _xtext.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
             _ntext.X = _xtext.X;
             _ntext.Y = _xtext.Y;
             _ntext.Width = _xtext.Width;
