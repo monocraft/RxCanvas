@@ -24,14 +24,30 @@ namespace RxCanvas.Model
         }
     }
 
-    public class XPoint : IPoint
+    public class XPoint : IPoint, IComparable<XPoint>
     {
         public double X { get; set; }
         public double Y { get; set; }
+
         public XPoint(double x, double y)
         {
             X = x;
             Y = y;
+        }
+
+        public static bool operator <(XPoint p1, XPoint p2)
+        {
+            return p1.X < p2.X || (p1.X == p2.X && p1.Y < p2.Y);
+        }
+
+        public static bool operator >(XPoint p1, XPoint p2)
+        {
+            return p1.X > p2.X || (p1.X == p2.X && p1.Y > p2.Y);
+        }
+
+        public int CompareTo(XPoint other)
+        {
+            return (this > other) ? -1 : ((this < other) ? 1 : 0);
         }
     }
 
