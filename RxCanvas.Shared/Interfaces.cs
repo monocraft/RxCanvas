@@ -144,22 +144,16 @@ namespace RxCanvas.Interfaces
         IObservable<ImmutablePoint> Downs { get; set; }
         IObservable<ImmutablePoint> Ups { get; set; }
         IObservable<ImmutablePoint> Moves { get; set; }
-
         IList<INative> Children { get; set; }
-
         double Width { get; set; }
         double Height { get; set; }
         IColor Background { get; set; }
-
         bool EnableSnap { get; set; }
         double SnapX { get; set; }
         double SnapY { get; set; }
-
         bool IsCaptured { get; set; }
-
         void Capture();
         void ReleaseCapture();
-
         void Add(INative value);
         void Remove(INative value);
         void Clear();
