@@ -149,8 +149,6 @@ namespace RxCanvas.Bounds
         {
             var ps = _polygonLine.Points;
             var ls = _polygonLine.Lines;
-            var offset = _offset;
-
             var ps1 = _polygonPoint1.Points;
             var ps2 = _polygonPoint2.Points;
 
