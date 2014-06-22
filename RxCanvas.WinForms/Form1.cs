@@ -155,7 +155,7 @@ namespace RxCanvas.WinForms
 
             openFileDialog1.Filter = filter;
             openFileDialog1.FilterIndex = defaultFilterIndex;
-            openFileDialog1.ShowDialog();
+            openFileDialog1.ShowDialog(this);
         }
 
         private void Save()
@@ -166,7 +166,7 @@ namespace RxCanvas.WinForms
             saveFileDialog1.Filter = filter;
             saveFileDialog1.FilterIndex = defaultFilterIndex;
             saveFileDialog1.FileName = "canvas";
-            saveFileDialog1.ShowDialog();
+            saveFileDialog1.ShowDialog(this);
         }
 
         private void Export()
@@ -177,7 +177,7 @@ namespace RxCanvas.WinForms
             saveFileDialog2.Filter = filter;
             saveFileDialog2.FilterIndex = defaultFilterIndex;
             saveFileDialog2.FileName = "canvas";
-            saveFileDialog2.ShowDialog();
+            saveFileDialog2.ShowDialog(this);
         }
 
         private string CreateSerializersFilter()

@@ -142,7 +142,7 @@ namespace RxCanvas
                 FilterIndex = defaultFilterIndex
             };
 
-            if (dlg.ShowDialog() == true)
+            if (dlg.ShowDialog(this) == true)
             {
                 string path = dlg.FileName;
                 int filterIndex = dlg.FilterIndex;
@@ -161,7 +161,7 @@ namespace RxCanvas
                 FileName = "canvas"
             };
 
-            if (dlg.ShowDialog() == true)
+            if (dlg.ShowDialog(this) == true)
             {
                 string path = dlg.FileName;
                 int filterIndex = dlg.FilterIndex;
