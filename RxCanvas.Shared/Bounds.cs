@@ -53,10 +53,6 @@ namespace RxCanvas.Bounds
         public static void UpdatePointBounds(IPoint point, IPoint[] ps, ILine[] ls, double size, double offset)
         {
             Debug.Assert(point != null);
-            Debug.Assert(ps != null);
-            Debug.Assert(ls != null);
-            Debug.Assert(ps.Length == PointBoundVertexCount);
-            Debug.Assert(ls.Length == PointBoundVertexCount);
 
             double x = point.X - (size / 2.0);
             double y = point.Y - (size / 2.0);
@@ -68,6 +64,11 @@ namespace RxCanvas.Bounds
 
         public static void UpdateRectangleBounds(IPoint[] ps, ILine[] ls, double offset, double x, double y, double width, double height)
         {
+            Debug.Assert(ps != null);
+            Debug.Assert(ls != null);
+            Debug.Assert(ps.Length == PointBoundVertexCount);
+            Debug.Assert(ls.Length == PointBoundVertexCount);
+
             // top-left
             ps[0].X = x - offset;
             ps[0].Y = y - offset;
