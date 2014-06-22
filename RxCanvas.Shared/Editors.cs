@@ -151,7 +151,7 @@ namespace RxCanvas.Editors
                     {
                         if (IsState(State.Selected))
                         {
-                            if (_selected != _hover)
+                            if (_hover != _selected && _hover != result)
                             {
                                 HideHover();
                                 render = true;
