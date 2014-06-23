@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using RxCanvas.Binary;
 using RxCanvas.Bounds;
 using RxCanvas.Creators;
 using RxCanvas.Editors;
@@ -7,6 +8,7 @@ using RxCanvas.Model;
 using RxCanvas.Serializers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -58,7 +60,8 @@ namespace RxCanvas.WinForms
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 
-            builder.Register<ITextFile>(f => new Utf8TextFile()).SingleInstance();
+            builder.Register<ITextFile>(c => new Utf8TextFile()).SingleInstance();
+            builder.Register<IBinaryFile<ICanvas, Stream>>(c => new BinaryFile()).SingleInstance();
 
             // create container
             return builder.Build();

@@ -117,6 +117,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RxCanvas.Binary\RxCanvas.Binary.csproj">
+      <Project>{4c39b88d-97c2-4c11-94ef-227ce7af20e0}</Project>
+      <Name>RxCanvas.Binary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RxCanvas.Creators\RxCanvas.Creators.csproj">
       <Project>{d80af44a-f33f-441e-9fd4-25781aeb25aa}</Project>
       <Name>RxCanvas.Creators</Name>

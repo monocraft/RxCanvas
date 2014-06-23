@@ -67,7 +67,7 @@ namespace RxCanvas.Binary
         Text
     }
 
-    public class BinaryFile : IFile<ICanvas, Stream>
+    public class BinaryFile : IBinaryFile<ICanvas, Stream>
     {
         public string Name { get; set; }
         public string Extension { get; set; }

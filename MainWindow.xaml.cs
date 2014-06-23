@@ -16,6 +16,7 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using Autofac;
 using RxCanvas.Interfaces;
+using RxCanvas.Binary;
 
 namespace RxCanvas
 {
@@ -142,6 +143,22 @@ namespace RxCanvas
                 () => Clear());
 
             //Debug.Print("Control+Delete -> Clear");
+
+            // undo shortcut
+            //_shortcuts.Add(
+            //    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Z"),
+            //                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+            //    () => Undo());
+
+            //Debug.Print("Control+Z -> Undo");
+
+            // redo shortcut
+            //_shortcuts.Add(
+            //    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Y"),
+            //                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+            //    () => Redo());
+
+            //Debug.Print("Control+Y -> Redo");
         }
 
         private void Open()
@@ -240,8 +257,7 @@ namespace RxCanvas
             ConvertToNative(xcanvas);
 
             // binary
-            //var binary = new RxCanvas.Binary.BinaryFile();
-            //var xcanvas = binary.Open(path);
+            //var xcanvas = (new BinaryFile()).Open(path);
             //ConvertToNative(xcanvas);
         }
 
@@ -256,8 +272,7 @@ namespace RxCanvas
 
             // binary
             //var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            //var binary = new RxCanvas.Binary.BinaryFile();
-            //binary.Save(path, drawingCanvas);
+            //(new BinaryFile()).Save(path, drawingCanvas);
         }
 
         private void Export(string path, int index)
