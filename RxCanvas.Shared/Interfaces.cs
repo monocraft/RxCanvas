@@ -47,6 +47,7 @@ namespace RxCanvas.Interfaces
         void Show();
         void Hide();
         bool Contains(double x, double y);
+        void Move(double dx, double dy);
     }
 
     public interface INative
@@ -151,6 +152,7 @@ namespace RxCanvas.Interfaces
         bool EnableSnap { get; set; }
         double SnapX { get; set; }
         double SnapY { get; set; }
+        double Snap(double val, double snap);
         bool IsCaptured { get; set; }
         void Capture();
         void ReleaseCapture();

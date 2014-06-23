@@ -201,6 +201,12 @@ namespace RxCanvas.Model
 
         public bool IsCaptured { get; set; }
 
+        public double Snap(double val, double snap)
+        {
+            double r = val % snap;
+            return r >= snap / 2.0 ? val + snap - r : val - r;
+        }
+
         public XCanvas()
         {
             Children = new ObservableCollection<INative>();
