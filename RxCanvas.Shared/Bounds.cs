@@ -307,7 +307,7 @@ namespace RxCanvas.Bounds
 
         public void Move(double dx, double dy)
         {
-            Debug.Print("Move: {0}", _hitResult);
+            Debug.Print("_hitResult: {0}", _hitResult);
 
             switch(_hitResult)
             {
@@ -359,6 +359,9 @@ namespace RxCanvas.Bounds
         private IPolygon _polygonPoint2;
         private IPolygon _polygonPoint3;
         private bool _isVisible;
+
+        private enum HitResult { None, Start, Point1, Point2, Point3, Bezier };
+        private HitResult _hitResult;
 
         public BezierBounds(
             IModelToNativeConverter nativeConverter,
@@ -548,16 +551,102 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return ConvexHullAsPolygonContains(x, y) //_polygonBezier.Contains(x, y)
-                || _polygonStart.Contains(x, y)
-                || _polygonPoint1.Contains(x, y)
-                || _polygonPoint2.Contains(x, y)
-                || _polygonPoint3.Contains(x, y);
+            if (_polygonStart.Contains(x, y))
+            {
+                _hitResult = HitResult.Start;
+                return true;
+            }
+            else if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonPoint3.Contains(x, y))
+            {
+                _hitResult = HitResult.Point3;
+                return true;
+            }
+            else if (ConvexHullAsPolygonContains(x, y)) //_polygonBezier.Contains(x, y)
+            {
+                _hitResult = HitResult.Bezier;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
         }
 
         public void Move(double dx, double dy)
         {
-            throw new NotImplementedException();
+            Debug.Print("_hitResult: {0}", _hitResult);
+
+            switch (_hitResult)
+            {
+                case HitResult.Start:
+                    {
+                        double x = _bezier.Start.X - dx;
+                        double y = _bezier.Start.Y - dy;
+                        _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _bezier.Start = _bezier.Start;
+                    }
+                    break;
+                case HitResult.Point1:
+                    {
+                        double x1 = _bezier.Point1.X - dx;
+                        double y1 = _bezier.Point1.Y - dy;
+                        _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _bezier.Point1 = _bezier.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _bezier.Point2.X - dx;
+                        double y2 = _bezier.Point2.Y - dy;
+                        _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _bezier.Point2 = _bezier.Point2;
+                    }
+                    break;
+                case HitResult.Point3:
+                    {
+                        double x3 = _bezier.Point3.X - dx;
+                        double y3 = _bezier.Point3.Y - dy;
+                        _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
+                        _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
+                        _bezier.Point3 = _bezier.Point3;
+                    }
+                    break;
+                case HitResult.Bezier:
+                    {
+                        double x = _bezier.Start.X - dx;
+                        double y = _bezier.Start.Y - dy;
+                        double x1 = _bezier.Point1.X - dx;
+                        double y1 = _bezier.Point1.Y - dy;
+                        double x2 = _bezier.Point2.X - dx;
+                        double y2 = _bezier.Point2.Y - dy;
+                        double x3 = _bezier.Point3.X - dx;
+                        double y3 = _bezier.Point3.Y - dy;
+                        _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
+                        _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
+                        _bezier.Start = _bezier.Start;
+                        _bezier.Point1 = _bezier.Point1;
+                        _bezier.Point2 = _bezier.Point2;
+                        _bezier.Point3 = _bezier.Point3;
+                    }
+                    break;
+            }
         }
     }
 

@@ -250,6 +250,7 @@ namespace RxCanvas.Editors
             double dy = _start.Y - p.Y;
             _start = p;
 
+            /*
             if (_selected is ILine)
             {
                 var line = _selected as ILine;
@@ -258,7 +259,7 @@ namespace RxCanvas.Editors
             else if (_selected is IBezier)
             {
                 var bezier = _selected as IBezier;
-                MoveBezier(bezier, dx, dy);
+                bezier.Bounds.Move(dx, dy);
             }
             else if (_selected is IQuadraticBezier)
             {
@@ -285,28 +286,15 @@ namespace RxCanvas.Editors
                 var text = _selected as IText;
                 MoveText(text, dx, dy);
             }
+            */
+
+            _selected.Bounds.Move(dx, dy);
 
             _selected.Bounds.Update();
             _canvas.Render(null);
         }
 
-        private void MoveBezier(IBezier bezier, double dx, double dy)
-        {
-            bezier.Start.X -= dx;
-            bezier.Start.Y -= dy;
-            bezier.Point1.X -= dx;
-            bezier.Point1.Y -= dy;
-            bezier.Point2.X -= dx;
-            bezier.Point2.Y -= dy;
-            bezier.Point3.X -= dx;
-            bezier.Point3.Y -= dy;
-
-            bezier.Start = bezier.Start;
-            bezier.Point1 = bezier.Point1;
-            bezier.Point2 = bezier.Point2;
-            bezier.Point3 = bezier.Point3;
-        }
-
+        /*
         private void MoveQuadraticBezier(IQuadraticBezier quadraticBezier, double dx, double dy)
         {
             quadraticBezier.Start.X -= dx;
@@ -344,6 +332,7 @@ namespace RxCanvas.Editors
             text.X -= dx;
             text.Y -= dy;
         }
+        */
 
         private INative HitTest(double x, double y)
         {
