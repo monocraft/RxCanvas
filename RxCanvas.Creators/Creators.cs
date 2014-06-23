@@ -131,8 +131,6 @@ namespace RxCanvas.Creators
 
         private void DrawRectangle(XGraphics gfx, IRectangle rectangle)
         {
-            double st = rectangle.StrokeThickness;
-            double hst = st / 2.0;
             if (rectangle.Fill.A > 0x00)
             {
                 var pen = new XPen(
@@ -140,14 +138,19 @@ namespace RxCanvas.Creators
                     X(rectangle.StrokeThickness));
 
                 var brush = new XSolidBrush(ToXColor(rectangle.Fill));
-                
+
+                double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+                double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+                double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+                double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
                 gfx.DrawRectangle(
                     pen, 
                     brush, 
-                    X(rectangle.X + hst), 
-                    Y(rectangle.Y + hst), 
-                    X(rectangle.Width - st), 
-                    Y(rectangle.Height - st));
+                    X(x), 
+                    Y(y), 
+                    X(width), 
+                    Y(height));
             }
             else
             {
@@ -155,19 +158,22 @@ namespace RxCanvas.Creators
                     ToXColor(rectangle.Stroke), 
                     X(rectangle.StrokeThickness));
 
+                double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+                double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+                double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+                double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
                 gfx.DrawRectangle(
                     pen, 
-                    X(rectangle.X + hst), 
-                    Y(rectangle.Y + hst), 
-                    X(rectangle.Width - st), 
-                    Y(rectangle.Height - st));
+                    X(x), 
+                    Y(y), 
+                    X(width), 
+                    Y(height));
             }
         }
 
         private void DrawEllipse(XGraphics gfx, IEllipse ellipse)
         {
-            double st = ellipse.StrokeThickness;
-            double hst = st / 2.0;
             if (ellipse.Fill.A > 0x00)
             {
                 var pen = new XPen(
@@ -179,10 +185,10 @@ namespace RxCanvas.Creators
                 gfx.DrawEllipse(
                     pen, 
                     brush, 
-                    X(ellipse.X + hst), 
-                    Y(ellipse.Y + hst), 
-                    X(ellipse.Width - st), 
-                    Y(ellipse.Height - st));
+                    X(ellipse.X), 
+                    Y(ellipse.Y), 
+                    X(ellipse.Width), 
+                    Y(ellipse.Height));
             }
             else
             {
@@ -191,10 +197,10 @@ namespace RxCanvas.Creators
                     X(ellipse.StrokeThickness));
                 
                 gfx.DrawEllipse(pen,
-                    X(ellipse.X + hst), 
-                    Y(ellipse.Y + hst), 
-                    X(ellipse.Width - st), 
-                    Y(ellipse.Height - st));
+                    X(ellipse.X), 
+                    Y(ellipse.Y), 
+                    X(ellipse.Width), 
+                    Y(ellipse.Height));
             }
         }
 

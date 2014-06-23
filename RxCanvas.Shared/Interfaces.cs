@@ -106,10 +106,8 @@ namespace RxCanvas.Interfaces
 
     public interface IRectangle : INative
     {
-        double X { get; set; }
-        double Y { get; set; }
-        double Width { get; set; }
-        double Height { get; set; }
+        IPoint Point1 { get; set; }
+        IPoint Point2 { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
         IColor Fill { get; set; }

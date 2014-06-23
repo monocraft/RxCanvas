@@ -142,10 +142,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
         public IColor Fill { get; set; }
@@ -318,10 +316,8 @@ namespace RxCanvas.Model
         {
             return new XRectangle()
             {
-                X = rectangle.X,
-                Y = rectangle.Y,
-                Width = rectangle.Width,
-                Height = rectangle.Height,
+                Point1 = Convert(rectangle.Point1),
+                Point2 = Convert(rectangle.Point2),
                 Stroke = Convert(rectangle.Stroke),
                 StrokeThickness = rectangle.StrokeThickness,
                 Fill = Convert(rectangle.Fill),

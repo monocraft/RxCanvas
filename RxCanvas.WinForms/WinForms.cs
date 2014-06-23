@@ -142,36 +142,37 @@ namespace RxCanvas.WinForms
                 else if (child is IRectangle)
                 {
                     var rectangle = child as IRectangle;
-                    double st = rectangle.StrokeThickness;
-                    double hst = st / 2.0;
                     Pen pen = new Pen(
                         ToColor(rectangle.Stroke), 
                         (float)rectangle.StrokeThickness);
 
+                    double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+                    double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+                    double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+                    double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
                     g.DrawRectangle(
                         pen, 
-                        (float)(rectangle.X + hst), 
-                        (float)(rectangle.Y + hst),
-                        (float)(rectangle.Width - st),
-                        (float)(rectangle.Height - st));
+                        (float)(x), 
+                        (float)(y),
+                        (float)(width),
+                        (float)(height));
 
                     pen.Dispose();
                 }
                 else if (child is IEllipse)
                 {
                     var ellipse = child as IEllipse;
-                    double st = ellipse.StrokeThickness;
-                    double hst = st / 2.0;
                     Pen pen = new Pen(
                         ToColor(ellipse.Stroke), 
                         (float)ellipse.StrokeThickness);
                     
                     g.DrawEllipse(
                         pen,
-                        (float)(ellipse.X + hst),
-                        (float)(ellipse.Y + hst),
-                        (float)(ellipse.Width - st),
-                        (float)(ellipse.Height - st));
+                        (float)(ellipse.X),
+                        (float)(ellipse.Y),
+                        (float)(ellipse.Width),
+                        (float)(ellipse.Height));
 
                     pen.Dispose();
                 }
@@ -180,7 +181,6 @@ namespace RxCanvas.WinForms
                     var text = child as IText;
                     Brush brush = new SolidBrush(ToColor(text.Foreground));
                     Font font = new Font("Callibri", (float)text.Size);
-                    
 
                     g.DrawString(
                         text.Text, 

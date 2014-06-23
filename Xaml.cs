@@ -635,11 +635,15 @@ namespace RxCanvas.Xaml
         private Rectangle _rectangle;
         private IColor _stroke;
         private IColor _fill;
+        private IPoint _point1;
+        private IPoint _point2;
 
         public WpfRectangle(IRectangle rectangle)
         {
             _stroke = rectangle.Stroke;
             _fill = rectangle.Fill;
+            _point1 = rectangle.Point1;
+            _point2 = rectangle.Point2;
 
             _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
@@ -648,41 +652,46 @@ namespace RxCanvas.Xaml
 
             _rectangle = new Rectangle()
             {
-                Width = rectangle.Width,
-                Height = rectangle.Height,
                 Stroke = _strokeBrush,
                 StrokeThickness = rectangle.StrokeThickness,
                 Fill = _fillBrush
             };
 
-            Canvas.SetLeft(_rectangle, rectangle.X);
-            Canvas.SetTop(_rectangle, rectangle.Y);
+            Update();
 
             Native = _rectangle;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return Canvas.GetLeft(_rectangle); }
-            set { Canvas.SetLeft(_rectangle, value); }
+            get { return _point1; }
+            set
+            {
+                _point1 = value;
+                Update();
+            }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return Canvas.GetTop(_rectangle); }
-            set { Canvas.SetTop(_rectangle, value); }
+            get { return _point2; }
+            set
+            {
+                _point2 = value;
+                Update();
+            }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _rectangle.Width; }
-            set { _rectangle.Width = value; }
-        }
-
-        public double Height
-        {
-            get { return _rectangle.Height; }
-            set { _rectangle.Height = value; }
+            double x = Math.Min(_point1.X, _point2.X);
+            double y = Math.Min(_point1.Y, _point2.Y);
+            double width = Math.Abs(_point2.X - _point1.X);
+            double height = Math.Abs(_point2.Y - _point1.Y);
+            Canvas.SetLeft(_rectangle, x - 1.0);
+            Canvas.SetTop(_rectangle, y - 1.0);
+            _rectangle.Width = width + 2.0;
+            _rectangle.Height = height + 2.0;
         }
 
         public IColor Stroke

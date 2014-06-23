@@ -809,7 +809,6 @@ namespace RxCanvas.Editors
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _drag;
-        private ImmutablePoint _start;
 
         public XCanvasRectangleEditor(
             IModelToNativeConverter nativeConverter, 
@@ -841,7 +840,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    UpdatePositionAndSize(p);
+                    _xrectangle.Point2.X = p.X;
+                    _xrectangle.Point2.Y = p.Y;
+                    _nrectangle.Point2 = _xrectangle.Point2;
                     _nrectangle.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -849,10 +850,11 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
                     _xrectangle = canvasFactory.CreateRectangle();
-                    _xrectangle.X = _start.X;
-                    _xrectangle.Y = _start.Y;
+                    _xrectangle.Point1.X = p.X;
+                    _xrectangle.Point1.Y = p.Y;
+                    _xrectangle.Point2.X = p.X;
+                    _xrectangle.Point2.Y = p.Y;
                     _nrectangle = nativeConverter.Convert(_xrectangle);
                     _canvas.Add(_nrectangle);
                     _nrectangle.Bounds = boundsFactory.Create(_canvas, _nrectangle);
@@ -873,27 +875,13 @@ namespace RxCanvas.Editors
 
                 if (_state == State.BottomRight)
                 {
-                    UpdatePositionAndSize(p);
+                    _xrectangle.Point2.X = p.X;
+                    _xrectangle.Point2.Y = p.Y;
+                    _nrectangle.Point2 = _xrectangle.Point2;
                     _nrectangle.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
-        }
-
-        private void UpdatePositionAndSize(ImmutablePoint p)
-        {
-            double width = Math.Abs(p.X - _start.X);
-            double height = Math.Abs(p.Y - _start.Y);
-            double x = Math.Min(_start.X, p.X);
-            double y = Math.Min(_start.Y, p.Y);
-            _xrectangle.X = _start.X <= p.X ? x : x - 1.0;
-            _xrectangle.Y =  _start.Y <= p.Y ? y : y - 1.0;
-            _xrectangle.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
-            _xrectangle.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
-            _nrectangle.X = _xrectangle.X;
-            _nrectangle.Y = _xrectangle.Y;
-            _nrectangle.Width = _xrectangle.Width;
-            _nrectangle.Height = _xrectangle.Height;
         }
 
         public void Dispose()
@@ -1202,10 +1190,8 @@ namespace RxCanvas.Editors
         {
             return new XRectangle()
             {
-                X = 0.0,
-                Y = 0.0,
-                Width = 0.0,
-                Height = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)
