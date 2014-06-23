@@ -166,13 +166,18 @@ namespace RxCanvas.WinForms
                     Pen pen = new Pen(
                         ToColor(ellipse.Stroke), 
                         (float)ellipse.StrokeThickness);
-                    
+
+                    double x = Math.Min(ellipse.Point1.X, ellipse.Point2.X);
+                    double y = Math.Min(ellipse.Point1.Y, ellipse.Point2.Y);
+                    double width = Math.Abs(ellipse.Point2.X - ellipse.Point1.X);
+                    double height = Math.Abs(ellipse.Point2.Y - ellipse.Point1.Y);
+
                     g.DrawEllipse(
                         pen,
-                        (float)(ellipse.X),
-                        (float)(ellipse.Y),
-                        (float)(ellipse.Width),
-                        (float)(ellipse.Height));
+                        (float)(x),
+                        (float)(y),
+                        (float)(width),
+                        (float)(height));
 
                     pen.Dispose();
                 }

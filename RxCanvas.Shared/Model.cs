@@ -153,10 +153,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
         public IColor Fill { get; set; }
@@ -328,10 +326,8 @@ namespace RxCanvas.Model
         {
             return new XEllipse()
             {
-                X = ellipse.X,
-                Y = ellipse.Y,
-                Width = ellipse.Width,
-                Height = ellipse.Height,
+                Point1 = Convert(ellipse.Point1),
+                Point2 = Convert(ellipse.Point2),
                 Stroke = Convert(ellipse.Stroke),
                 StrokeThickness = ellipse.StrokeThickness,
                 Fill = Convert(ellipse.Fill),

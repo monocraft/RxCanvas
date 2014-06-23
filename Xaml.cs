@@ -733,14 +733,17 @@ namespace RxCanvas.Xaml
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
         private Ellipse _ellipse;
-
         private IColor _stroke;
         private IColor _fill;
+        private IPoint _point1;
+        private IPoint _point2;
 
         public WpfEllipse(IEllipse ellipse)
         {
             _stroke = ellipse.Stroke;
             _fill = ellipse.Fill;
+            _point1 = ellipse.Point1;
+            _point2 = ellipse.Point2;
 
             _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
@@ -749,41 +752,46 @@ namespace RxCanvas.Xaml
 
             _ellipse = new Ellipse()
             {
-                Width = ellipse.Width,
-                Height = ellipse.Height,
                 Stroke = _strokeBrush,
                 StrokeThickness = ellipse.StrokeThickness,
                 Fill = _fillBrush
             };
 
-            Canvas.SetLeft(_ellipse, ellipse.X);
-            Canvas.SetTop(_ellipse, ellipse.Y);
+            Update();
 
             Native = _ellipse;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return Canvas.GetLeft(_ellipse); }
-            set { Canvas.SetLeft(_ellipse, value); }
+            get { return _point1; }
+            set
+            {
+                _point1 = value;
+                Update();
+            }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return Canvas.GetTop(_ellipse); }
-            set { Canvas.SetTop(_ellipse, value); }
+            get { return _point2; }
+            set
+            {
+                _point2 = value;
+                Update();
+            }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _ellipse.Width; }
-            set { _ellipse.Width = value; }
-        }
-
-        public double Height
-        {
-            get { return _ellipse.Height; }
-            set { _ellipse.Height = value; }
+            double x = Math.Min(_point1.X, _point2.X);
+            double y = Math.Min(_point1.Y, _point2.Y);
+            double width = Math.Abs(_point2.X - _point1.X);
+            double height = Math.Abs(_point2.Y - _point1.Y);
+            Canvas.SetLeft(_ellipse, x - 1.0);
+            Canvas.SetTop(_ellipse, y - 1.0);
+            _ellipse.Width = width + 2.0;
+            _ellipse.Height = height + 2.0;
         }
 
         public IColor Stroke

@@ -906,10 +906,9 @@ namespace RxCanvas.Editors
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _drag;
-        private ImmutablePoint _start;
 
         public XCanvasEllipseEditor(
-            IModelToNativeConverter nativeConverter, 
+            IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -938,7 +937,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    UpdatePositionAndSize(p);
+                    _xellipse.Point2.X = p.X;
+                    _xellipse.Point2.Y = p.Y;
+                    _nellipse.Point2 = _xellipse.Point2;
                     _nellipse.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -946,10 +947,11 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
                     _xellipse = canvasFactory.CreateEllipse();
-                    _xellipse.X = _start.X;
-                    _xellipse.Y = _start.Y;
+                    _xellipse.Point1.X = p.X;
+                    _xellipse.Point1.Y = p.Y;
+                    _xellipse.Point2.X = p.X;
+                    _xellipse.Point2.Y = p.Y;
                     _nellipse = nativeConverter.Convert(_xellipse);
                     _canvas.Add(_nellipse);
                     _nellipse.Bounds = boundsFactory.Create(_canvas, _nellipse);
@@ -970,27 +972,13 @@ namespace RxCanvas.Editors
 
                 if (_state == State.BottomRight)
                 {
-                    UpdatePositionAndSize(p);
+                    _xellipse.Point2.X = p.X;
+                    _xellipse.Point2.Y = p.Y;
+                    _nellipse.Point2 = _xellipse.Point2;
                     _nellipse.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
-        }
-
-        private void UpdatePositionAndSize(ImmutablePoint p)
-        {
-            double width = Math.Abs(p.X - _start.X);
-            double height = Math.Abs(p.Y - _start.Y);
-            double x = Math.Min(_start.X, p.X);
-            double y = Math.Min(_start.Y, p.Y);
-            _xellipse.X = _start.X <= p.X ? x : x - 1.0;
-            _xellipse.Y = _start.Y <= p.Y ? y : y - 1.0;
-            _xellipse.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
-            _xellipse.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
-            _nellipse.X = _xellipse.X;
-            _nellipse.Y = _xellipse.Y;
-            _nellipse.Width = _xellipse.Width;
-            _nellipse.Height = _xellipse.Height;
         }
 
         public void Dispose()
@@ -1202,10 +1190,8 @@ namespace RxCanvas.Editors
         {
             return new XEllipse()
             {
-                X = 0.0,
-                Y = 0.0,
-                Width = 0.0,
-                Height = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)

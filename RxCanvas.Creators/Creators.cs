@@ -131,6 +131,11 @@ namespace RxCanvas.Creators
 
         private void DrawRectangle(XGraphics gfx, IRectangle rectangle)
         {
+            double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+            double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+            double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+            double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
             if (rectangle.Fill.A > 0x00)
             {
                 var pen = new XPen(
@@ -138,11 +143,6 @@ namespace RxCanvas.Creators
                     X(rectangle.StrokeThickness));
 
                 var brush = new XSolidBrush(ToXColor(rectangle.Fill));
-
-                double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
-                double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
-                double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
-                double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
 
                 gfx.DrawRectangle(
                     pen, 
@@ -157,11 +157,6 @@ namespace RxCanvas.Creators
                 var pen = new XPen(
                     ToXColor(rectangle.Stroke), 
                     X(rectangle.StrokeThickness));
-
-                double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
-                double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
-                double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
-                double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
 
                 gfx.DrawRectangle(
                     pen, 
@@ -174,6 +169,11 @@ namespace RxCanvas.Creators
 
         private void DrawEllipse(XGraphics gfx, IEllipse ellipse)
         {
+            double x = Math.Min(ellipse.Point1.X, ellipse.Point2.X);
+            double y = Math.Min(ellipse.Point1.Y, ellipse.Point2.Y);
+            double width = Math.Abs(ellipse.Point2.X - ellipse.Point1.X);
+            double height = Math.Abs(ellipse.Point2.Y - ellipse.Point1.Y);
+
             if (ellipse.Fill.A > 0x00)
             {
                 var pen = new XPen(
@@ -184,11 +184,11 @@ namespace RxCanvas.Creators
                 
                 gfx.DrawEllipse(
                     pen, 
-                    brush, 
-                    X(ellipse.X), 
-                    Y(ellipse.Y), 
-                    X(ellipse.Width), 
-                    Y(ellipse.Height));
+                    brush,
+                    X(x),
+                    Y(y),
+                    X(width),
+                    Y(height));
             }
             else
             {
@@ -196,11 +196,12 @@ namespace RxCanvas.Creators
                     ToXColor(ellipse.Stroke), 
                     X(ellipse.StrokeThickness));
                 
-                gfx.DrawEllipse(pen,
-                    X(ellipse.X), 
-                    Y(ellipse.Y), 
-                    X(ellipse.Width), 
-                    Y(ellipse.Height));
+                gfx.DrawEllipse(
+                    pen,
+                    X(x),
+                    Y(y),
+                    X(width),
+                    Y(height));
             }
         }
 
