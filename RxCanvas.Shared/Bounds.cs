@@ -307,8 +307,7 @@ namespace RxCanvas.Bounds
 
         public void Move(double dx, double dy)
         {
-            Debug.Print("_hitResult: {0}", _hitResult);
-
+            //Debug.Print("_hitResult: {0}", _hitResult);
             switch(_hitResult)
             {
                 case HitResult.Point1:
@@ -582,8 +581,7 @@ namespace RxCanvas.Bounds
 
         public void Move(double dx, double dy)
         {
-            Debug.Print("_hitResult: {0}", _hitResult);
-
+            //Debug.Print("_hitResult: {0}", _hitResult);
             switch (_hitResult)
             {
                 case HitResult.Start:
@@ -662,6 +660,9 @@ namespace RxCanvas.Bounds
         private IPolygon _polygonPoint2;
         private bool _isVisible;
 
+        private enum HitResult { None, Start, Point1, Point2, QuadraticBezier };
+        private HitResult _hitResult;
+
         public QuadraticBezierBounds(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -685,7 +686,7 @@ namespace RxCanvas.Bounds
             _polygonStart = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
-            _polygonQuadraticBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonQuadraticBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 3);
         }
 
         private void UpdateStartBounds()
@@ -738,10 +739,6 @@ namespace RxCanvas.Bounds
             ps[2].X = _quadraticBezier.Point2.X;
             ps[2].Y = _quadraticBezier.Point2.Y;
 
-            // not used
-            ps[3].X = _quadraticBezier.Point2.X;
-            ps[3].Y = _quadraticBezier.Point2.Y;
-
             MonotoneChain.ConvexHull(ps, out convexHull, out k);
             //Debug.Print("k: {0}", k);
 
@@ -752,23 +749,12 @@ namespace RxCanvas.Bounds
 
                 // not used
                 Helper.MoveLine(ls[2], convexHull[0], convexHull[0]);
-                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
             }
             else if (k == 4)
             {
                 Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
                 Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
                 Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
-
-                // not used
-                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
-            }
-            else if (k == 5)
-            {
-                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
-                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
-                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
-                Helper.MoveLine(ls[3], convexHull[3], convexHull[4]);
             }
         }
 
@@ -835,15 +821,82 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return ConvexHullAsPolygonContains(x, y) //_polygonQuadraticBezier.Contains(x, y)
-                || _polygonStart.Contains(x, y)
-                || _polygonPoint1.Contains(x, y)
-                || _polygonPoint2.Contains(x, y);
+            if (_polygonStart.Contains(x, y))
+            {
+                _hitResult = HitResult.Start;
+                return true;
+            }
+            else if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (ConvexHullAsPolygonContains(x, y)) //_polygonQuadraticBezier.Contains(x, y)
+            {
+                _hitResult = HitResult.QuadraticBezier;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
         }
 
         public void Move(double dx, double dy)
         {
-            throw new NotImplementedException();
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch (_hitResult)
+            {
+                case HitResult.Start:
+                    {
+                        double x = _quadraticBezier.Start.X - dx;
+                        double y = _quadraticBezier.Start.Y - dy;
+                        _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _quadraticBezier.Start = _quadraticBezier.Start;
+                    }
+                    break;
+                case HitResult.Point1:
+                    {
+                        double x1 = _quadraticBezier.Point1.X - dx;
+                        double y1 = _quadraticBezier.Point1.Y - dy;
+                        _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _quadraticBezier.Point1 = _quadraticBezier.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _quadraticBezier.Point2.X - dx;
+                        double y2 = _quadraticBezier.Point2.Y - dy;
+                        _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _quadraticBezier.Point2 = _quadraticBezier.Point2;
+                    }
+                    break;
+                case HitResult.QuadraticBezier:
+                    {
+                        double x = _quadraticBezier.Start.X - dx;
+                        double y = _quadraticBezier.Start.Y - dy;
+                        double x1 = _quadraticBezier.Point1.X - dx;
+                        double y1 = _quadraticBezier.Point1.Y - dy;
+                        double x2 = _quadraticBezier.Point2.X - dx;
+                        double y2 = _quadraticBezier.Point2.Y - dy;
+                        _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _quadraticBezier.Start = _quadraticBezier.Start;
+                        _quadraticBezier.Point1 = _quadraticBezier.Point1;
+                        _quadraticBezier.Point2 = _quadraticBezier.Point2;
+                    }
+                    break;
+            }
         }
     }
 
