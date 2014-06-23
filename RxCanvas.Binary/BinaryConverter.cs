@@ -144,17 +144,17 @@ namespace RxCanvas.Binary
                             break;
                         case NativeType.Arc:
                             {
-                                //var arc = new XArc();
-                                //arc.Point1 = reader.ReadPoint();
-                                //arc.Point2 = reader.ReadPoint();
-                                //arc.StartAngle = reader.ReadDouble();
-                                //arc.SweepAngle = reader.ReadDouble();
-                                //arc.Stroke = reader.ReadColor();
-                                //arc.StrokeThickness = reader.ReadDouble();
-                                //arc.Fill = reader.ReadColor();
-                                //arc.IsFilled = reader.ReadBoolean();
-                                //arc.IsClosed = reader.ReadBoolean();
-                                //children.Add(arc);
+                                var arc = new XArc();
+                                arc.Point1 = reader.ReadPoint();
+                                arc.Point2 = reader.ReadPoint();
+                                arc.StartAngle = reader.ReadDouble();
+                                arc.SweepAngle = reader.ReadDouble();
+                                arc.Stroke = reader.ReadColor();
+                                arc.StrokeThickness = reader.ReadDouble();
+                                arc.Fill = reader.ReadColor();
+                                arc.IsFilled = reader.ReadBoolean();
+                                arc.IsClosed = reader.ReadBoolean();
+                                children.Add(arc);
                             }
                             break;
                         case NativeType.Rectangle:
@@ -181,16 +181,16 @@ namespace RxCanvas.Binary
                             break;
                         case NativeType.Text:
                             {
-                                //var text = new XText();
-                                //text.Point1 = reader.ReadPoint();
-                                //text.Point2 = reader.ReadPoint();
-                                //text.HorizontalAlignment = reader.ReadInt32();
-                                //text.VerticalAlignment = reader.ReadInt32();
-                                //text.Size = reader.ReadDouble();
-                                //text.Text = reader.ReadString();
-                                //text.Foreground = reader.ReadColor();
-                                //text.Backgroud = reader.ReadColor();
-                                //children.Add(text);
+                                var text = new XText();
+                                text.Point1 = reader.ReadPoint();
+                                text.Point2 = reader.ReadPoint();
+                                text.HorizontalAlignment = reader.ReadInt32();
+                                text.VerticalAlignment = reader.ReadInt32();
+                                text.Size = reader.ReadDouble();
+                                text.Text = reader.ReadString();
+                                text.Foreground = reader.ReadColor();
+                                text.Backgroud = reader.ReadColor();
+                                children.Add(text);
                             }
                             break;
                     }
@@ -255,17 +255,17 @@ namespace RxCanvas.Binary
                     }
                     else if (child is IArc)
                     {
-                        //var arc = child as IArc;
-                        //writer.Write(NativeType.Arc);
-                        //writer.Write(arc.Point1);
-                        //writer.Write(arc.Point2);
-                        //writer.Write(arc.StartAngle);
-                        //writer.Write(arc.SweepAngle);
-                        //writer.Write(arc.Stroke);
-                        //writer.Write(arc.StrokeThickness);
-                        //writer.Write(arc.Fill);
-                        //writer.Write(arc.IsFilled);
-                        //writer.Write(arc.IsClosed);
+                        var arc = child as IArc;
+                        writer.Write(NativeType.Arc);
+                        writer.Write(arc.Point1);
+                        writer.Write(arc.Point2);
+                        writer.Write(arc.StartAngle);
+                        writer.Write(arc.SweepAngle);
+                        writer.Write(arc.Stroke);
+                        writer.Write(arc.StrokeThickness);
+                        writer.Write(arc.Fill);
+                        writer.Write(arc.IsFilled);
+                        writer.Write(arc.IsClosed);
                     }
                     else if (child is IRectangle)
                     {
@@ -289,16 +289,16 @@ namespace RxCanvas.Binary
                     }
                     else if (child is IText)
                     {
-                        //var text = child as IText;
-                        //writer.Write(NativeType.Text);
-                        //writer.Write(text.Point1);
-                        //writer.Write(text.Point2);
-                        //writer.Write(text.HorizontalAlignment);
-                        //writer.Write(text.VerticalAlignment);
-                        //writer.Write(text.Size);
-                        //writer.Write(text.Text);
-                        //writer.Write(text.Foreground);
-                        //writer.Write(text.Backgroud);
+                        var text = child as IText;
+                        writer.Write(NativeType.Text);
+                        writer.Write(text.Point1);
+                        writer.Write(text.Point2);
+                        writer.Write(text.HorizontalAlignment);
+                        writer.Write(text.VerticalAlignment);
+                        writer.Write(text.Size);
+                        writer.Write(text.Text);
+                        writer.Write(text.Foreground);
+                        writer.Write(text.Backgroud);
                     }
                 }
             }
