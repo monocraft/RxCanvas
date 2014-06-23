@@ -70,7 +70,6 @@ namespace RxCanvas.Editors
             Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
-                            //where _canvas.IsCaptured
                             select move;
 
             var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
