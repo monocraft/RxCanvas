@@ -124,10 +124,8 @@ namespace RxCanvas.Interfaces
 
     public interface IText : INative
     {
-        double X { get; set; }
-        double Y { get; set; }
-        double Width { get; set; }
-        double Height { get; set; }
+        IPoint Point1 { get; set; }
+        IPoint Point2 { get; set; }
         int HorizontalAlignment { get; set; }
         int VerticalAlignment { get; set; }
         double Size { get; set; }

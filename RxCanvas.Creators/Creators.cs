@@ -219,11 +219,16 @@ namespace RxCanvas.Creators
 
             XStringFormat format = new XStringFormat();
 
+            double x = Math.Min(text.Point1.X, text.Point2.X);
+            double y = Math.Min(text.Point1.Y, text.Point2.Y);
+            double width = Math.Abs(text.Point2.X - text.Point1.X);
+            double height = Math.Abs(text.Point2.Y - text.Point1.Y);
+
             XRect rect = new XRect(
-                X(text.X), 
-                Y(text.Y), 
-                X(text.Width), 
-                Y(text.Height));
+                    X(x),
+                    Y(y),
+                    X(width),
+                    Y(height));
 
             switch (text.HorizontalAlignment)
             {

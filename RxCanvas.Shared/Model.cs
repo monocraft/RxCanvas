@@ -164,10 +164,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public int HorizontalAlignment { get; set; }
         public int VerticalAlignment { get; set; }
         public double Size { get; set; }
@@ -333,10 +331,8 @@ namespace RxCanvas.Model
         {
             return new XText()
             {
-                X = text.X,
-                Y = text.Y,
-                Width = text.Width,
-                Height = text.Height,
+                Point1 = Convert(text.Point1),
+                Point2 = Convert(text.Point2),
                 HorizontalAlignment = text.HorizontalAlignment,
                 VerticalAlignment = text.VerticalAlignment,
                 Size = text.Size,

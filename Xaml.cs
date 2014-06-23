@@ -834,14 +834,17 @@ namespace RxCanvas.Xaml
         private SolidColorBrush _backgroundBrush;
         private Grid _grid;
         private TextBlock _tb;
-
         private IColor _foreground;
         private IColor _background;
+        private IPoint _point1;
+        private IPoint _point2;
 
         public WpfText(IText text)
         {
             _foreground = text.Foreground;
             _background = text.Backgroud;
+            _point1 = text.Point1;
+            _point2 = text.Point2;
 
             _foregroundBrush = new SolidColorBrush(Color.FromArgb(_foreground.A, _foreground.R, _foreground.G, _foreground.B));
             _foregroundBrush.Freeze();
@@ -850,8 +853,6 @@ namespace RxCanvas.Xaml
 
             _grid = new Grid();
             _grid.Background = _backgroundBrush;
-            _grid.Width = text.Width;
-            _grid.Height = text.Height;
 
             _tb = new TextBlock();
             _tb.HorizontalAlignment = (HorizontalAlignment)text.HorizontalAlignment;
@@ -864,34 +865,41 @@ namespace RxCanvas.Xaml
 
             _grid.Children.Add(_tb);
 
-            Canvas.SetLeft(_grid, text.X);
-            Canvas.SetTop(_grid, text.Y);
+            Update();
 
             Native = _grid;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return Canvas.GetLeft(_grid); }
-            set { Canvas.SetLeft(_grid, value); }
+            get { return _point1; }
+            set
+            {
+                _point1 = value;
+                Update();
+            }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return Canvas.GetTop(_grid); }
-            set { Canvas.SetTop(_grid, value); }
+            get { return _point2; }
+            set
+            {
+                _point2 = value;
+                Update();
+            }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _grid.Width; }
-            set { _grid.Width = value; }
-        }
-
-        public double Height
-        {
-            get { return _grid.Height; }
-            set { _grid.Height = value; }
+            double x = Math.Min(_point1.X, _point2.X);
+            double y = Math.Min(_point1.Y, _point2.Y);
+            double width = Math.Abs(_point2.X - _point1.X);
+            double height = Math.Abs(_point2.Y - _point1.Y);
+            Canvas.SetLeft(_grid, x - 1.0);
+            Canvas.SetTop(_grid, y - 1.0);
+            _grid.Width = width + 2.0;
+            _grid.Height = height + 2.0;
         }
 
         public int HorizontalAlignment

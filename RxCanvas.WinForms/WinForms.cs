@@ -187,15 +187,20 @@ namespace RxCanvas.WinForms
                     Brush brush = new SolidBrush(ToColor(text.Foreground));
                     Font font = new Font("Callibri", (float)text.Size);
 
+                    double x = Math.Min(text.Point1.X, text.Point2.X);
+                    double y = Math.Min(text.Point1.Y, text.Point2.Y);
+                    double width = Math.Abs(text.Point2.X - text.Point1.X);
+                    double height = Math.Abs(text.Point2.Y - text.Point1.Y);
+
                     g.DrawString(
                         text.Text, 
                         font, 
                         brush,
                         new RectangleF(
-                            (float)text.X, 
-                            (float)text.Y, 
-                            (float)text.Width, 
-                            (float)text.Height),
+                            (float)(x),
+                            (float)(y),
+                            (float)(width),
+                            (float)(height)),
                         new StringFormat() 
                         { 
                             Alignment = (StringAlignment)text.HorizontalAlignment, 

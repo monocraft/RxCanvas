@@ -1003,10 +1003,9 @@ namespace RxCanvas.Editors
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _drag;
-        private ImmutablePoint _start;
 
         public XCanvasTextEditor(
-            IModelToNativeConverter nativeConverter, 
+            IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -1035,7 +1034,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    UpdatePositionAndSize(p);
+                    _xtext.Point2.X = p.X;
+                    _xtext.Point2.Y = p.Y;
+                    _ntext.Point2 = _xtext.Point2;
                     _ntext.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -1043,10 +1044,11 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
                     _xtext = canvasFactory.CreateText();
-                    _xtext.X = _start.X;
-                    _xtext.Y = _start.Y;
+                    _xtext.Point1.X = p.X;
+                    _xtext.Point1.Y = p.Y;
+                    _xtext.Point2.X = p.X;
+                    _xtext.Point2.Y = p.Y;
                     _ntext = nativeConverter.Convert(_xtext);
                     _canvas.Add(_ntext);
                     _ntext.Bounds = boundsFactory.Create(_canvas, _ntext);
@@ -1067,27 +1069,13 @@ namespace RxCanvas.Editors
 
                 if (_state == State.BottomRight)
                 {
-                    UpdatePositionAndSize(p);
+                    _xtext.Point2.X = p.X;
+                    _xtext.Point2.Y = p.Y;
+                    _ntext.Point2 = _xtext.Point2;
                     _ntext.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
-        }
-
-        private void UpdatePositionAndSize(ImmutablePoint p)
-        {
-            double width = Math.Abs(p.X - _start.X);
-            double height = Math.Abs(p.Y - _start.Y);
-            double x = Math.Min(_start.X, p.X);
-            double y = Math.Min(_start.Y, p.Y);
-            _xtext.X = _start.X <= p.X ? x : x - 1.0;
-            _xtext.Y = _start.Y <= p.Y ? y : y - 1.0;
-            _xtext.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
-            _xtext.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
-            _ntext.X = _xtext.X;
-            _ntext.Y = _xtext.Y;
-            _ntext.Width = _xtext.Width;
-            _ntext.Height = _xtext.Height;
         }
 
         public void Dispose()
@@ -1202,10 +1190,8 @@ namespace RxCanvas.Editors
         {
             return new XText()
             {
-                X = 0.0,
-                Y = 0.0,
-                Width = 0.0,
-                Height = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 HorizontalAlignment = 1,
                 VerticalAlignment = 1,
                 Size = 11.0,
