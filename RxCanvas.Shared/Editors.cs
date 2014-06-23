@@ -249,90 +249,10 @@ namespace RxCanvas.Editors
             double dx = _start.X - p.X;
             double dy = _start.Y - p.Y;
             _start = p;
-
-            /*
-            if (_selected is ILine)
-            {
-                var line = _selected as ILine;
-                line.Bounds.Move(dx, dy);
-            }
-            else if (_selected is IBezier)
-            {
-                var bezier = _selected as IBezier;
-                bezier.Bounds.Move(dx, dy);
-            }
-            else if (_selected is IQuadraticBezier)
-            {
-                var quadraticBezier = _selected as IQuadraticBezier;
-                MoveQuadraticBezier(quadraticBezier, dx, dy);
-            }
-            else if (_selected is IArc)
-            {
-                var arc = _selected as IArc;
-                MoveArc(arc, dx, dy);
-            }
-            else if (_selected is IRectangle)
-            {
-                var rectangle = _selected as IRectangle;
-                MoveRectangle(rectangle, dx, dy);
-            }
-            else if (_selected is IEllipse)
-            {
-                var ellipse = _selected as IEllipse;
-                MoveEllipse(ellipse, dx, dy);
-            }
-            else if (_selected is IText)
-            {
-                var text = _selected as IText;
-                MoveText(text, dx, dy);
-            }
-            */
-
             _selected.Bounds.Move(dx, dy);
-
             _selected.Bounds.Update();
             _canvas.Render(null);
         }
-
-        /*
-        private void MoveQuadraticBezier(IQuadraticBezier quadraticBezier, double dx, double dy)
-        {
-            quadraticBezier.Start.X -= dx;
-            quadraticBezier.Start.Y -= dy;
-            quadraticBezier.Point1.X -= dx;
-            quadraticBezier.Point1.Y -= dy;
-            quadraticBezier.Point2.X -= dx;
-            quadraticBezier.Point2.Y -= dy;
-
-            quadraticBezier.Start = quadraticBezier.Start;
-            quadraticBezier.Point1 = quadraticBezier.Point1;
-            quadraticBezier.Point2 = quadraticBezier.Point2;
-        }
-
-        private void MoveArc(IArc arc, double dx, double dy)
-        {
-            arc.X -= dx;
-            arc.Y -= dy;
-        }
-
-        private void MoveRectangle(IRectangle rectangle, double dx, double dy)
-        {
-            rectangle.X -= dx;
-            rectangle.Y -= dy;
-        }
-
-        private void MoveEllipse(IEllipse ellipse, double dx, double dy)
-        {
-            ellipse.X -= dx;
-            ellipse.Y -= dy;
-        }
-
-        private void MoveText(IText text, double dx, double dy)
-        {
-            text.X -= dx;
-            text.Y -= dy;
-        }
-        */
 
         private INative HitTest(double x, double y)
         {
