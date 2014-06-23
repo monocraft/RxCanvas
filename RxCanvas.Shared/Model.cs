@@ -100,9 +100,9 @@ namespace RxCanvas.Model
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
         public IPoint Point3 { get; set; }
-        public IColor Fill { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
+        public IColor Fill { get; set; }
         public bool IsFilled { get; set; }
         public bool IsClosed { get; set; }
     }
@@ -114,9 +114,9 @@ namespace RxCanvas.Model
         public IPoint Start { get; set; }
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
-        public IColor Fill { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
+        public IColor Fill { get; set; }
         public bool IsFilled { get; set; }
         public bool IsClosed { get; set; }
     }
@@ -180,22 +180,17 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
-
-        public IList<INative> Children { get; set; }
-
         public double Width { get; set; }
         public double Height { get; set; }
         public IColor Background { get; set; }
-
         public bool EnableSnap { get; set; }
         public double SnapX { get; set; }
         public double SnapY { get; set; }
-
         public bool IsCaptured { get; set; }
+        public IList<INative> Children { get; set; }
 
         public double Snap(double val, double snap)
         {
@@ -269,9 +264,9 @@ namespace RxCanvas.Model
                 Point1 = Convert(bezier.Point1),
                 Point2 = Convert(bezier.Point2),
                 Point3 = Convert(bezier.Point3),
-                Fill = Convert(bezier.Fill),
                 Stroke = Convert(bezier.Stroke),
                 StrokeThickness = bezier.StrokeThickness,
+                Fill = Convert(bezier.Fill),
                 IsFilled = bezier.IsFilled,
                 IsClosed = bezier.IsClosed
             };
@@ -284,9 +279,9 @@ namespace RxCanvas.Model
                 Start = Convert(quadraticBezier.Start),
                 Point1 = Convert(quadraticBezier.Point1),
                 Point2 = Convert(quadraticBezier.Point2),
-                Fill = Convert(quadraticBezier.Fill),
                 Stroke = Convert(quadraticBezier.Stroke),
                 StrokeThickness = quadraticBezier.StrokeThickness,
+                Fill = Convert(quadraticBezier.Fill),
                 IsFilled = quadraticBezier.IsFilled,
                 IsClosed = quadraticBezier.IsClosed
             };

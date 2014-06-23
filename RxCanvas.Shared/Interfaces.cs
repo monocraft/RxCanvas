@@ -70,9 +70,9 @@ namespace RxCanvas.Interfaces
         IPoint Point1 { get; set; }
         IPoint Point2 { get; set; }
         IPoint Point3 { get; set; }
-        IColor Fill { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
+        IColor Fill { get; set; }
         bool IsFilled { get; set; }
         bool IsClosed { get; set; }
     }
@@ -82,9 +82,9 @@ namespace RxCanvas.Interfaces
         IPoint Start { get; set; }
         IPoint Point1 { get; set; }
         IPoint Point2 { get; set; }
-        IColor Fill { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
+        IColor Fill { get; set; }
         bool IsFilled { get; set; }
         bool IsClosed { get; set; }
     }
@@ -141,7 +141,6 @@ namespace RxCanvas.Interfaces
         IObservable<ImmutablePoint> Downs { get; set; }
         IObservable<ImmutablePoint> Ups { get; set; }
         IObservable<ImmutablePoint> Moves { get; set; }
-        IList<INative> Children { get; set; }
         double Width { get; set; }
         double Height { get; set; }
         IColor Background { get; set; }
@@ -149,6 +148,7 @@ namespace RxCanvas.Interfaces
         double SnapX { get; set; }
         double SnapY { get; set; }
         double Snap(double val, double snap);
+        IList<INative> Children { get; set; }
         bool IsCaptured { get; set; }
         void Capture();
         void ReleaseCapture();

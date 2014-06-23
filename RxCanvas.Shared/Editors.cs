@@ -1133,9 +1133,9 @@ namespace RxCanvas.Editors
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
                 Point3 = new XPoint(0.0, 0.0),
-                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
+                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 IsFilled = false,
                 IsClosed = false
             };
@@ -1148,9 +1148,9 @@ namespace RxCanvas.Editors
                 Start = new XPoint(0.0, 0.0),
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
-                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
+                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 IsFilled = false,
                 IsClosed = false
             };

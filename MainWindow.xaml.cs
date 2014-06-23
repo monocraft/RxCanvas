@@ -237,6 +237,8 @@ namespace RxCanvas
             var json = file.Open(path);
             var xcanvas = serializer.Deserialize(json);
             ConvertToNative(xcanvas);
+            //var xcanvas = RxCanvas.Binary.BinaryConverter.Open(path);
+            //ConvertToNative(xcanvas);
         }
 
         private void Save(string path, int index)
@@ -246,6 +248,8 @@ namespace RxCanvas
             var serializer = _serializers[index];
             var json = serializer.Serialize(canvas);
             file.Save(path, json);
+            //var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            //RxCanvas.Binary.BinaryConverter.Save(path, drawingCanvas);
         }
 
         private void Export(string path, int index)
