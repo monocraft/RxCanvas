@@ -121,7 +121,13 @@ namespace RxCanvas.WinForms
                 else if (child is IArc)
                 {
                     var arc = child as IArc;
-                    if (arc.Width > 0.0 && arc.Height > 0.0)
+
+                    double x = Math.Min(arc.Point1.X, arc.Point2.X);
+                    double y = Math.Min(arc.Point1.Y, arc.Point2.Y);
+                    double width = Math.Abs(arc.Point2.X - arc.Point1.X);
+                    double height = Math.Abs(arc.Point2.Y - arc.Point1.Y);
+
+                    if (width > 0.0 && height > 0.0)
                     {
                         Pen pen = new Pen(
                             ToColor(arc.Stroke), 
@@ -129,10 +135,10 @@ namespace RxCanvas.WinForms
 
                         g.DrawArc(
                             pen, 
-                            (float)arc.X, 
-                            (float)arc.Y, 
-                            (float)arc.Width, 
-                            (float)arc.Height, 
+                            (float)x, 
+                            (float)y, 
+                            (float)width, 
+                            (float)height, 
                             (float)arc.StartAngle, 
                             (float)arc.SweepAngle);
 

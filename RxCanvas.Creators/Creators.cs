@@ -119,12 +119,17 @@ namespace RxCanvas.Creators
                 ToXColor(arc.Stroke), 
                 X(arc.StrokeThickness));
 
+            double x = Math.Min(arc.Point1.X, arc.Point2.X);
+            double y = Math.Min(arc.Point1.Y, arc.Point2.Y);
+            double width = Math.Abs(arc.Point2.X - arc.Point1.X);
+            double height = Math.Abs(arc.Point2.Y - arc.Point1.Y);
+
             gfx.DrawArc(
                 pen, 
-                X(arc.X), 
-                Y(arc.Y), 
-                X(arc.Width), 
-                Y(arc.Height), 
+                X(x), 
+                Y(y), 
+                X(width), 
+                Y(height),
                 arc.StartAngle, 
                 arc.SweepAngle);
         }

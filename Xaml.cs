@@ -367,7 +367,6 @@ namespace RxCanvas.Xaml
         public WpfArc(IArc arc)
         {
             _source = arc;
-
             _fill = arc.Fill;
             _stroke = arc.Stroke;
 
@@ -405,10 +404,10 @@ namespace RxCanvas.Xaml
             // https://pdfsharp.codeplex.com/SourceControl/latest#PDFsharp/code/PdfSharp/PdfSharp.Internal/Calc.cs
             // https://pdfsharp.codeplex.com/SourceControl/latest#PDFsharp/code/PdfSharp/PdfSharp.Drawing/GeometryHelper.cs
 
-            double x = arc.X;
-            double y = arc.Y;
-            double width = arc.Width;
-            double height = arc.Height;
+            double x = Math.Min(arc.Point1.X, arc.Point2.X);
+            double y = Math.Min(arc.Point1.Y, arc.Point2.Y);
+            double width = Math.Abs(arc.Point2.X - arc.Point1.X);
+            double height = Math.Abs(arc.Point2.Y - arc.Point1.Y);
             double startAngle = arc.StartAngle;
             double sweepAngle = arc.SweepAngle;
 
@@ -516,48 +515,30 @@ namespace RxCanvas.Xaml
             segment.IsStroked = isStroked;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return _source.X; }
-            set 
+            get { return _source.Point1; }
+            set
             {
-                _source.X = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
+                _source.Point1 = value;
+                Update();
             }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return _source.Y; }
+            get { return _source.Point2; }
             set
             {
-                _source.Y = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
+                _source.Point2 = value;
+                Update();
             }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _source.Width; }
-            set
-            {
-                _source.Width = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
-            }
-        }
-
-        public double Height
-        {
-            get { return _source.Height; }
-            set
-            {
-                _source.Height = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
-            }
+            SetArcSegment(_as, _source, out _start);
+            _pf.StartPoint = _start;
         }
 
         public double StartAngle

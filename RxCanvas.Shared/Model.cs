@@ -125,10 +125,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public double StartAngle { get; set; }
         public double SweepAngle { get; set; }
         public IColor Stroke { get; set; }
@@ -289,10 +287,8 @@ namespace RxCanvas.Model
         {
             return new XArc()
             {
-                X = arc.X,
-                Y = arc.Y,
-                Width = arc.Width,
-                Height = arc.Height,
+                Point1 = Convert(arc.Point1),
+                Point2 = Convert(arc.Point2),
                 StartAngle = arc.StartAngle,
                 SweepAngle = arc.SweepAngle,
                 Stroke = Convert(arc.Stroke),
