@@ -253,7 +253,7 @@ namespace RxCanvas.Editors
             if (_selected is ILine)
             {
                 var line = _selected as ILine;
-                MoveLine(line, dx, dy);
+                line.Bounds.Move(dx, dy);
             }
             else if (_selected is IBezier)
             {
@@ -288,17 +288,6 @@ namespace RxCanvas.Editors
 
             _selected.Bounds.Update();
             _canvas.Render(null);
-        }
-
-        private void MoveLine(ILine line, double dx, double dy)
-        {
-            line.Point1.X -= dx;
-            line.Point1.Y -= dy;
-            line.Point2.X -= dx;
-            line.Point2.Y -= dy;
-
-            line.Point1 = line.Point1;
-            line.Point2 = line.Point2;
         }
 
         private void MoveBezier(IBezier bezier, double dx, double dy)

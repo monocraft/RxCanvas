@@ -154,6 +154,9 @@ namespace RxCanvas.Bounds
         private IPolygon _polygonPoint2;
         private bool _isVisible;
 
+        private enum HitResult { None, Point1, Point2, Line};
+        private HitResult _hitResult;
+
         public LineBounds(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -166,6 +169,8 @@ namespace RxCanvas.Bounds
             _size = size;
             _offset = offset;
             _canvas = canvas;
+
+            _hitResult = HitResult.None;
 
             InitBounds(nativeConverter, canvasFactory);
         }
@@ -281,9 +286,64 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygonLine.Contains(x, y)
-                || _polygonPoint1.Contains(x, y)
-                || _polygonPoint2.Contains(x, y);
+            if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonLine.Contains(x, y))
+            {
+                _hitResult = HitResult.Line;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            Debug.Print("Move: {0}", _hitResult);
+
+            switch(_hitResult)
+            {
+                case HitResult.Point1:
+                    {
+                        double x1 = _line.Point1.X - dx;
+                        double y1 = _line.Point1.Y - dy;
+                        _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _line.Point1 = _line.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _line.Point2.X - dx;
+                        double y2 = _line.Point2.Y - dy;
+                        _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _line.Point2 = _line.Point2;
+                    }
+                    break;
+                case HitResult.Line:
+                    {
+                        double x1 = _line.Point1.X - dx;
+                        double y1 = _line.Point1.Y - dy;
+                        double x2 = _line.Point2.X - dx;
+                        double y2 = _line.Point2.Y - dy;
+                        _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _line.Point1 = _line.Point1;
+                        _line.Point2 = _line.Point2;
+                    }
+                    break;
+            }
         }
     }
 
@@ -494,6 +554,11 @@ namespace RxCanvas.Bounds
                 || _polygonPoint2.Contains(x, y)
                 || _polygonPoint3.Contains(x, y);
         }
+
+        public void Move(double dx, double dy)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class QuadraticBezierBounds : IBounds
@@ -686,6 +751,11 @@ namespace RxCanvas.Bounds
                 || _polygonPoint1.Contains(x, y)
                 || _polygonPoint2.Contains(x, y);
         }
+
+        public void Move(double dx, double dy)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ArcBounds : IBounds
@@ -755,6 +825,11 @@ namespace RxCanvas.Bounds
         public bool Contains(double x, double y)
         {
             return _polygon.Contains(x, y);
+        }
+
+        public void Move(double dx, double dy)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -826,6 +901,11 @@ namespace RxCanvas.Bounds
         {
             return _polygon.Contains(x, y);
         }
+
+        public void Move(double dx, double dy)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class EllipseBounds : IBounds
@@ -896,6 +976,11 @@ namespace RxCanvas.Bounds
         {
             return _polygon.Contains(x, y);
         }
+
+        public void Move(double dx, double dy)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class TextBounds : IBounds
@@ -965,6 +1050,11 @@ namespace RxCanvas.Bounds
         public bool Contains(double x, double y)
         {
             return _polygon.Contains(x, y);
+        }
+
+        public void Move(double dx, double dy)
+        {
+            throw new NotImplementedException();
         }
     }
 
