@@ -70,7 +70,6 @@ namespace RxCanvas.Editors
             Modifiers = "";
 
             var dragMoves = from move in _canvas.Moves
-                            //where _canvas.IsCaptured
                             select move;
 
             var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
@@ -250,111 +249,9 @@ namespace RxCanvas.Editors
             double dx = _start.X - p.X;
             double dy = _start.Y - p.Y;
             _start = p;
-
-            if (_selected is ILine)
-            {
-                var line = _selected as ILine;
-                MoveLine(line, dx, dy);
-            }
-            else if (_selected is IBezier)
-            {
-                var bezier = _selected as IBezier;
-                MoveBezier(bezier, dx, dy);
-            }
-            else if (_selected is IQuadraticBezier)
-            {
-                var quadraticBezier = _selected as IQuadraticBezier;
-                MoveQuadraticBezier(quadraticBezier, dx, dy);
-            }
-            else if (_selected is IArc)
-            {
-                var arc = _selected as IArc;
-                MoveArc(arc, dx, dy);
-            }
-            else if (_selected is IRectangle)
-            {
-                var rectangle = _selected as IRectangle;
-                MoveRectangle(rectangle, dx, dy);
-            }
-            else if (_selected is IEllipse)
-            {
-                var ellipse = _selected as IEllipse;
-                MoveEllipse(ellipse, dx, dy);
-            }
-            else if (_selected is IText)
-            {
-                var text = _selected as IText;
-                MoveText(text, dx, dy);
-            }
-
+            _selected.Bounds.Move(dx, dy);
             _selected.Bounds.Update();
             _canvas.Render(null);
-        }
-
-        private void MoveLine(ILine line, double dx, double dy)
-        {
-            line.Point1.X -= dx;
-            line.Point1.Y -= dy;
-            line.Point2.X -= dx;
-            line.Point2.Y -= dy;
-
-            line.Point1 = line.Point1;
-            line.Point2 = line.Point2;
-        }
-
-        private void MoveBezier(IBezier bezier, double dx, double dy)
-        {
-            bezier.Start.X -= dx;
-            bezier.Start.Y -= dy;
-            bezier.Point1.X -= dx;
-            bezier.Point1.Y -= dy;
-            bezier.Point2.X -= dx;
-            bezier.Point2.Y -= dy;
-            bezier.Point3.X -= dx;
-            bezier.Point3.Y -= dy;
-
-            bezier.Start = bezier.Start;
-            bezier.Point1 = bezier.Point1;
-            bezier.Point2 = bezier.Point2;
-            bezier.Point3 = bezier.Point3;
-        }
-
-        private void MoveQuadraticBezier(IQuadraticBezier quadraticBezier, double dx, double dy)
-        {
-            quadraticBezier.Start.X -= dx;
-            quadraticBezier.Start.Y -= dy;
-            quadraticBezier.Point1.X -= dx;
-            quadraticBezier.Point1.Y -= dy;
-            quadraticBezier.Point2.X -= dx;
-            quadraticBezier.Point2.Y -= dy;
-
-            quadraticBezier.Start = quadraticBezier.Start;
-            quadraticBezier.Point1 = quadraticBezier.Point1;
-            quadraticBezier.Point2 = quadraticBezier.Point2;
-        }
-
-        private void MoveArc(IArc arc, double dx, double dy)
-        {
-            arc.X -= dx;
-            arc.Y -= dy;
-        }
-
-        private void MoveRectangle(IRectangle rectangle, double dx, double dy)
-        {
-            rectangle.X -= dx;
-            rectangle.Y -= dy;
-        }
-
-        private void MoveEllipse(IEllipse ellipse, double dx, double dy)
-        {
-            ellipse.X -= dx;
-            ellipse.Y -= dy;
-        }
-
-        private void MoveText(IText text, double dx, double dy)
-        {
-            text.X -= dx;
-            text.Y -= dy;
         }
 
         private INative HitTest(double x, double y)
@@ -805,7 +702,6 @@ namespace RxCanvas.Editors
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _drag;
-        private ImmutablePoint _start;
 
         public XArcEditor(
             IModelToNativeConverter nativeConverter, 
@@ -837,7 +733,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    UpdatePositionAndSize(p);
+                    _xarc.Point2.X = p.X;
+                    _xarc.Point2.Y = p.Y;
+                    _narc.Point2 = _xarc.Point2;
                     _narc.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -845,10 +743,11 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _start = new ImmutablePoint(p.X, p.Y);
                     _xarc = canvasFactory.CreateArc();
-                    _xarc.X = _start.X;
-                    _xarc.Y = _start.Y;
+                    _xarc.Point1.X = p.X;
+                    _xarc.Point1.Y = p.Y;
+                    _xarc.Point2.X = p.X;
+                    _xarc.Point2.Y = p.Y;
                     _narc = nativeConverter.Convert(_xarc);
                     _canvas.Add(_narc);
                     _narc.Bounds = boundsFactory.Create(_canvas, _narc);
@@ -869,25 +768,13 @@ namespace RxCanvas.Editors
 
                 if (_state == State.Size)
                 {
-                    UpdatePositionAndSize(p);
+                    _xarc.Point2.X = p.X;
+                    _xarc.Point2.Y = p.Y;
+                    _narc.Point2 = _xarc.Point2;
                     _narc.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
-        }
-
-        private void UpdatePositionAndSize(ImmutablePoint p)
-        {
-            double width = Math.Abs(p.X - _start.X);
-            double height = Math.Abs(p.Y - _start.Y);
-            _xarc.X = Math.Min(_start.X, p.X);
-            _xarc.Y = Math.Min(_start.Y, p.Y);
-            _xarc.Width = width;
-            _xarc.Height = height;
-            _narc.X = _xarc.X;
-            _narc.Y = _xarc.Y;
-            _narc.Width = _xarc.Width;
-            _narc.Height = _xarc.Height;
         }
 
         public void Dispose()
@@ -912,7 +799,6 @@ namespace RxCanvas.Editors
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _drag;
-        private ImmutablePoint _start;
 
         public XCanvasRectangleEditor(
             IModelToNativeConverter nativeConverter, 
@@ -944,7 +830,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    UpdatePositionAndSize(p);
+                    _xrectangle.Point2.X = p.X;
+                    _xrectangle.Point2.Y = p.Y;
+                    _nrectangle.Point2 = _xrectangle.Point2;
                     _nrectangle.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -952,10 +840,11 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
                     _xrectangle = canvasFactory.CreateRectangle();
-                    _xrectangle.X = _start.X;
-                    _xrectangle.Y = _start.Y;
+                    _xrectangle.Point1.X = p.X;
+                    _xrectangle.Point1.Y = p.Y;
+                    _xrectangle.Point2.X = p.X;
+                    _xrectangle.Point2.Y = p.Y;
                     _nrectangle = nativeConverter.Convert(_xrectangle);
                     _canvas.Add(_nrectangle);
                     _nrectangle.Bounds = boundsFactory.Create(_canvas, _nrectangle);
@@ -976,27 +865,13 @@ namespace RxCanvas.Editors
 
                 if (_state == State.BottomRight)
                 {
-                    UpdatePositionAndSize(p);
+                    _xrectangle.Point2.X = p.X;
+                    _xrectangle.Point2.Y = p.Y;
+                    _nrectangle.Point2 = _xrectangle.Point2;
                     _nrectangle.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
-        }
-
-        private void UpdatePositionAndSize(ImmutablePoint p)
-        {
-            double width = Math.Abs(p.X - _start.X);
-            double height = Math.Abs(p.Y - _start.Y);
-            double x = Math.Min(_start.X, p.X);
-            double y = Math.Min(_start.Y, p.Y);
-            _xrectangle.X = _start.X <= p.X ? x : x - 1.0;
-            _xrectangle.Y =  _start.Y <= p.Y ? y : y - 1.0;
-            _xrectangle.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
-            _xrectangle.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
-            _nrectangle.X = _xrectangle.X;
-            _nrectangle.Y = _xrectangle.Y;
-            _nrectangle.Width = _xrectangle.Width;
-            _nrectangle.Height = _xrectangle.Height;
         }
 
         public void Dispose()
@@ -1021,10 +896,9 @@ namespace RxCanvas.Editors
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _drag;
-        private ImmutablePoint _start;
 
         public XCanvasEllipseEditor(
-            IModelToNativeConverter nativeConverter, 
+            IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -1053,7 +927,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    UpdatePositionAndSize(p);
+                    _xellipse.Point2.X = p.X;
+                    _xellipse.Point2.Y = p.Y;
+                    _nellipse.Point2 = _xellipse.Point2;
                     _nellipse.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -1061,10 +937,11 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
                     _xellipse = canvasFactory.CreateEllipse();
-                    _xellipse.X = _start.X;
-                    _xellipse.Y = _start.Y;
+                    _xellipse.Point1.X = p.X;
+                    _xellipse.Point1.Y = p.Y;
+                    _xellipse.Point2.X = p.X;
+                    _xellipse.Point2.Y = p.Y;
                     _nellipse = nativeConverter.Convert(_xellipse);
                     _canvas.Add(_nellipse);
                     _nellipse.Bounds = boundsFactory.Create(_canvas, _nellipse);
@@ -1085,27 +962,13 @@ namespace RxCanvas.Editors
 
                 if (_state == State.BottomRight)
                 {
-                    UpdatePositionAndSize(p);
+                    _xellipse.Point2.X = p.X;
+                    _xellipse.Point2.Y = p.Y;
+                    _nellipse.Point2 = _xellipse.Point2;
                     _nellipse.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
-        }
-
-        private void UpdatePositionAndSize(ImmutablePoint p)
-        {
-            double width = Math.Abs(p.X - _start.X);
-            double height = Math.Abs(p.Y - _start.Y);
-            double x = Math.Min(_start.X, p.X);
-            double y = Math.Min(_start.Y, p.Y);
-            _xellipse.X = _start.X <= p.X ? x : x - 1.0;
-            _xellipse.Y = _start.Y <= p.Y ? y : y - 1.0;
-            _xellipse.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
-            _xellipse.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
-            _nellipse.X = _xellipse.X;
-            _nellipse.Y = _xellipse.Y;
-            _nellipse.Width = _xellipse.Width;
-            _nellipse.Height = _xellipse.Height;
         }
 
         public void Dispose()
@@ -1130,10 +993,9 @@ namespace RxCanvas.Editors
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _drag;
-        private ImmutablePoint _start;
 
         public XCanvasTextEditor(
-            IModelToNativeConverter nativeConverter, 
+            IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -1162,7 +1024,9 @@ namespace RxCanvas.Editors
 
                 if (_canvas.IsCaptured)
                 {
-                    UpdatePositionAndSize(p);
+                    _xtext.Point2.X = p.X;
+                    _xtext.Point2.Y = p.Y;
+                    _ntext.Point2 = _xtext.Point2;
                     _ntext.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -1170,10 +1034,11 @@ namespace RxCanvas.Editors
                 }
                 else
                 {
-                    _start = new ImmutablePoint(p.X - 1.0, p.Y - 1.0);
                     _xtext = canvasFactory.CreateText();
-                    _xtext.X = _start.X;
-                    _xtext.Y = _start.Y;
+                    _xtext.Point1.X = p.X;
+                    _xtext.Point1.Y = p.Y;
+                    _xtext.Point2.X = p.X;
+                    _xtext.Point2.Y = p.Y;
                     _ntext = nativeConverter.Convert(_xtext);
                     _canvas.Add(_ntext);
                     _ntext.Bounds = boundsFactory.Create(_canvas, _ntext);
@@ -1194,27 +1059,13 @@ namespace RxCanvas.Editors
 
                 if (_state == State.BottomRight)
                 {
-                    UpdatePositionAndSize(p);
+                    _xtext.Point2.X = p.X;
+                    _xtext.Point2.Y = p.Y;
+                    _ntext.Point2 = _xtext.Point2;
                     _ntext.Bounds.Update();
                     _canvas.Render(null);
                 }
             });
-        }
-
-        private void UpdatePositionAndSize(ImmutablePoint p)
-        {
-            double width = Math.Abs(p.X - _start.X);
-            double height = Math.Abs(p.Y - _start.Y);
-            double x = Math.Min(_start.X, p.X);
-            double y = Math.Min(_start.Y, p.Y);
-            _xtext.X = _start.X <= p.X ? x : x - 1.0;
-            _xtext.Y = _start.Y <= p.Y ? y : y - 1.0;
-            _xtext.Width = _start.X <= p.X ? width + 1.0 : width + 3.0;
-            _xtext.Height = _start.Y <= p.Y ? height + 1.0 : height + 3.0;
-            _ntext.X = _xtext.X;
-            _ntext.Y = _xtext.Y;
-            _ntext.Width = _xtext.Width;
-            _ntext.Height = _xtext.Height;
         }
 
         public void Dispose()
@@ -1260,9 +1111,9 @@ namespace RxCanvas.Editors
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
                 Point3 = new XPoint(0.0, 0.0),
-                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
+                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 IsFilled = false,
                 IsClosed = false
             };
@@ -1275,9 +1126,9 @@ namespace RxCanvas.Editors
                 Start = new XPoint(0.0, 0.0),
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
-                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
+                Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF),
                 IsFilled = false,
                 IsClosed = false
             };
@@ -1287,10 +1138,8 @@ namespace RxCanvas.Editors
         {
             return new XArc()
             {
-                X = 0.0,
-                Y = 0.0,
-                Width = 0.0,
-                Height = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 StartAngle = 180.0,
                 SweepAngle = 180.0,
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
@@ -1305,10 +1154,8 @@ namespace RxCanvas.Editors
         {
             return new XRectangle()
             {
-                X = 0.0,
-                Y = 0.0,
-                Width = 0.0,
-                Height = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)
@@ -1319,10 +1166,8 @@ namespace RxCanvas.Editors
         {
             return new XEllipse()
             {
-                X = 0.0,
-                Y = 0.0,
-                Width = 0.0,
-                Height = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)
@@ -1333,10 +1178,8 @@ namespace RxCanvas.Editors
         {
             return new XText()
             {
-                X = 0.0,
-                Y = 0.0,
-                Width = 0.0,
-                Height = 0.0,
+                Point1 = new XPoint(0.0, 0.0),
+                Point2 = new XPoint(0.0, 0.0),
                 HorizontalAlignment = 1,
                 VerticalAlignment = 1,
                 Size = 11.0,

@@ -100,9 +100,9 @@ namespace RxCanvas.Model
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
         public IPoint Point3 { get; set; }
-        public IColor Fill { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
+        public IColor Fill { get; set; }
         public bool IsFilled { get; set; }
         public bool IsClosed { get; set; }
     }
@@ -114,9 +114,9 @@ namespace RxCanvas.Model
         public IPoint Start { get; set; }
         public IPoint Point1 { get; set; }
         public IPoint Point2 { get; set; }
-        public IColor Fill { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
+        public IColor Fill { get; set; }
         public bool IsFilled { get; set; }
         public bool IsClosed { get; set; }
     }
@@ -125,10 +125,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public double StartAngle { get; set; }
         public double SweepAngle { get; set; }
         public IColor Stroke { get; set; }
@@ -142,10 +140,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
         public IColor Fill { get; set; }
@@ -155,10 +151,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public IColor Stroke { get; set; }
         public double StrokeThickness { get; set; }
         public IColor Fill { get; set; }
@@ -168,10 +162,8 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
+        public IPoint Point1 { get; set; }
+        public IPoint Point2 { get; set; }
         public int HorizontalAlignment { get; set; }
         public int VerticalAlignment { get; set; }
         public double Size { get; set; }
@@ -184,22 +176,23 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
-
-        public IList<INative> Children { get; set; }
-
         public double Width { get; set; }
         public double Height { get; set; }
         public IColor Background { get; set; }
-
         public bool EnableSnap { get; set; }
         public double SnapX { get; set; }
         public double SnapY { get; set; }
-
         public bool IsCaptured { get; set; }
+        public IList<INative> Children { get; set; }
+
+        public double Snap(double val, double snap)
+        {
+            double r = val % snap;
+            return r >= snap / 2.0 ? val + snap - r : val - r;
+        }
 
         public XCanvas()
         {
@@ -267,9 +260,9 @@ namespace RxCanvas.Model
                 Point1 = Convert(bezier.Point1),
                 Point2 = Convert(bezier.Point2),
                 Point3 = Convert(bezier.Point3),
-                Fill = Convert(bezier.Fill),
                 Stroke = Convert(bezier.Stroke),
                 StrokeThickness = bezier.StrokeThickness,
+                Fill = Convert(bezier.Fill),
                 IsFilled = bezier.IsFilled,
                 IsClosed = bezier.IsClosed
             };
@@ -282,9 +275,9 @@ namespace RxCanvas.Model
                 Start = Convert(quadraticBezier.Start),
                 Point1 = Convert(quadraticBezier.Point1),
                 Point2 = Convert(quadraticBezier.Point2),
-                Fill = Convert(quadraticBezier.Fill),
                 Stroke = Convert(quadraticBezier.Stroke),
                 StrokeThickness = quadraticBezier.StrokeThickness,
+                Fill = Convert(quadraticBezier.Fill),
                 IsFilled = quadraticBezier.IsFilled,
                 IsClosed = quadraticBezier.IsClosed
             };
@@ -294,10 +287,8 @@ namespace RxCanvas.Model
         {
             return new XArc()
             {
-                X = arc.X,
-                Y = arc.Y,
-                Width = arc.Width,
-                Height = arc.Height,
+                Point1 = Convert(arc.Point1),
+                Point2 = Convert(arc.Point2),
                 StartAngle = arc.StartAngle,
                 SweepAngle = arc.SweepAngle,
                 Stroke = Convert(arc.Stroke),
@@ -312,10 +303,8 @@ namespace RxCanvas.Model
         {
             return new XRectangle()
             {
-                X = rectangle.X,
-                Y = rectangle.Y,
-                Width = rectangle.Width,
-                Height = rectangle.Height,
+                Point1 = Convert(rectangle.Point1),
+                Point2 = Convert(rectangle.Point2),
                 Stroke = Convert(rectangle.Stroke),
                 StrokeThickness = rectangle.StrokeThickness,
                 Fill = Convert(rectangle.Fill),
@@ -326,10 +315,8 @@ namespace RxCanvas.Model
         {
             return new XEllipse()
             {
-                X = ellipse.X,
-                Y = ellipse.Y,
-                Width = ellipse.Width,
-                Height = ellipse.Height,
+                Point1 = Convert(ellipse.Point1),
+                Point2 = Convert(ellipse.Point2),
                 Stroke = Convert(ellipse.Stroke),
                 StrokeThickness = ellipse.StrokeThickness,
                 Fill = Convert(ellipse.Fill),
@@ -340,10 +327,8 @@ namespace RxCanvas.Model
         {
             return new XText()
             {
-                X = text.X,
-                Y = text.Y,
-                Width = text.Width,
-                Height = text.Height,
+                Point1 = Convert(text.Point1),
+                Point2 = Convert(text.Point2),
                 HorizontalAlignment = text.HorizontalAlignment,
                 VerticalAlignment = text.VerticalAlignment,
                 Size = text.Size,

@@ -232,20 +232,32 @@ namespace RxCanvas
 
         private void Open(string path, int index)
         {
+            // text
             var file = _drawingScope.Resolve<ITextFile>();
             var serializer = _serializers[index];
             var json = file.Open(path);
             var xcanvas = serializer.Deserialize(json);
             ConvertToNative(xcanvas);
+
+            // binary
+            //var binary = new RxCanvas.Binary.BinaryFile();
+            //var xcanvas = binary.Open(path);
+            //ConvertToNative(xcanvas);
         }
 
         private void Save(string path, int index)
         {
+            // text
             var canvas = ConvertToModel();
             var file = _drawingScope.Resolve<ITextFile>();
             var serializer = _serializers[index];
             var json = serializer.Serialize(canvas);
             file.Save(path, json);
+
+            // binary
+            //var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            //var binary = new RxCanvas.Binary.BinaryFile();
+            //binary.Save(path, drawingCanvas);
         }
 
         private void Export(string path, int index)

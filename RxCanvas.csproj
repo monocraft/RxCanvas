@@ -139,6 +139,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="RxCanvas.Binary\RxCanvas.Binary.csproj">
+      <Project>{4c39b88d-97c2-4c11-94ef-227ce7af20e0}</Project>
+      <Name>RxCanvas.Binary</Name>
+    </ProjectReference>
     <ProjectReference Include="RxCanvas.Serializers\RxCanvas.Serializers.csproj">
       <Project>{9dd40808-5705-4ca4-9672-a23e5f585a61}</Project>
       <Name>RxCanvas.Serializers</Name>

@@ -119,20 +119,28 @@ namespace RxCanvas.Creators
                 ToXColor(arc.Stroke), 
                 X(arc.StrokeThickness));
 
+            double x = Math.Min(arc.Point1.X, arc.Point2.X);
+            double y = Math.Min(arc.Point1.Y, arc.Point2.Y);
+            double width = Math.Abs(arc.Point2.X - arc.Point1.X);
+            double height = Math.Abs(arc.Point2.Y - arc.Point1.Y);
+
             gfx.DrawArc(
                 pen, 
-                X(arc.X), 
-                Y(arc.Y), 
-                X(arc.Width), 
-                Y(arc.Height), 
+                X(x), 
+                Y(y), 
+                X(width), 
+                Y(height),
                 arc.StartAngle, 
                 arc.SweepAngle);
         }
 
         private void DrawRectangle(XGraphics gfx, IRectangle rectangle)
         {
-            double st = rectangle.StrokeThickness;
-            double hst = st / 2.0;
+            double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+            double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+            double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+            double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
             if (rectangle.Fill.A > 0x00)
             {
                 var pen = new XPen(
@@ -140,14 +148,14 @@ namespace RxCanvas.Creators
                     X(rectangle.StrokeThickness));
 
                 var brush = new XSolidBrush(ToXColor(rectangle.Fill));
-                
+
                 gfx.DrawRectangle(
                     pen, 
                     brush, 
-                    X(rectangle.X + hst), 
-                    Y(rectangle.Y + hst), 
-                    X(rectangle.Width - st), 
-                    Y(rectangle.Height - st));
+                    X(x), 
+                    Y(y), 
+                    X(width), 
+                    Y(height));
             }
             else
             {
@@ -157,17 +165,20 @@ namespace RxCanvas.Creators
 
                 gfx.DrawRectangle(
                     pen, 
-                    X(rectangle.X + hst), 
-                    Y(rectangle.Y + hst), 
-                    X(rectangle.Width - st), 
-                    Y(rectangle.Height - st));
+                    X(x), 
+                    Y(y), 
+                    X(width), 
+                    Y(height));
             }
         }
 
         private void DrawEllipse(XGraphics gfx, IEllipse ellipse)
         {
-            double st = ellipse.StrokeThickness;
-            double hst = st / 2.0;
+            double x = Math.Min(ellipse.Point1.X, ellipse.Point2.X);
+            double y = Math.Min(ellipse.Point1.Y, ellipse.Point2.Y);
+            double width = Math.Abs(ellipse.Point2.X - ellipse.Point1.X);
+            double height = Math.Abs(ellipse.Point2.Y - ellipse.Point1.Y);
+
             if (ellipse.Fill.A > 0x00)
             {
                 var pen = new XPen(
@@ -178,11 +189,11 @@ namespace RxCanvas.Creators
                 
                 gfx.DrawEllipse(
                     pen, 
-                    brush, 
-                    X(ellipse.X + hst), 
-                    Y(ellipse.Y + hst), 
-                    X(ellipse.Width - st), 
-                    Y(ellipse.Height - st));
+                    brush,
+                    X(x),
+                    Y(y),
+                    X(width),
+                    Y(height));
             }
             else
             {
@@ -190,11 +201,12 @@ namespace RxCanvas.Creators
                     ToXColor(ellipse.Stroke), 
                     X(ellipse.StrokeThickness));
                 
-                gfx.DrawEllipse(pen,
-                    X(ellipse.X + hst), 
-                    Y(ellipse.Y + hst), 
-                    X(ellipse.Width - st), 
-                    Y(ellipse.Height - st));
+                gfx.DrawEllipse(
+                    pen,
+                    X(x),
+                    Y(y),
+                    X(width),
+                    Y(height));
             }
         }
 
@@ -212,11 +224,16 @@ namespace RxCanvas.Creators
 
             XStringFormat format = new XStringFormat();
 
+            double x = Math.Min(text.Point1.X, text.Point2.X);
+            double y = Math.Min(text.Point1.Y, text.Point2.Y);
+            double width = Math.Abs(text.Point2.X - text.Point1.X);
+            double height = Math.Abs(text.Point2.Y - text.Point1.Y);
+
             XRect rect = new XRect(
-                X(text.X), 
-                Y(text.Y), 
-                X(text.Width), 
-                Y(text.Height));
+                    X(x),
+                    Y(y),
+                    X(width),
+                    Y(height));
 
             switch (text.HorizontalAlignment)
             {

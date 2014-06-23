@@ -47,6 +47,7 @@ namespace RxCanvas.Interfaces
         void Show();
         void Hide();
         bool Contains(double x, double y);
+        void Move(double dx, double dy);
     }
 
     public interface INative
@@ -69,9 +70,9 @@ namespace RxCanvas.Interfaces
         IPoint Point1 { get; set; }
         IPoint Point2 { get; set; }
         IPoint Point3 { get; set; }
-        IColor Fill { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
+        IColor Fill { get; set; }
         bool IsFilled { get; set; }
         bool IsClosed { get; set; }
     }
@@ -81,19 +82,17 @@ namespace RxCanvas.Interfaces
         IPoint Start { get; set; }
         IPoint Point1 { get; set; }
         IPoint Point2 { get; set; }
-        IColor Fill { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
+        IColor Fill { get; set; }
         bool IsFilled { get; set; }
         bool IsClosed { get; set; }
     }
 
     public interface IArc : INative
     {
-        double X { get; set; }
-        double Y { get; set; }
-        double Width { get; set; }
-        double Height { get; set; }
+        IPoint Point1 { get; set; }
+        IPoint Point2 { get; set; }
         double StartAngle { get; set; }
         double SweepAngle { get; set; }
         IColor Stroke { get; set; }
@@ -105,10 +104,8 @@ namespace RxCanvas.Interfaces
 
     public interface IRectangle : INative
     {
-        double X { get; set; }
-        double Y { get; set; }
-        double Width { get; set; }
-        double Height { get; set; }
+        IPoint Point1 { get; set; }
+        IPoint Point2 { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
         IColor Fill { get; set; }
@@ -116,10 +113,8 @@ namespace RxCanvas.Interfaces
 
     public interface IEllipse : INative
     {
-        double X { get; set; }
-        double Y { get; set; }
-        double Width { get; set; }
-        double Height { get; set; }
+        IPoint Point1 { get; set; }
+        IPoint Point2 { get; set; }
         IColor Stroke { get; set; }
         double StrokeThickness { get; set; }
         IColor Fill { get; set; }
@@ -127,10 +122,8 @@ namespace RxCanvas.Interfaces
 
     public interface IText : INative
     {
-        double X { get; set; }
-        double Y { get; set; }
-        double Width { get; set; }
-        double Height { get; set; }
+        IPoint Point1 { get; set; }
+        IPoint Point2 { get; set; }
         int HorizontalAlignment { get; set; }
         int VerticalAlignment { get; set; }
         double Size { get; set; }
@@ -144,13 +137,14 @@ namespace RxCanvas.Interfaces
         IObservable<ImmutablePoint> Downs { get; set; }
         IObservable<ImmutablePoint> Ups { get; set; }
         IObservable<ImmutablePoint> Moves { get; set; }
-        IList<INative> Children { get; set; }
         double Width { get; set; }
         double Height { get; set; }
         IColor Background { get; set; }
         bool EnableSnap { get; set; }
         double SnapX { get; set; }
         double SnapY { get; set; }
+        double Snap(double val, double snap);
+        IList<INative> Children { get; set; }
         bool IsCaptured { get; set; }
         void Capture();
         void ReleaseCapture();
@@ -213,6 +207,16 @@ namespace RxCanvas.Interfaces
         IBounds Create(ICanvas canvas, IRectangle rectangle);
         IBounds Create(ICanvas canvas, IEllipse ellipse);
         IBounds Create(ICanvas canvas, IText text);
+    }
+
+    public interface IFile<T, S>
+    {
+        string Name { get; set; }
+        string Extension { get; set; }
+        T Open(string path);
+        void Save(string path, T value);
+        T Read(S stream);
+        void Write(S stream, T value);
     }
 
     public interface ISerializer<T> where T : class

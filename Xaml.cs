@@ -367,7 +367,6 @@ namespace RxCanvas.Xaml
         public WpfArc(IArc arc)
         {
             _source = arc;
-
             _fill = arc.Fill;
             _stroke = arc.Stroke;
 
@@ -405,10 +404,10 @@ namespace RxCanvas.Xaml
             // https://pdfsharp.codeplex.com/SourceControl/latest#PDFsharp/code/PdfSharp/PdfSharp.Internal/Calc.cs
             // https://pdfsharp.codeplex.com/SourceControl/latest#PDFsharp/code/PdfSharp/PdfSharp.Drawing/GeometryHelper.cs
 
-            double x = arc.X;
-            double y = arc.Y;
-            double width = arc.Width;
-            double height = arc.Height;
+            double x = Math.Min(arc.Point1.X, arc.Point2.X);
+            double y = Math.Min(arc.Point1.Y, arc.Point2.Y);
+            double width = Math.Abs(arc.Point2.X - arc.Point1.X);
+            double height = Math.Abs(arc.Point2.Y - arc.Point1.Y);
             double startAngle = arc.StartAngle;
             double sweepAngle = arc.SweepAngle;
 
@@ -516,48 +515,30 @@ namespace RxCanvas.Xaml
             segment.IsStroked = isStroked;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return _source.X; }
-            set 
+            get { return _source.Point1; }
+            set
             {
-                _source.X = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
+                _source.Point1 = value;
+                Update();
             }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return _source.Y; }
+            get { return _source.Point2; }
             set
             {
-                _source.Y = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
+                _source.Point2 = value;
+                Update();
             }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _source.Width; }
-            set
-            {
-                _source.Width = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
-            }
-        }
-
-        public double Height
-        {
-            get { return _source.Height; }
-            set
-            {
-                _source.Height = value;
-                SetArcSegment(_as, _source, out _start);
-                _pf.StartPoint = _start;
-            }
+            SetArcSegment(_as, _source, out _start);
+            _pf.StartPoint = _start;
         }
 
         public double StartAngle
@@ -635,11 +616,15 @@ namespace RxCanvas.Xaml
         private Rectangle _rectangle;
         private IColor _stroke;
         private IColor _fill;
+        private IPoint _point1;
+        private IPoint _point2;
 
         public WpfRectangle(IRectangle rectangle)
         {
             _stroke = rectangle.Stroke;
             _fill = rectangle.Fill;
+            _point1 = rectangle.Point1;
+            _point2 = rectangle.Point2;
 
             _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
@@ -648,41 +633,46 @@ namespace RxCanvas.Xaml
 
             _rectangle = new Rectangle()
             {
-                Width = rectangle.Width,
-                Height = rectangle.Height,
                 Stroke = _strokeBrush,
                 StrokeThickness = rectangle.StrokeThickness,
                 Fill = _fillBrush
             };
 
-            Canvas.SetLeft(_rectangle, rectangle.X);
-            Canvas.SetTop(_rectangle, rectangle.Y);
+            Update();
 
             Native = _rectangle;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return Canvas.GetLeft(_rectangle); }
-            set { Canvas.SetLeft(_rectangle, value); }
+            get { return _point1; }
+            set
+            {
+                _point1 = value;
+                Update();
+            }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return Canvas.GetTop(_rectangle); }
-            set { Canvas.SetTop(_rectangle, value); }
+            get { return _point2; }
+            set
+            {
+                _point2 = value;
+                Update();
+            }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _rectangle.Width; }
-            set { _rectangle.Width = value; }
-        }
-
-        public double Height
-        {
-            get { return _rectangle.Height; }
-            set { _rectangle.Height = value; }
+            double x = Math.Min(_point1.X, _point2.X);
+            double y = Math.Min(_point1.Y, _point2.Y);
+            double width = Math.Abs(_point2.X - _point1.X);
+            double height = Math.Abs(_point2.Y - _point1.Y);
+            Canvas.SetLeft(_rectangle, x - 1.0);
+            Canvas.SetTop(_rectangle, y - 1.0);
+            _rectangle.Width = width + 2.0;
+            _rectangle.Height = height + 2.0;
         }
 
         public IColor Stroke
@@ -724,14 +714,17 @@ namespace RxCanvas.Xaml
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
         private Ellipse _ellipse;
-
         private IColor _stroke;
         private IColor _fill;
+        private IPoint _point1;
+        private IPoint _point2;
 
         public WpfEllipse(IEllipse ellipse)
         {
             _stroke = ellipse.Stroke;
             _fill = ellipse.Fill;
+            _point1 = ellipse.Point1;
+            _point2 = ellipse.Point2;
 
             _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
             _strokeBrush.Freeze();
@@ -740,41 +733,46 @@ namespace RxCanvas.Xaml
 
             _ellipse = new Ellipse()
             {
-                Width = ellipse.Width,
-                Height = ellipse.Height,
                 Stroke = _strokeBrush,
                 StrokeThickness = ellipse.StrokeThickness,
                 Fill = _fillBrush
             };
 
-            Canvas.SetLeft(_ellipse, ellipse.X);
-            Canvas.SetTop(_ellipse, ellipse.Y);
+            Update();
 
             Native = _ellipse;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return Canvas.GetLeft(_ellipse); }
-            set { Canvas.SetLeft(_ellipse, value); }
+            get { return _point1; }
+            set
+            {
+                _point1 = value;
+                Update();
+            }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return Canvas.GetTop(_ellipse); }
-            set { Canvas.SetTop(_ellipse, value); }
+            get { return _point2; }
+            set
+            {
+                _point2 = value;
+                Update();
+            }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _ellipse.Width; }
-            set { _ellipse.Width = value; }
-        }
-
-        public double Height
-        {
-            get { return _ellipse.Height; }
-            set { _ellipse.Height = value; }
+            double x = Math.Min(_point1.X, _point2.X);
+            double y = Math.Min(_point1.Y, _point2.Y);
+            double width = Math.Abs(_point2.X - _point1.X);
+            double height = Math.Abs(_point2.Y - _point1.Y);
+            Canvas.SetLeft(_ellipse, x - 1.0);
+            Canvas.SetTop(_ellipse, y - 1.0);
+            _ellipse.Width = width + 2.0;
+            _ellipse.Height = height + 2.0;
         }
 
         public IColor Stroke
@@ -817,14 +815,17 @@ namespace RxCanvas.Xaml
         private SolidColorBrush _backgroundBrush;
         private Grid _grid;
         private TextBlock _tb;
-
         private IColor _foreground;
         private IColor _background;
+        private IPoint _point1;
+        private IPoint _point2;
 
         public WpfText(IText text)
         {
             _foreground = text.Foreground;
             _background = text.Backgroud;
+            _point1 = text.Point1;
+            _point2 = text.Point2;
 
             _foregroundBrush = new SolidColorBrush(Color.FromArgb(_foreground.A, _foreground.R, _foreground.G, _foreground.B));
             _foregroundBrush.Freeze();
@@ -833,8 +834,6 @@ namespace RxCanvas.Xaml
 
             _grid = new Grid();
             _grid.Background = _backgroundBrush;
-            _grid.Width = text.Width;
-            _grid.Height = text.Height;
 
             _tb = new TextBlock();
             _tb.HorizontalAlignment = (HorizontalAlignment)text.HorizontalAlignment;
@@ -847,34 +846,41 @@ namespace RxCanvas.Xaml
 
             _grid.Children.Add(_tb);
 
-            Canvas.SetLeft(_grid, text.X);
-            Canvas.SetTop(_grid, text.Y);
+            Update();
 
             Native = _grid;
         }
 
-        public double X
+        public IPoint Point1
         {
-            get { return Canvas.GetLeft(_grid); }
-            set { Canvas.SetLeft(_grid, value); }
+            get { return _point1; }
+            set
+            {
+                _point1 = value;
+                Update();
+            }
         }
 
-        public double Y
+        public IPoint Point2
         {
-            get { return Canvas.GetTop(_grid); }
-            set { Canvas.SetTop(_grid, value); }
+            get { return _point2; }
+            set
+            {
+                _point2 = value;
+                Update();
+            }
         }
 
-        public double Width
+        private void Update()
         {
-            get { return _grid.Width; }
-            set { _grid.Width = value; }
-        }
-
-        public double Height
-        {
-            get { return _grid.Height; }
-            set { _grid.Height = value; }
+            double x = Math.Min(_point1.X, _point2.X);
+            double y = Math.Min(_point1.Y, _point2.Y);
+            double width = Math.Abs(_point2.X - _point1.X);
+            double height = Math.Abs(_point2.Y - _point1.Y);
+            Canvas.SetLeft(_grid, x - 1.0);
+            Canvas.SetTop(_grid, y - 1.0);
+            _grid.Width = width + 2.0;
+            _grid.Height = height + 2.0;
         }
 
         public int HorizontalAlignment

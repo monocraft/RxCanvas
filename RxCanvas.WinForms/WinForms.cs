@@ -121,7 +121,13 @@ namespace RxCanvas.WinForms
                 else if (child is IArc)
                 {
                     var arc = child as IArc;
-                    if (arc.Width > 0.0 && arc.Height > 0.0)
+
+                    double x = Math.Min(arc.Point1.X, arc.Point2.X);
+                    double y = Math.Min(arc.Point1.Y, arc.Point2.Y);
+                    double width = Math.Abs(arc.Point2.X - arc.Point1.X);
+                    double height = Math.Abs(arc.Point2.Y - arc.Point1.Y);
+
+                    if (width > 0.0 && height > 0.0)
                     {
                         Pen pen = new Pen(
                             ToColor(arc.Stroke), 
@@ -129,10 +135,10 @@ namespace RxCanvas.WinForms
 
                         g.DrawArc(
                             pen, 
-                            (float)arc.X, 
-                            (float)arc.Y, 
-                            (float)arc.Width, 
-                            (float)arc.Height, 
+                            (float)x, 
+                            (float)y, 
+                            (float)width, 
+                            (float)height, 
                             (float)arc.StartAngle, 
                             (float)arc.SweepAngle);
 
@@ -142,36 +148,42 @@ namespace RxCanvas.WinForms
                 else if (child is IRectangle)
                 {
                     var rectangle = child as IRectangle;
-                    double st = rectangle.StrokeThickness;
-                    double hst = st / 2.0;
                     Pen pen = new Pen(
                         ToColor(rectangle.Stroke), 
                         (float)rectangle.StrokeThickness);
 
+                    double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+                    double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+                    double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+                    double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
                     g.DrawRectangle(
                         pen, 
-                        (float)(rectangle.X + hst), 
-                        (float)(rectangle.Y + hst),
-                        (float)(rectangle.Width - st),
-                        (float)(rectangle.Height - st));
+                        (float)(x), 
+                        (float)(y),
+                        (float)(width),
+                        (float)(height));
 
                     pen.Dispose();
                 }
                 else if (child is IEllipse)
                 {
                     var ellipse = child as IEllipse;
-                    double st = ellipse.StrokeThickness;
-                    double hst = st / 2.0;
                     Pen pen = new Pen(
                         ToColor(ellipse.Stroke), 
                         (float)ellipse.StrokeThickness);
-                    
+
+                    double x = Math.Min(ellipse.Point1.X, ellipse.Point2.X);
+                    double y = Math.Min(ellipse.Point1.Y, ellipse.Point2.Y);
+                    double width = Math.Abs(ellipse.Point2.X - ellipse.Point1.X);
+                    double height = Math.Abs(ellipse.Point2.Y - ellipse.Point1.Y);
+
                     g.DrawEllipse(
                         pen,
-                        (float)(ellipse.X + hst),
-                        (float)(ellipse.Y + hst),
-                        (float)(ellipse.Width - st),
-                        (float)(ellipse.Height - st));
+                        (float)(x),
+                        (float)(y),
+                        (float)(width),
+                        (float)(height));
 
                     pen.Dispose();
                 }
@@ -180,17 +192,21 @@ namespace RxCanvas.WinForms
                     var text = child as IText;
                     Brush brush = new SolidBrush(ToColor(text.Foreground));
                     Font font = new Font("Callibri", (float)text.Size);
-                    
+
+                    double x = Math.Min(text.Point1.X, text.Point2.X);
+                    double y = Math.Min(text.Point1.Y, text.Point2.Y);
+                    double width = Math.Abs(text.Point2.X - text.Point1.X);
+                    double height = Math.Abs(text.Point2.Y - text.Point1.Y);
 
                     g.DrawString(
                         text.Text, 
                         font, 
                         brush,
                         new RectangleF(
-                            (float)text.X, 
-                            (float)text.Y, 
-                            (float)text.Width, 
-                            (float)text.Height),
+                            (float)(x),
+                            (float)(y),
+                            (float)(width),
+                            (float)(height)),
                         new StringFormat() 
                         { 
                             Alignment = (StringAlignment)text.HorizontalAlignment, 

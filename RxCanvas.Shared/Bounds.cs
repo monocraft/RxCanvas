@@ -154,6 +154,9 @@ namespace RxCanvas.Bounds
         private IPolygon _polygonPoint2;
         private bool _isVisible;
 
+        private enum HitResult { None, Point1, Point2, Line};
+        private HitResult _hitResult;
+
         public LineBounds(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -166,6 +169,8 @@ namespace RxCanvas.Bounds
             _size = size;
             _offset = offset;
             _canvas = canvas;
+
+            _hitResult = HitResult.None;
 
             InitBounds(nativeConverter, canvasFactory);
         }
@@ -281,9 +286,63 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygonLine.Contains(x, y)
-                || _polygonPoint1.Contains(x, y)
-                || _polygonPoint2.Contains(x, y);
+            if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonLine.Contains(x, y))
+            {
+                _hitResult = HitResult.Line;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch(_hitResult)
+            {
+                case HitResult.Point1:
+                    {
+                        double x1 = _line.Point1.X - dx;
+                        double y1 = _line.Point1.Y - dy;
+                        _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _line.Point1 = _line.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _line.Point2.X - dx;
+                        double y2 = _line.Point2.Y - dy;
+                        _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _line.Point2 = _line.Point2;
+                    }
+                    break;
+                case HitResult.Line:
+                    {
+                        double x1 = _line.Point1.X - dx;
+                        double y1 = _line.Point1.Y - dy;
+                        double x2 = _line.Point2.X - dx;
+                        double y2 = _line.Point2.Y - dy;
+                        _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _line.Point1 = _line.Point1;
+                        _line.Point2 = _line.Point2;
+                    }
+                    break;
+            }
         }
     }
 
@@ -299,6 +358,9 @@ namespace RxCanvas.Bounds
         private IPolygon _polygonPoint2;
         private IPolygon _polygonPoint3;
         private bool _isVisible;
+
+        private enum HitResult { None, Start, Point1, Point2, Point3, Bezier };
+        private HitResult _hitResult;
 
         public BezierBounds(
             IModelToNativeConverter nativeConverter,
@@ -488,11 +550,101 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return ConvexHullAsPolygonContains(x, y) //_polygonBezier.Contains(x, y)
-                || _polygonStart.Contains(x, y)
-                || _polygonPoint1.Contains(x, y)
-                || _polygonPoint2.Contains(x, y)
-                || _polygonPoint3.Contains(x, y);
+            if (_polygonStart.Contains(x, y))
+            {
+                _hitResult = HitResult.Start;
+                return true;
+            }
+            else if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonPoint3.Contains(x, y))
+            {
+                _hitResult = HitResult.Point3;
+                return true;
+            }
+            else if (ConvexHullAsPolygonContains(x, y)) //_polygonBezier.Contains(x, y)
+            {
+                _hitResult = HitResult.Bezier;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch (_hitResult)
+            {
+                case HitResult.Start:
+                    {
+                        double x = _bezier.Start.X - dx;
+                        double y = _bezier.Start.Y - dy;
+                        _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _bezier.Start = _bezier.Start;
+                    }
+                    break;
+                case HitResult.Point1:
+                    {
+                        double x1 = _bezier.Point1.X - dx;
+                        double y1 = _bezier.Point1.Y - dy;
+                        _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _bezier.Point1 = _bezier.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _bezier.Point2.X - dx;
+                        double y2 = _bezier.Point2.Y - dy;
+                        _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _bezier.Point2 = _bezier.Point2;
+                    }
+                    break;
+                case HitResult.Point3:
+                    {
+                        double x3 = _bezier.Point3.X - dx;
+                        double y3 = _bezier.Point3.Y - dy;
+                        _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
+                        _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
+                        _bezier.Point3 = _bezier.Point3;
+                    }
+                    break;
+                case HitResult.Bezier:
+                    {
+                        double x = _bezier.Start.X - dx;
+                        double y = _bezier.Start.Y - dy;
+                        double x1 = _bezier.Point1.X - dx;
+                        double y1 = _bezier.Point1.Y - dy;
+                        double x2 = _bezier.Point2.X - dx;
+                        double y2 = _bezier.Point2.Y - dy;
+                        double x3 = _bezier.Point3.X - dx;
+                        double y3 = _bezier.Point3.Y - dy;
+                        _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
+                        _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
+                        _bezier.Start = _bezier.Start;
+                        _bezier.Point1 = _bezier.Point1;
+                        _bezier.Point2 = _bezier.Point2;
+                        _bezier.Point3 = _bezier.Point3;
+                    }
+                    break;
+            }
         }
     }
 
@@ -507,6 +659,9 @@ namespace RxCanvas.Bounds
         private IPolygon _polygonPoint1;
         private IPolygon _polygonPoint2;
         private bool _isVisible;
+
+        private enum HitResult { None, Start, Point1, Point2, QuadraticBezier };
+        private HitResult _hitResult;
 
         public QuadraticBezierBounds(
             IModelToNativeConverter nativeConverter,
@@ -531,7 +686,7 @@ namespace RxCanvas.Bounds
             _polygonStart = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
-            _polygonQuadraticBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonQuadraticBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 3);
         }
 
         private void UpdateStartBounds()
@@ -584,10 +739,6 @@ namespace RxCanvas.Bounds
             ps[2].X = _quadraticBezier.Point2.X;
             ps[2].Y = _quadraticBezier.Point2.Y;
 
-            // not used
-            ps[3].X = _quadraticBezier.Point2.X;
-            ps[3].Y = _quadraticBezier.Point2.Y;
-
             MonotoneChain.ConvexHull(ps, out convexHull, out k);
             //Debug.Print("k: {0}", k);
 
@@ -598,23 +749,12 @@ namespace RxCanvas.Bounds
 
                 // not used
                 Helper.MoveLine(ls[2], convexHull[0], convexHull[0]);
-                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
             }
             else if (k == 4)
             {
                 Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
                 Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
                 Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
-
-                // not used
-                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
-            }
-            else if (k == 5)
-            {
-                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
-                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
-                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
-                Helper.MoveLine(ls[3], convexHull[3], convexHull[4]);
             }
         }
 
@@ -681,46 +821,160 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return ConvexHullAsPolygonContains(x, y) //_polygonQuadraticBezier.Contains(x, y)
-                || _polygonStart.Contains(x, y)
-                || _polygonPoint1.Contains(x, y)
-                || _polygonPoint2.Contains(x, y);
+            if (_polygonStart.Contains(x, y))
+            {
+                _hitResult = HitResult.Start;
+                return true;
+            }
+            else if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (ConvexHullAsPolygonContains(x, y)) //_polygonQuadraticBezier.Contains(x, y)
+            {
+                _hitResult = HitResult.QuadraticBezier;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch (_hitResult)
+            {
+                case HitResult.Start:
+                    {
+                        double x = _quadraticBezier.Start.X - dx;
+                        double y = _quadraticBezier.Start.Y - dy;
+                        _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _quadraticBezier.Start = _quadraticBezier.Start;
+                    }
+                    break;
+                case HitResult.Point1:
+                    {
+                        double x1 = _quadraticBezier.Point1.X - dx;
+                        double y1 = _quadraticBezier.Point1.Y - dy;
+                        _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _quadraticBezier.Point1 = _quadraticBezier.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _quadraticBezier.Point2.X - dx;
+                        double y2 = _quadraticBezier.Point2.Y - dy;
+                        _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _quadraticBezier.Point2 = _quadraticBezier.Point2;
+                    }
+                    break;
+                case HitResult.QuadraticBezier:
+                    {
+                        double x = _quadraticBezier.Start.X - dx;
+                        double y = _quadraticBezier.Start.Y - dy;
+                        double x1 = _quadraticBezier.Point1.X - dx;
+                        double y1 = _quadraticBezier.Point1.Y - dy;
+                        double x2 = _quadraticBezier.Point2.X - dx;
+                        double y2 = _quadraticBezier.Point2.Y - dy;
+                        _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _quadraticBezier.Start = _quadraticBezier.Start;
+                        _quadraticBezier.Point1 = _quadraticBezier.Point1;
+                        _quadraticBezier.Point2 = _quadraticBezier.Point2;
+                    }
+                    break;
+            }
         }
     }
 
     public class ArcBounds : IBounds
     {
         private IArc _arc;
+        private double _size;
         private double _offset;
         private ICanvas _canvas;
-        private IPolygon _polygon;
+        private IPolygon _polygonArc;
+        private IPolygon _polygonPoint1;
+        private IPolygon _polygonPoint2;
         private bool _isVisible;
+
+        private enum HitResult { None, Point1, Point2, Arc };
+        private HitResult _hitResult;
 
         public ArcBounds(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IArc arc,
+            double size,
             double offset)
         {
             _arc = arc;
+            _size = size;
             _offset = offset;
             _canvas = canvas;
 
-            _polygon = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _hitResult = HitResult.None;
+
+            InitBounds(nativeConverter, canvasFactory);
+        }
+
+        private void InitBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory)
+        {
+            _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonArc = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        private void UpdatePoint1Bounds()
+        {
+            var ps = _polygonPoint1.Points;
+            var ls = _polygonPoint1.Lines;
+            Helper.UpdatePointBounds(_arc.Point1, ps, ls, _size, _offset);
+        }
+
+        private void UpdatePoint2Bounds()
+        {
+            var ps = _polygonPoint2.Points;
+            var ls = _polygonPoint2.Lines;
+            Helper.UpdatePointBounds(_arc.Point2, ps, ls, _size, _offset);
+        }
+
+        private void UpdateArcBounds()
+        {
+            var ps = _polygonArc.Points;
+            var ls = _polygonArc.Lines;
+            var p1 = _arc.Point1;
+            var p2 = _arc.Point2;
+
+            double x = Math.Min(p1.X, p2.X);
+            double y = Math.Min(p1.Y, p2.Y);
+            double width = Math.Abs(p2.X - p1.X);
+            double height = Math.Abs(p2.Y - p1.Y);
+
+            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
         }
 
         public void Update()
         {
-            var ps = _polygon.Points;
-            var ls = _polygon.Lines;
-
-            double x = _arc.X;
-            double y = _arc.Y;
-            double width = _arc.Width;
-            double height = _arc.Height;
-
-            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+            UpdatePoint1Bounds();
+            UpdatePoint2Bounds();
+            UpdateArcBounds();
         }
 
         public bool IsVisible()
@@ -732,7 +986,15 @@ namespace RxCanvas.Bounds
         {
             if (!_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonArc.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Add(line);
                 }
@@ -744,7 +1006,15 @@ namespace RxCanvas.Bounds
         {
             if (_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonArc.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Remove(line);
                 }
@@ -754,43 +1024,142 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygon.Contains(x, y);
+            if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonArc.Contains(x, y))
+            {
+                _hitResult = HitResult.Arc;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch (_hitResult)
+            {
+                case HitResult.Point1:
+                    {
+                        double x1 = _arc.Point1.X - dx;
+                        double y1 = _arc.Point1.Y - dy;
+                        _arc.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _arc.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _arc.Point1 = _arc.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _arc.Point2.X - dx;
+                        double y2 = _arc.Point2.Y - dy;
+                        _arc.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _arc.Point2 = _arc.Point2;
+                    }
+                    break;
+                case HitResult.Arc:
+                    {
+                        double x1 = _arc.Point1.X - dx;
+                        double y1 = _arc.Point1.Y - dy;
+                        double x2 = _arc.Point2.X - dx;
+                        double y2 = _arc.Point2.Y - dy;
+                        _arc.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _arc.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _arc.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _arc.Point1 = _arc.Point1;
+                        _arc.Point2 = _arc.Point2;
+                    }
+                    break;
+            }
         }
     }
+
 
     public class RectangleBounds : IBounds
     {
         private IRectangle _rectangle;
+        private double _size;
         private double _offset;
         private ICanvas _canvas;
-        private IPolygon _polygon;
+        private IPolygon _polygonRectangle;
+        private IPolygon _polygonPoint1;
+        private IPolygon _polygonPoint2;
         private bool _isVisible;
+
+        private enum HitResult { None, Point1, Point2, Rectangle };
+        private HitResult _hitResult;
 
         public RectangleBounds(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IRectangle rectangle,
+            double size,
             double offset)
         {
             _rectangle = rectangle;
+            _size = size;
             _offset = offset;
             _canvas = canvas;
 
-            _polygon = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _hitResult = HitResult.None;
+
+            InitBounds(nativeConverter, canvasFactory);
+        }
+
+        private void InitBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory)
+        {
+            _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonRectangle = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        private void UpdatePoint1Bounds()
+        {
+            var ps = _polygonPoint1.Points;
+            var ls = _polygonPoint1.Lines;
+            Helper.UpdatePointBounds(_rectangle.Point1, ps, ls, _size, _offset);
+        }
+
+        private void UpdatePoint2Bounds()
+        {
+            var ps = _polygonPoint2.Points;
+            var ls = _polygonPoint2.Lines;
+            Helper.UpdatePointBounds(_rectangle.Point2, ps, ls, _size, _offset);
+        }
+
+        private void UpdateRectangleBounds()
+        {
+            var ps = _polygonRectangle.Points;
+            var ls = _polygonRectangle.Lines;
+            var p1 = _rectangle.Point1;
+            var p2 = _rectangle.Point2;
+
+            double x = Math.Min(p1.X, p2.X);
+            double y = Math.Min(p1.Y, p2.Y);
+            double width = Math.Abs(p2.X - p1.X);
+            double height = Math.Abs(p2.Y - p1.Y);
+
+            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
         }
 
         public void Update()
         {
-            var ps = _polygon.Points;
-            var ls = _polygon.Lines;
-
-            double x = _rectangle.X;
-            double y = _rectangle.Y;
-            double width = _rectangle.Width;
-            double height = _rectangle.Height;
-
-            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+            UpdatePoint1Bounds();
+            UpdatePoint2Bounds();
+            UpdateRectangleBounds();
         }
 
         public bool IsVisible()
@@ -802,7 +1171,15 @@ namespace RxCanvas.Bounds
         {
             if (!_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonRectangle.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Add(line);
                 }
@@ -814,7 +1191,15 @@ namespace RxCanvas.Bounds
         {
             if (_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonRectangle.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Remove(line);
                 }
@@ -824,43 +1209,141 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygon.Contains(x, y);
+            if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonRectangle.Contains(x, y))
+            {
+                _hitResult = HitResult.Rectangle;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch (_hitResult)
+            {
+                case HitResult.Point1:
+                    {
+                        double x1 = _rectangle.Point1.X - dx;
+                        double y1 = _rectangle.Point1.Y - dy;
+                        _rectangle.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _rectangle.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _rectangle.Point1 = _rectangle.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _rectangle.Point2.X - dx;
+                        double y2 = _rectangle.Point2.Y - dy;
+                        _rectangle.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _rectangle.Point2 = _rectangle.Point2;
+                    }
+                    break;
+                case HitResult.Rectangle:
+                    {
+                        double x1 = _rectangle.Point1.X - dx;
+                        double y1 = _rectangle.Point1.Y - dy;
+                        double x2 = _rectangle.Point2.X - dx;
+                        double y2 = _rectangle.Point2.Y - dy;
+                        _rectangle.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _rectangle.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _rectangle.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _rectangle.Point1 = _rectangle.Point1;
+                        _rectangle.Point2 = _rectangle.Point2;
+                    }
+                    break;
+            }
         }
     }
 
     public class EllipseBounds : IBounds
     {
         private IEllipse _ellipse;
+        private double _size;
         private double _offset;
         private ICanvas _canvas;
-        private IPolygon _polygon;
+        private IPolygon _polygonEllipse;
+        private IPolygon _polygonPoint1;
+        private IPolygon _polygonPoint2;
         private bool _isVisible;
+
+        private enum HitResult { None, Point1, Point2, Ellipse };
+        private HitResult _hitResult;
 
         public EllipseBounds(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IEllipse ellipse,
+            double size,
             double offset)
         {
             _ellipse = ellipse;
+            _size = size;
             _offset = offset;
             _canvas = canvas;
 
-            _polygon = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _hitResult = HitResult.None;
+
+            InitBounds(nativeConverter, canvasFactory);
+        }
+
+        private void InitBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory)
+        {
+            _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonEllipse = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        private void UpdatePoint1Bounds()
+        {
+            var ps = _polygonPoint1.Points;
+            var ls = _polygonPoint1.Lines;
+            Helper.UpdatePointBounds(_ellipse.Point1, ps, ls, _size, _offset);
+        }
+
+        private void UpdatePoint2Bounds()
+        {
+            var ps = _polygonPoint2.Points;
+            var ls = _polygonPoint2.Lines;
+            Helper.UpdatePointBounds(_ellipse.Point2, ps, ls, _size, _offset);
+        }
+
+        private void UpdateEllipseBounds()
+        {
+            var ps = _polygonEllipse.Points;
+            var ls = _polygonEllipse.Lines;
+            var p1 = _ellipse.Point1;
+            var p2 = _ellipse.Point2;
+
+            double x = Math.Min(p1.X, p2.X);
+            double y = Math.Min(p1.Y, p2.Y);
+            double width = Math.Abs(p2.X - p1.X);
+            double height = Math.Abs(p2.Y - p1.Y);
+
+            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
         }
 
         public void Update()
         {
-            var ps = _polygon.Points;
-            var ls = _polygon.Lines;
-
-            double x = _ellipse.X;
-            double y = _ellipse.Y;
-            double width = _ellipse.Width;
-            double height = _ellipse.Height;
-
-            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+            UpdatePoint1Bounds();
+            UpdatePoint2Bounds();
+            UpdateEllipseBounds();
         }
 
         public bool IsVisible()
@@ -872,7 +1355,15 @@ namespace RxCanvas.Bounds
         {
             if (!_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonEllipse.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Add(line);
                 }
@@ -884,7 +1375,15 @@ namespace RxCanvas.Bounds
         {
             if (_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonEllipse.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Remove(line);
                 }
@@ -894,43 +1393,141 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygon.Contains(x, y);
+            if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonEllipse.Contains(x, y))
+            {
+                _hitResult = HitResult.Ellipse;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch (_hitResult)
+            {
+                case HitResult.Point1:
+                    {
+                        double x1 = _ellipse.Point1.X - dx;
+                        double y1 = _ellipse.Point1.Y - dy;
+                        _ellipse.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _ellipse.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _ellipse.Point1 = _ellipse.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _ellipse.Point2.X - dx;
+                        double y2 = _ellipse.Point2.Y - dy;
+                        _ellipse.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _ellipse.Point2 = _ellipse.Point2;
+                    }
+                    break;
+                case HitResult.Ellipse:
+                    {
+                        double x1 = _ellipse.Point1.X - dx;
+                        double y1 = _ellipse.Point1.Y - dy;
+                        double x2 = _ellipse.Point2.X - dx;
+                        double y2 = _ellipse.Point2.Y - dy;
+                        _ellipse.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _ellipse.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _ellipse.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _ellipse.Point1 = _ellipse.Point1;
+                        _ellipse.Point2 = _ellipse.Point2;
+                    }
+                    break;
+            }
         }
     }
 
     public class TextBounds : IBounds
     {
         private IText _text;
+        private double _size;
         private double _offset;
         private ICanvas _canvas;
-        private IPolygon _polygon;
+        private IPolygon _polygonText;
+        private IPolygon _polygonPoint1;
+        private IPolygon _polygonPoint2;
         private bool _isVisible;
+
+        private enum HitResult { None, Point1, Point2, Text };
+        private HitResult _hitResult;
 
         public TextBounds(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IText text,
+            double size,
             double offset)
         {
             _text = text;
+            _size = size;
             _offset = offset;
             _canvas = canvas;
 
-            _polygon = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _hitResult = HitResult.None;
+
+            InitBounds(nativeConverter, canvasFactory);
+        }
+
+        private void InitBounds(
+            IModelToNativeConverter nativeConverter,
+            ICanvasFactory canvasFactory)
+        {
+            _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _polygonText = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        private void UpdatePoint1Bounds()
+        {
+            var ps = _polygonPoint1.Points;
+            var ls = _polygonPoint1.Lines;
+            Helper.UpdatePointBounds(_text.Point1, ps, ls, _size, _offset);
+        }
+
+        private void UpdatePoint2Bounds()
+        {
+            var ps = _polygonPoint2.Points;
+            var ls = _polygonPoint2.Lines;
+            Helper.UpdatePointBounds(_text.Point2, ps, ls, _size, _offset);
+        }
+
+        private void UpdateTextBounds()
+        {
+            var ps = _polygonText.Points;
+            var ls = _polygonText.Lines;
+            var p1 = _text.Point1;
+            var p2 = _text.Point2;
+
+            double x = Math.Min(p1.X, p2.X);
+            double y = Math.Min(p1.Y, p2.Y);
+            double width = Math.Abs(p2.X - p1.X);
+            double height = Math.Abs(p2.Y - p1.Y);
+
+            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
         }
 
         public void Update()
         {
-            var ps = _polygon.Points;
-            var ls = _polygon.Lines;
-
-            double x = _text.X;
-            double y = _text.Y;
-            double width = _text.Width;
-            double height = _text.Height;
-
-            Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+            UpdatePoint1Bounds();
+            UpdatePoint2Bounds();
+            UpdateTextBounds();
         }
 
         public bool IsVisible()
@@ -942,7 +1539,15 @@ namespace RxCanvas.Bounds
         {
             if (!_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonText.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Add(line);
                 }
@@ -954,7 +1559,15 @@ namespace RxCanvas.Bounds
         {
             if (_isVisible)
             {
-                foreach (var line in _polygon.Lines)
+                foreach (var line in _polygonText.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint1.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                foreach (var line in _polygonPoint2.Lines)
                 {
                     _canvas.Remove(line);
                 }
@@ -964,7 +1577,63 @@ namespace RxCanvas.Bounds
 
         public bool Contains(double x, double y)
         {
-            return _polygon.Contains(x, y);
+            if (_polygonPoint1.Contains(x, y))
+            {
+                _hitResult = HitResult.Point1;
+                return true;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                _hitResult = HitResult.Point2;
+                return true;
+            }
+            else if (_polygonText.Contains(x, y))
+            {
+                _hitResult = HitResult.Text;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch (_hitResult)
+            {
+                case HitResult.Point1:
+                    {
+                        double x1 = _text.Point1.X - dx;
+                        double y1 = _text.Point1.Y - dy;
+                        _text.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _text.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _text.Point1 = _text.Point1;
+                    }
+                    break;
+                case HitResult.Point2:
+                    {
+                        double x2 = _text.Point2.X - dx;
+                        double y2 = _text.Point2.Y - dy;
+                        _text.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _text.Point2 = _text.Point2;
+                    }
+                    break;
+                case HitResult.Text:
+                    {
+                        double x1 = _text.Point1.X - dx;
+                        double y1 = _text.Point1.Y - dy;
+                        double x2 = _text.Point2.X - dx;
+                        double y2 = _text.Point2.Y - dy;
+                        _text.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+                        _text.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+                        _text.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+                        _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+                        _text.Point1 = _text.Point1;
+                        _text.Point2 = _text.Point2;
+                    }
+                    break;
+            }
         }
     }
 
@@ -1002,22 +1671,22 @@ namespace RxCanvas.Bounds
 
         public IBounds Create(ICanvas canvas, IArc arc)
         {
-            return new ArcBounds(_nativeConverter, _canvasFactory, canvas, arc, 5.0);
+            return new ArcBounds(_nativeConverter, _canvasFactory, canvas, arc, 0.0, 7.5);
         }
 
         public IBounds Create(ICanvas canvas, IRectangle rectangle)
         {
-            return new RectangleBounds(_nativeConverter, _canvasFactory, canvas, rectangle, 5.0);
+            return new RectangleBounds(_nativeConverter, _canvasFactory, canvas, rectangle, 0.0, 7.5);
         }
 
         public IBounds Create(ICanvas canvas, IEllipse ellipse)
         {
-            return new EllipseBounds(_nativeConverter, _canvasFactory, canvas, ellipse, 5.0);
+            return new EllipseBounds(_nativeConverter, _canvasFactory, canvas, ellipse, 0.0, 7.5);
         }
 
         public IBounds Create(ICanvas canvas, IText text)
         {
-            return new TextBounds(_nativeConverter, _canvasFactory, canvas, text, 5.0);
+            return new TextBounds(_nativeConverter, _canvasFactory, canvas, text, 0.0, 7.5);
         }
     }
 }
