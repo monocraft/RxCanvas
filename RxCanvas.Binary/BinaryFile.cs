@@ -67,9 +67,18 @@ namespace RxCanvas.Binary
         Text
     }
 
-    public static class BinaryConverter
+    public class BinaryFile : IFile<ICanvas, Stream>
     {
-        public static ICanvas Open(string path)
+        public string Name { get; set; }
+        public string Extension { get; set; }
+
+        public BinaryFile()
+        {
+            Name = "Binary";
+            Extension = "bin";
+        }
+
+        public ICanvas Open(string path)
         {
             using (var file = File.Open(path, FileMode.Open))
             {
@@ -77,7 +86,7 @@ namespace RxCanvas.Binary
             }
         }
 
-        public static void Save(string path, ICanvas canvas)
+        public void Save(string path, ICanvas canvas)
         {
             using (var file = File.Create(path))
             {
@@ -85,7 +94,7 @@ namespace RxCanvas.Binary
             }
         }
 
-        public static ICanvas Read(Stream stream)
+        public ICanvas Read(Stream stream)
         {
             using (var reader = new BinaryReader(stream))
             {
@@ -200,7 +209,7 @@ namespace RxCanvas.Binary
             }
         }
 
-        public static void Write(Stream stream, ICanvas canvas)
+        public void Write(Stream stream, ICanvas canvas)
         {
             using (var writer = new BinaryWriter(stream))
             {

@@ -209,6 +209,16 @@ namespace RxCanvas.Interfaces
         IBounds Create(ICanvas canvas, IText text);
     }
 
+    public interface IFile<T, S>
+    {
+        string Name { get; set; }
+        string Extension { get; set; }
+        T Open(string path);
+        void Save(string path, T value);
+        T Read(S stream);
+        void Write(S stream, T value);
+    }
+
     public interface ISerializer<T> where T : class
     {
         string Name { get; set; }

@@ -240,7 +240,8 @@ namespace RxCanvas
             ConvertToNative(xcanvas);
 
             // binary
-            //var xcanvas = RxCanvas.Binary.BinaryConverter.Open(path);
+            //var binary = new RxCanvas.Binary.BinaryFile();
+            //var xcanvas = binary.Open(path);
             //ConvertToNative(xcanvas);
         }
 
@@ -255,7 +256,8 @@ namespace RxCanvas
 
             // binary
             //var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            //RxCanvas.Binary.BinaryConverter.Save(path, drawingCanvas);
+            //var binary = new RxCanvas.Binary.BinaryFile();
+            //binary.Save(path, drawingCanvas);
         }
 
         private void Export(string path, int index)
