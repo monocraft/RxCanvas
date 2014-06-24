@@ -46,6 +46,9 @@ namespace RxCanvas
             builder.Register<ICanvasFactory>(c => new XModelFactory()).SingleInstance();
             builder.Register<IModelToNativeConverter>(c => new XModelToWpfConverter()).SingleInstance();
 
+            builder.Register<ITextFile>(c => new Utf8TextFile()).SingleInstance();
+            builder.Register<IBinaryFile<ICanvas, Stream>>(c => new BinaryFile()).SingleInstance();
+
             builder.Register<IBoundsFactory>(c =>
             {
                 var nativeConverter = c.Resolve<IModelToNativeConverter>();
@@ -57,12 +60,11 @@ namespace RxCanvas
             {
                 var nativeConverter = c.Resolve<IModelToNativeConverter>();
                 var canvasFactory = c.Resolve<ICanvasFactory>();
+                var binaryFile = c.Resolve<IBinaryFile<ICanvas, Stream>>();
                 var xcanvas = canvasFactory.CreateCanvas();
+                xcanvas.History = new History(binaryFile);
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
-
-            builder.Register<ITextFile>(c => new Utf8TextFile()).SingleInstance();
-            builder.Register<IBinaryFile<ICanvas, Stream>>(c => new BinaryFile()).SingleInstance();
 
             // create container
             return builder.Build();

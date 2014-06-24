@@ -179,6 +179,7 @@ namespace RxCanvas.Model
         public IObservable<ImmutablePoint> Downs { get; set; }
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
+        public IHistory History { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
         public IColor Background { get; set; }

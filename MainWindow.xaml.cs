@@ -145,18 +145,18 @@ namespace RxCanvas
             //Debug.Print("Control+Delete -> Clear");
 
             // undo shortcut
-            //_shortcuts.Add(
-            //    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Z"),
-            //                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-            //    () => Undo());
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Z"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Undo());
 
             //Debug.Print("Control+Z -> Undo");
 
             // redo shortcut
-            //_shortcuts.Add(
-            //    new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Y"),
-            //                                 (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-            //    () => Redo());
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Y"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Redo());
 
             //Debug.Print("Control+Y -> Redo");
         }
@@ -254,7 +254,7 @@ namespace RxCanvas
             var serializer = _serializers[index];
             var json = file.Open(path);
             var xcanvas = serializer.Deserialize(json);
-            ConvertToNative(xcanvas);
+            Open(xcanvas);
 
             // binary
             //var xcanvas = (new BinaryFile()).Open(path);
@@ -282,7 +282,7 @@ namespace RxCanvas
             creator.Save(path, canvas);
         }
 
-        private void ConvertToNative(ICanvas xcanvas)
+        private void Open(ICanvas xcanvas)
         {
             var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
             var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
@@ -443,7 +443,28 @@ namespace RxCanvas
         private void Clear()
         {
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            drawingCanvas.History.Snapshot(drawingCanvas);
             drawingCanvas.Clear();
+        }
+
+        private void Undo()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var xcanvas = drawingCanvas.History.Undo(drawingCanvas);
+            if (xcanvas != null)
+            {
+                Open(xcanvas);
+            }
+        }
+
+        private void Redo()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var xcanvas = drawingCanvas.History.Redo(drawingCanvas);
+            if (xcanvas != null)
+            {
+                Open(xcanvas);
+            }
         }
     }
 }

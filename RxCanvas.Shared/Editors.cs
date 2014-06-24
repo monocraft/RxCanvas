@@ -367,6 +367,7 @@ namespace RxCanvas.Editors
                     _xline.Point2.X = p.X;
                     _xline.Point2.Y = p.Y;
                     _nline = nativeConverter.Convert(_xline);
+                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nline);
                     _nline.Bounds = boundsFactory.Create(_canvas, _nline);
                     _nline.Bounds.Update();
@@ -498,6 +499,7 @@ namespace RxCanvas.Editors
                     _xb.Point3.X = p.X;
                     _xb.Point3.Y = p.Y;
                     _nb = nativeConverter.Convert(_xb);
+                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nb);
                     _nb.Bounds = boundsFactory.Create(_canvas, _nb);
                     _nb.Bounds.Update();
@@ -639,6 +641,7 @@ namespace RxCanvas.Editors
                     _xqb.Point2.X = p.X;
                     _xqb.Point2.Y = p.Y;
                     _nqb = nativeConverter.Convert(_xqb);
+                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nqb);
                     _nqb.Bounds = boundsFactory.Create(_canvas, _nqb);
                     _nqb.Bounds.Update();
@@ -749,6 +752,7 @@ namespace RxCanvas.Editors
                     _xarc.Point2.X = p.X;
                     _xarc.Point2.Y = p.Y;
                     _narc = nativeConverter.Convert(_xarc);
+                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_narc);
                     _narc.Bounds = boundsFactory.Create(_canvas, _narc);
                     _narc.Bounds.Update();
@@ -846,6 +850,7 @@ namespace RxCanvas.Editors
                     _xrectangle.Point2.X = p.X;
                     _xrectangle.Point2.Y = p.Y;
                     _nrectangle = nativeConverter.Convert(_xrectangle);
+                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nrectangle);
                     _nrectangle.Bounds = boundsFactory.Create(_canvas, _nrectangle);
                     _nrectangle.Bounds.Update();
@@ -943,6 +948,7 @@ namespace RxCanvas.Editors
                     _xellipse.Point2.X = p.X;
                     _xellipse.Point2.Y = p.Y;
                     _nellipse = nativeConverter.Convert(_xellipse);
+                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nellipse);
                     _nellipse.Bounds = boundsFactory.Create(_canvas, _nellipse);
                     _nellipse.Bounds.Update();
@@ -1040,6 +1046,7 @@ namespace RxCanvas.Editors
                     _xtext.Point2.X = p.X;
                     _xtext.Point2.Y = p.Y;
                     _ntext = nativeConverter.Convert(_xtext);
+                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_ntext);
                     _ntext.Bounds = boundsFactory.Create(_canvas, _ntext);
                     _ntext.Bounds.Update();

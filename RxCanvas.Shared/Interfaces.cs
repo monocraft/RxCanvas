@@ -137,6 +137,7 @@ namespace RxCanvas.Interfaces
         IObservable<ImmutablePoint> Downs { get; set; }
         IObservable<ImmutablePoint> Ups { get; set; }
         IObservable<ImmutablePoint> Moves { get; set; }
+        IHistory History { get; set; }
         double Width { get; set; }
         double Height { get; set; }
         IColor Background { get; set; }
@@ -243,8 +244,9 @@ namespace RxCanvas.Interfaces
 
     public interface IHistory
     {
-        void Snapshot();
-        void Undo();
-        void Redo();
+        void Snapshot(ICanvas canvas);
+        ICanvas Undo(ICanvas canvas);
+        ICanvas Redo(ICanvas canvas);
+        void Clear();
     }
 }

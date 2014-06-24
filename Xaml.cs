@@ -942,6 +942,8 @@ namespace RxCanvas.Xaml
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
 
+        public IHistory History { get; set; }
+
         private SolidColorBrush _backgroundBrush;
         private IColor _background;
         private double _snapX;
@@ -961,6 +963,8 @@ namespace RxCanvas.Xaml
             _snapX = canvas.SnapX;
             _snapY = canvas.SnapY;
             _enableSnap = canvas.EnableSnap;
+
+            History = canvas.History;
 
             _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
             _backgroundBrush.Freeze();

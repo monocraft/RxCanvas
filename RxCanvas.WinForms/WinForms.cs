@@ -1,4 +1,5 @@
-﻿using RxCanvas.Interfaces;
+﻿using RxCanvas.Binary;
+using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -229,6 +230,8 @@ namespace RxCanvas.WinForms
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
 
+        public IHistory History { get; set; }
+
         public IList<INative> Children { get; set; }
 
         public double Width 
@@ -265,6 +268,8 @@ namespace RxCanvas.WinForms
             SnapX = canvas.SnapX;
             SnapY = canvas.SnapY;
             EnableSnap = canvas.EnableSnap;
+
+            History = canvas.History;
 
             Children = new ObservableCollection<INative>();
 

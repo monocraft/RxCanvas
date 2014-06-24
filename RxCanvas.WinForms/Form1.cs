@@ -144,8 +144,20 @@ namespace RxCanvas.WinForms
             // clear shortcut
             _shortcuts.Add(
                 new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("Delete"),
-                    (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Clear());
+
+            // undo shortcut
+            _shortcuts.Add(
+                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("Z"),
+                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Undo());
+
+            // redo shortcut
+            _shortcuts.Add(
+                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("Y"),
+                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Redo());
         }
 
         private void Open()
@@ -216,7 +228,7 @@ namespace RxCanvas.WinForms
             var serializer = _serializers[index];
             var json = file.Open(path);
             var xcanvas = serializer.Deserialize(json);
-            ConvertToNative(xcanvas);
+            Open(xcanvas);
         }
 
         private void Save(string path, int index)
@@ -235,7 +247,7 @@ namespace RxCanvas.WinForms
             creator.Save(path, canvas);
         }
 
-        private void ConvertToNative(ICanvas xcanvas)
+        private void Open(ICanvas xcanvas)
         {
             var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
             var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
@@ -398,6 +410,26 @@ namespace RxCanvas.WinForms
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
             drawingCanvas.Clear();
             this.canvasPanel1.Invalidate();
+        }
+
+        private void Undo()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var xcanvas = drawingCanvas.History.Undo(drawingCanvas);
+            if (xcanvas != null)
+            {
+                Open(xcanvas);
+            }
+        }
+
+        private void Redo()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var xcanvas = drawingCanvas.History.Redo(drawingCanvas);
+            if (xcanvas != null)
+            {
+                Open(xcanvas);
+            }
         }
 
         private void Render()

@@ -26,6 +26,9 @@ Keyboard Shortcuts:
     Control+O -> Open
     Control+S -> Save
     Control+E -> Export
+    (Edit)
+    Control+Z -> Undo
+    Control+Y -> Redo
     (Canvas)
     H -> Selection
     S -> Snap
