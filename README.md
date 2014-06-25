@@ -21,6 +21,10 @@ Keyboard Shortcuts:
     (Edit)
     Control+Z -> Undo
     Control+Y -> Redo
+    (Canvas)
+    H -> Selection
+    S -> Snap
+    Control+Delete -> Clear
     (Create)
     L -> Line
     B -> Bézier
@@ -29,10 +33,6 @@ Keyboard Shortcuts:
     R -> Rectangle
     E -> Ellipse
     T -> Text
-    (Canvas)
-    H -> Selection
-    S -> Snap
-    Control+Delete -> Clear
 
 Mouse:
 
