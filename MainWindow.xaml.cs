@@ -92,6 +92,48 @@ namespace RxCanvas
             var keyConverter = new KeyConverter();
             var modifiersKeyConverter = new ModifierKeysConverter();
 
+            // open shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("O"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Open());
+
+            // save shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Save());
+
+            // export shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("E"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Export());
+
+            // undo shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Z"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Undo());
+
+            // redo shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Y"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Redo());
+
+            // snap shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
+                                             ModifierKeys.None),
+                () => ToggleSnap());
+
+            // clear shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Delete"),
+                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
+                () => Clear());
+
             // editor shortcuts
             foreach (var editor in _editors)
             {
@@ -100,65 +142,7 @@ namespace RxCanvas
                     new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString(editor.Key),
                                                  editor.Modifiers == "" ? ModifierKeys.None : (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
                     () => EnableEditor(_editor));
-
-                //Debug.Print("{0}{1}{2} -> {3}", editor.Modifiers, editor.Modifiers == "" ? "" : "+", editor.Key, editor.Name);
             }
-
-            // snap shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
-                                             ModifierKeys.None),
-                () => ToggleSnap());
-
-            //Debug.Print("S -> Snap");
-
-            // open shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("O"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => Open());
-
-            //Debug.Print("Control+O -> Open");
-
-            // save shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("S"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => Save());
-
-            //Debug.Print("Control+S -> Save");
-
-            // export shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("E"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => Export());
-
-            //Debug.Print("Control+E -> Export");
-
-            // clear shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Delete"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => Clear());
-
-            //Debug.Print("Control+Delete -> Clear");
-
-            // undo shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Z"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => Undo());
-
-            //Debug.Print("Control+Z -> Undo");
-
-            // redo shortcut
-            _shortcuts.Add(
-                new Tuple<Key, ModifierKeys>((Key)keyConverter.ConvertFromString("Y"),
-                                             (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => Redo());
-
-            //Debug.Print("Control+Y -> Redo");
         }
 
         private void Open()
