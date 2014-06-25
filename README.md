@@ -14,14 +14,6 @@ Platforms:
 
 Keyboard Shortcuts:
 
-    (Create)
-	L -> Line
-    B -> Bézier
-    Q -> Quadratic Bézier
-    A -> Arc
-    R -> Rectangle
-    E -> Ellipse
-    T -> Text
     (File)
     Control+O -> Open
     Control+S -> Save
@@ -29,6 +21,14 @@ Keyboard Shortcuts:
     (Edit)
     Control+Z -> Undo
     Control+Y -> Redo
+    (Create)
+    L -> Line
+    B -> Bézier
+    Q -> Quadratic Bézier
+    A -> Arc
+    R -> Rectangle
+    E -> Ellipse
+    T -> Text
     (Canvas)
     H -> Selection
     S -> Snap
