@@ -419,6 +419,7 @@ namespace RxCanvas.WinForms
             if (xcanvas != null)
             {
                 Open(xcanvas);
+                Render();
             }
         }
 
@@ -429,6 +430,7 @@ namespace RxCanvas.WinForms
             if (xcanvas != null)
             {
                 Open(xcanvas);
+                Render();
             }
         }
 
