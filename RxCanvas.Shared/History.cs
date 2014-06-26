@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Binary
 {
-    public class History : IHistory
+    public class BinaryHistory : IHistory
     {
         private IBinaryFile<ICanvas, Stream> _file;
 
         private Stack<byte[]> _undos;
         private Stack<byte[]> _redos;
 
-        public History(IBinaryFile<ICanvas, Stream> file)
+        public BinaryHistory(IBinaryFile<ICanvas, Stream> file)
         {
             _file = file;
             _undos = new Stack<byte[]>();

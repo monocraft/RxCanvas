@@ -61,7 +61,7 @@ namespace RxCanvas.WinForms
                 var canvasFactory = c.Resolve<ICanvasFactory>();
                 var binaryFile = c.Resolve<IBinaryFile<ICanvas, Stream>>();
                 var xcanvas = canvasFactory.CreateCanvas();
-                xcanvas.History = new History(binaryFile);
+                xcanvas.History = new BinaryHistory(binaryFile);
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 
