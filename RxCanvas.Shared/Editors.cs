@@ -69,21 +69,10 @@ namespace RxCanvas.Editors
             Key = "H";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            select move;
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, _canvas.Moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 bool render = false;
 
                 if (IsState(State.Selected))
@@ -113,13 +102,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _ups = _canvas.Ups.Subscribe(p =>
+            _ups = _canvas.Ups.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     if (IsState(State.Move))
@@ -130,13 +114,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drag = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     Move(p);
@@ -319,7 +298,7 @@ namespace RxCanvas.Editors
         private ILine _nline;
         private State _state = State.None;
         private IDisposable _downs;
-        private IDisposable _drag;
+        private IDisposable _drags;
 
         public XLineEditor(
             IModelToNativeConverter nativeConverter, 
@@ -333,22 +312,11 @@ namespace RxCanvas.Editors
             Key = "L";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            where _canvas.IsCaptured
-                            select move;
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     _xline.Point2.X = p.X;
@@ -378,13 +346,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drags = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_state == State.End)
                 {
                     _xline.Point2.X = p.X;
@@ -399,7 +362,7 @@ namespace RxCanvas.Editors
         public void Dispose()
         {
             _downs.Dispose();
-            _drag.Dispose();
+            _drags.Dispose();
         }
     }
 
@@ -417,7 +380,7 @@ namespace RxCanvas.Editors
         private IBezier _nb;
         private State _state = State.None;
         private IDisposable _downs;
-        private IDisposable _drag;
+        private IDisposable _drags;
 
         public XBezierEditor(
             IModelToNativeConverter nativeConverter, 
@@ -431,22 +394,11 @@ namespace RxCanvas.Editors
             Key = "B";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            where _canvas.IsCaptured
-                            select move;
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     switch (_state)
@@ -510,13 +462,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drags = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 switch (_state)
                 {
                     case State.Start:
@@ -556,7 +503,7 @@ namespace RxCanvas.Editors
         public void Dispose()
         {
             _downs.Dispose();
-            _drag.Dispose();
+            _drags.Dispose();
         }
     }
 
@@ -574,7 +521,7 @@ namespace RxCanvas.Editors
         private IQuadraticBezier _nqb;
         private State _state = State.None;
         private IDisposable _downs;
-        private IDisposable _drag;
+        private IDisposable _drags;
 
         public XQuadraticBezierEditor(
             IModelToNativeConverter nativeConverter, 
@@ -588,22 +535,11 @@ namespace RxCanvas.Editors
             Key = "Q";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            where _canvas.IsCaptured
-                            select move;
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     switch (_state)
@@ -652,13 +588,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drags = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 switch (_state)
                 {
                     case State.Start:
@@ -686,7 +617,7 @@ namespace RxCanvas.Editors
         public void Dispose()
         {
             _downs.Dispose();
-            _drag.Dispose();
+            _drags.Dispose();
         }
     }
 
@@ -704,7 +635,7 @@ namespace RxCanvas.Editors
         private IArc _narc;
         private State _state = State.None;
         private IDisposable _downs;
-        private IDisposable _drag;
+        private IDisposable _drags;
 
         public XArcEditor(
             IModelToNativeConverter nativeConverter, 
@@ -718,22 +649,11 @@ namespace RxCanvas.Editors
             Key = "A";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            where _canvas.IsCaptured
-                            select move;
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     _xarc.Point2.X = p.X;
@@ -763,13 +683,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drags = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_state == State.Size)
                 {
                     _xarc.Point2.X = p.X;
@@ -784,7 +699,7 @@ namespace RxCanvas.Editors
         public void Dispose()
         {
             _downs.Dispose();
-            _drag.Dispose();
+            _drags.Dispose();
         }
     }
 
@@ -802,7 +717,7 @@ namespace RxCanvas.Editors
         private IRectangle _nrectangle;
         private State _state = State.None;
         private IDisposable _downs;
-        private IDisposable _drag;
+        private IDisposable _drags;
 
         public XCanvasRectangleEditor(
             IModelToNativeConverter nativeConverter, 
@@ -816,22 +731,11 @@ namespace RxCanvas.Editors
             Key = "R";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            where _canvas.IsCaptured
-                            select move;
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     _xrectangle.Point2.X = p.X;
@@ -861,13 +765,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drags = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_state == State.BottomRight)
                 {
                     _xrectangle.Point2.X = p.X;
@@ -882,7 +781,7 @@ namespace RxCanvas.Editors
         public void Dispose()
         {
             _downs.Dispose();
-            _drag.Dispose();
+            _drags.Dispose();
         }
     }
 
@@ -900,7 +799,7 @@ namespace RxCanvas.Editors
         private IEllipse _nellipse;
         private State _state = State.None;
         private IDisposable _downs;
-        private IDisposable _drag;
+        private IDisposable _drags;
 
         public XCanvasEllipseEditor(
             IModelToNativeConverter nativeConverter,
@@ -914,22 +813,11 @@ namespace RxCanvas.Editors
             Key = "E";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            where _canvas.IsCaptured
-                            select move;
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     _xellipse.Point2.X = p.X;
@@ -959,13 +847,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drags = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_state == State.BottomRight)
                 {
                     _xellipse.Point2.X = p.X;
@@ -980,7 +863,7 @@ namespace RxCanvas.Editors
         public void Dispose()
         {
             _downs.Dispose();
-            _drag.Dispose();
+            _drags.Dispose();
         }
     }
 
@@ -998,7 +881,7 @@ namespace RxCanvas.Editors
         private IText _ntext;
         private State _state = State.None;
         private IDisposable _downs;
-        private IDisposable _drag;
+        private IDisposable _drags;
 
         public XCanvasTextEditor(
             IModelToNativeConverter nativeConverter,
@@ -1012,22 +895,11 @@ namespace RxCanvas.Editors
             Key = "T";
             Modifiers = "";
 
-            var dragMoves = from move in _canvas.Moves
-                            where _canvas.IsCaptured
-                            select move;
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
 
-            var allPositions = Observable.Merge(_canvas.Downs, _canvas.Ups, dragMoves);
-
-            var dragPositions = from move in allPositions
-                                select move;
-
-            _downs = _canvas.Downs.Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_canvas.IsCaptured)
                 {
                     _xtext.Point2.X = p.X;
@@ -1057,13 +929,8 @@ namespace RxCanvas.Editors
                 }
             });
 
-            _drag = dragPositions.Subscribe(p =>
+            _drags = drags.Where(_ => IsEnabled).Subscribe(p =>
             {
-                if (!IsEnabled)
-                {
-                    return;
-                }
-
                 if (_state == State.BottomRight)
                 {
                     _xtext.Point2.X = p.X;
@@ -1078,7 +945,7 @@ namespace RxCanvas.Editors
         public void Dispose()
         {
             _downs.Dispose();
-            _drag.Dispose();
+            _drags.Dispose();
         }
     }
 
