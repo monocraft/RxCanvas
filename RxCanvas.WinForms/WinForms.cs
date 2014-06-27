@@ -32,7 +32,7 @@ namespace RxCanvas.WinForms
             Draw(e.Graphics, Canvas);
         }
 
-        private Color ToColor(IColor color)
+        private Color ToNativeColor(IColor color)
         {
             return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
@@ -58,7 +58,7 @@ namespace RxCanvas.WinForms
                 {
                     var line = child as ILine;
                     Pen pen = new Pen(
-                        ToColor(line.Stroke), 
+                        ToNativeColor(line.Stroke), 
                         (float)line.StrokeThickness);
 
                     g.DrawLine(
@@ -74,7 +74,7 @@ namespace RxCanvas.WinForms
                 {
                     var bezier = child as IBezier;
                     Pen pen = new Pen(
-                        ToColor(bezier.Stroke), 
+                        ToNativeColor(bezier.Stroke), 
                         (float)bezier.StrokeThickness);
 
                     g.DrawBezier(
@@ -94,7 +94,7 @@ namespace RxCanvas.WinForms
                 {
                     var quadraticBezier = child as IQuadraticBezier;
                     Pen pen = new Pen(
-                        ToColor(quadraticBezier.Stroke), 
+                        ToNativeColor(quadraticBezier.Stroke), 
                         (float)quadraticBezier.StrokeThickness);
 
                     double x1 = quadraticBezier.Start.X;
@@ -131,7 +131,7 @@ namespace RxCanvas.WinForms
                     if (width > 0.0 && height > 0.0)
                     {
                         Pen pen = new Pen(
-                            ToColor(arc.Stroke), 
+                            ToNativeColor(arc.Stroke), 
                             (float)arc.StrokeThickness);
 
                         g.DrawArc(
@@ -150,7 +150,7 @@ namespace RxCanvas.WinForms
                 {
                     var rectangle = child as IRectangle;
                     Pen pen = new Pen(
-                        ToColor(rectangle.Stroke), 
+                        ToNativeColor(rectangle.Stroke), 
                         (float)rectangle.StrokeThickness);
 
                     double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
@@ -171,7 +171,7 @@ namespace RxCanvas.WinForms
                 {
                     var ellipse = child as IEllipse;
                     Pen pen = new Pen(
-                        ToColor(ellipse.Stroke), 
+                        ToNativeColor(ellipse.Stroke), 
                         (float)ellipse.StrokeThickness);
 
                     double x = Math.Min(ellipse.Point1.X, ellipse.Point2.X);
@@ -191,7 +191,7 @@ namespace RxCanvas.WinForms
                 else if (child is IText)
                 {
                     var text = child as IText;
-                    Brush brush = new SolidBrush(ToColor(text.Foreground));
+                    Brush brush = new SolidBrush(ToNativeColor(text.Foreground));
                     Font font = new Font("Callibri", (float)text.Size);
 
                     double x = Math.Min(text.Point1.X, text.Point2.X);
