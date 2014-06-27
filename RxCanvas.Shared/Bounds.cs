@@ -1084,7 +1084,6 @@ namespace RxCanvas.Bounds
         }
     }
 
-
     public class RectangleBounds : IBounds
     {
         private IRectangle _rectangle;
