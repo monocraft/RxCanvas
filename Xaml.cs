@@ -406,11 +406,14 @@ namespace RxCanvas.Xaml
         public const double Deg2Rad = Math.PI / 180;
         public const double πHalf = Math.PI / 2;
 
-        private void SetArcSegment(ArcSegment segment, IArc arc, out Point startPoint)
+        private void SetArcSegment(
+            ArcSegment segment, 
+            IArc arc, 
+            out Point startPoint)
         {
-            // original code
-            // https://pdfsharp.codeplex.com/SourceControl/latest#PDFsharp/code/PdfSharp/PdfSharp.Internal/Calc.cs
-            // https://pdfsharp.codeplex.com/SourceControl/latest#PDFsharp/code/PdfSharp/PdfSharp.Drawing/GeometryHelper.cs
+            // original code https://pdfsharp.codeplex.com/
+            // PDFsharp/code/PdfSharp/PdfSharp.Internal/Calc.cs
+            // PDFsharp/code/PdfSharp/PdfSharp.Drawing/GeometryHelper.cs
 
             double x = Math.Min(arc.Point1.X, arc.Point2.X);
             double y = Math.Min(arc.Point1.Y, arc.Point2.Y);
@@ -986,22 +989,34 @@ namespace RxCanvas.Xaml
                 Background = _backgroundBrush
             };
 
-            Downs = Observable.FromEventPattern<MouseButtonEventArgs>(_canvas, "PreviewMouseLeftButtonDown").Select(e =>
+            Downs = Observable.FromEventPattern<MouseButtonEventArgs>(
+                _canvas, 
+                "PreviewMouseLeftButtonDown").Select(e =>
             {
                 var p = e.EventArgs.GetPosition(_canvas);
-                return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
+                return new ImmutablePoint(
+                    _enableSnap ? Snap(p.X, _snapX) : p.X, 
+                    _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
 
-            Ups = Observable.FromEventPattern<MouseButtonEventArgs>(_canvas, "PreviewMouseLeftButtonUp").Select(e =>
+            Ups = Observable.FromEventPattern<MouseButtonEventArgs>(
+                _canvas, 
+                "PreviewMouseLeftButtonUp").Select(e =>
             {
                 var p = e.EventArgs.GetPosition(_canvas);
-                return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
+                return new ImmutablePoint(
+                    _enableSnap ? Snap(p.X, _snapX) : p.X, 
+                    _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
 
-            Moves = Observable.FromEventPattern<MouseEventArgs>(_canvas, "PreviewMouseMove").Select(e =>
+            Moves = Observable.FromEventPattern<MouseEventArgs>(
+                _canvas, 
+                "PreviewMouseMove").Select(e =>
             {
                 var p = e.EventArgs.GetPosition(_canvas);
-                return new ImmutablePoint(_enableSnap ? Snap(p.X, _snapX) : p.X, _enableSnap ? Snap(p.Y, _snapY) : p.Y);
+                return new ImmutablePoint(
+                    _enableSnap ? Snap(p.X, _snapX) : p.X, 
+                    _enableSnap ? Snap(p.Y, _snapY) : p.Y);
             });
 
             Native = _canvas;
