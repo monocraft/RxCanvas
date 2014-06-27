@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 
 namespace RxCanvas.Xaml
 {
-    public static class WpfExtensions
+    internal static class WpfExtensions
     {
         public static Color ToNativeColor(this IColor color)
         {
