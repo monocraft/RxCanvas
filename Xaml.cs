@@ -15,6 +15,14 @@ using System.Windows.Shapes;
 
 namespace RxCanvas.Xaml
 {
+    public static class WpfExtensions
+    {
+        public static Color ToNativeColor(this IColor color)
+        {
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+    }
+
     public class WpfLine : ILine
     {
         public object Native { get; set; }
@@ -32,7 +40,7 @@ namespace RxCanvas.Xaml
             _point1 = line.Point1;
             _point2 = line.Point2;
 
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
             _line = new Line()
@@ -76,7 +84,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _stroke = value;
-                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _line.Stroke = _strokeBrush;
             }
@@ -116,9 +124,9 @@ namespace RxCanvas.Xaml
             _point2 = b.Point2;
             _point3 = b.Point3;
 
-            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
             _path = new Path();
@@ -188,7 +196,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _fill = value;
-                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _path.Fill = _fillBrush;
             }
@@ -200,7 +208,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _stroke = value;
-                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _path.Stroke = _strokeBrush;
             }
@@ -250,9 +258,9 @@ namespace RxCanvas.Xaml
             _point1 = qb.Point1;
             _point2 = qb.Point2;
 
-            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
             _path = new Path();
@@ -311,7 +319,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _fill = value;
-                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _path.Fill = _fillBrush;
             }
@@ -323,7 +331,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _stroke = value;
-                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _path.Stroke = _strokeBrush;
             }
@@ -370,9 +378,9 @@ namespace RxCanvas.Xaml
             _fill = arc.Fill;
             _stroke = arc.Stroke;
 
-            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
             _path = new Path();
@@ -569,7 +577,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _stroke = value;
-                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _path.Stroke = _strokeBrush;
             }
@@ -587,7 +595,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _fill = value;
-                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _path.Fill = _fillBrush;
             }
@@ -626,9 +634,9 @@ namespace RxCanvas.Xaml
             _point1 = rectangle.Point1;
             _point2 = rectangle.Point2;
 
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
             _strokeBrush.Freeze();
-            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
             _fillBrush.Freeze();
 
             _rectangle = new Rectangle()
@@ -681,7 +689,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _stroke = value;
-                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _rectangle.Stroke = _strokeBrush;
             }
@@ -699,7 +707,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _fill = value;
-                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _rectangle.Fill = _fillBrush;
             }
@@ -726,9 +734,9 @@ namespace RxCanvas.Xaml
             _point1 = ellipse.Point1;
             _point2 = ellipse.Point2;
 
-            _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
             _strokeBrush.Freeze();
-            _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
             _fillBrush.Freeze();
 
             _ellipse = new Ellipse()
@@ -781,7 +789,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _stroke = value;
-                _strokeBrush = new SolidColorBrush(Color.FromArgb(_stroke.A, _stroke.R, _stroke.G, _stroke.B));
+                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _ellipse.Stroke = _strokeBrush;
             }
@@ -799,7 +807,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _fill = value;
-                _fillBrush = new SolidColorBrush(Color.FromArgb(_fill.A, _fill.R, _fill.G, _fill.B));
+                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _ellipse.Fill = _fillBrush;
             }
@@ -827,9 +835,9 @@ namespace RxCanvas.Xaml
             _point1 = text.Point1;
             _point2 = text.Point2;
 
-            _foregroundBrush = new SolidColorBrush(Color.FromArgb(_foreground.A, _foreground.R, _foreground.G, _foreground.B));
+            _foregroundBrush = new SolidColorBrush(_foreground.ToNativeColor());
             _foregroundBrush.Freeze();
-            _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+            _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
             _backgroundBrush.Freeze();
 
             _grid = new Grid();
@@ -913,7 +921,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _foreground = value;
-                _foregroundBrush = new SolidColorBrush(Color.FromArgb(_foreground.A, _foreground.R, _foreground.G, _foreground.B));
+                _foregroundBrush = new SolidColorBrush(_foreground.ToNativeColor());
                 _foregroundBrush.Freeze();
                 _tb.Foreground = _foregroundBrush;
             }
@@ -925,7 +933,7 @@ namespace RxCanvas.Xaml
             set
             {
                 _background = value;
-                _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+                _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
                 _backgroundBrush.Freeze();
                 _grid.Background = _backgroundBrush;
                 _tb.Background = _backgroundBrush;
@@ -966,7 +974,7 @@ namespace RxCanvas.Xaml
 
             History = canvas.History;
 
-            _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+            _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
             _backgroundBrush.Freeze();
 
             Children = new ObservableCollection<INative>();
@@ -1025,7 +1033,7 @@ namespace RxCanvas.Xaml
                 }
                 else
                 {
-                    _backgroundBrush = new SolidColorBrush(Color.FromArgb(_background.A, _background.R, _background.G, _background.B));
+                    _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
                     _backgroundBrush.Freeze();
                 }
                 _canvas.Background = _backgroundBrush;
