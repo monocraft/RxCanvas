@@ -72,7 +72,6 @@ namespace RxCanvas.Binary
             }
 
             PushRedo(canvas);
-
             return PopUndo();
         }
 
@@ -84,7 +83,6 @@ namespace RxCanvas.Binary
             }
 
             PushUndo(canvas);
-
             return PopRedo();
         }
 
