@@ -469,13 +469,14 @@ namespace RxCanvas.Xaml
 
             if (width == height)
             {
-                // circular arc needs no correction.
+                // circular arc needs no correction
                 α = α * Deg2Rad;
                 β = β * Deg2Rad;
             }
             else
             {
-                // elliptic arc needs the angles to be adjusted such that the scaling transformation is compensated.
+                // elliptic arc needs the angles to be adjusted 
+                // such that the scaling transformation is compensated
                 α = α * Deg2Rad;
                 sinα = Math.Sin(α);
                 if (Math.Abs(sinα) > 1E-10)
@@ -515,7 +516,8 @@ namespace RxCanvas.Xaml
             var destPoint = new Point(x0 + δx * cosβ, y0 + δy * sinβ);
             var size = new Size(δx, δy);
             bool isLargeArc = Math.Abs(sweepAngle) >= 180;
-            SweepDirection sweepDirection = sweepAngle > 0 ? SweepDirection.Clockwise : SweepDirection.Counterclockwise;
+            SweepDirection sweepDirection = 
+                sweepAngle > 0 ? SweepDirection.Clockwise : SweepDirection.Counterclockwise;
             bool isStroked = true;
 
             segment.Point = destPoint;
