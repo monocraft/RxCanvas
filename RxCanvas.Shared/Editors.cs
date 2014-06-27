@@ -44,6 +44,7 @@ namespace RxCanvas.Editors
         public string Modifiers { get; set; }
 
         private ICanvas _canvas;
+        private ImmutablePoint _original;
         private ImmutablePoint _start;
         private INative _selected;
         private INative _hover;
@@ -108,7 +109,7 @@ namespace RxCanvas.Editors
                 {
                     if (IsState(State.Move))
                     {
-                        FinishMove();
+                        FinishMove(p);
                         _canvas.ReleaseCapture();
                     }
                 }
@@ -212,13 +213,23 @@ namespace RxCanvas.Editors
 
         private void InitMove(ImmutablePoint p)
         {
+            // TODO: Create history snapshot but do not push undo.
+            _original = p;
             _start = p;
             _state |= State.Move;
             Debug.Print("_state: {0}", _state);
         }
 
-        private void FinishMove()
+        private void FinishMove(ImmutablePoint p)
         {
+            if (p.X == _original.X && p.Y == _original.Y)
+            {
+                // TODO: Do not push history undo.
+            }
+            else
+            {
+                // TODO: Push history undo.
+            }
             _state = _state & ~State.Move;
             Debug.Print("_state: {0}", _state);
         }
