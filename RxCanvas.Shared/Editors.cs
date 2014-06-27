@@ -235,18 +235,9 @@ namespace RxCanvas.Editors
 
         private INative HitTest(double x, double y)
         {
-            foreach (var child in _canvas.Children)
-            {
-                if (child.Bounds != null)
-                {
-                    var bounds = child.Bounds;
-                    if (bounds.Contains(x, y))
-                    {
-                        return child;
-                    }
-                }
-            }
-            return null;
+            return _canvas.Children
+                .Where(c => c.Bounds != null && c.Bounds.Contains(x, y))
+                .FirstOrDefault();
         }
 
         private void Reset()
