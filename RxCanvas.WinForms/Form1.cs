@@ -246,7 +246,6 @@ namespace RxCanvas.WinForms
             var creator = _creators[index];
             creator.Save(path, canvas);
         }
-
         private void Open(ICanvas xcanvas)
         {
             var nativeConverter = _drawingScope.Resolve<IModelToNativeConverter>();
@@ -256,7 +255,16 @@ namespace RxCanvas.WinForms
 
             drawingCanvas.Clear();
 
-            foreach (var child in xcanvas.Children)
+            Add(nativeConverter, drawingCanvas, boundsFactory, xcanvas.Children);
+        }
+
+        private void Add(
+            IModelToNativeConverter nativeConverter,
+            ICanvas drawingCanvas,
+            IBoundsFactory boundsFactory,
+            IList<INative> children)
+        {
+            foreach (var child in children)
             {
                 if (child is ILine)
                 {
@@ -334,6 +342,13 @@ namespace RxCanvas.WinForms
                     {
                         native.Bounds.Update();
                     }
+                }
+                else if (child is IBlock)
+                {
+                    var block = child as IBlock;
+                    drawingCanvas.Add(block);
+
+                    Add(nativeConverter, drawingCanvas, boundsFactory, block.Children);
                 }
                 else
                 {
