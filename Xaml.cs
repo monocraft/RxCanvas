@@ -955,15 +955,16 @@ namespace RxCanvas.Xaml
         public IObservable<ImmutablePoint> Ups { get; set; }
         public IObservable<ImmutablePoint> Moves { get; set; }
 
-        public IHistory History { get; set; }
+        public IHistory History
+        {
+            get { return _xcanvas.History; }
+            set { _xcanvas.History = value; }
+        }
 
         private SolidColorBrush _backgroundBrush;
-        private IColor _background;
-        private double _snapX;
-        private double _snapY;
-        private bool _enableSnap;
-        private Canvas _canvas;
-
+        private ICanvas _xcanvas;
+        private Canvas _ncanvas;
+    
         public double Snap(double val, double snap)
         {
             double r = val % snap;
@@ -972,19 +973,12 @@ namespace RxCanvas.Xaml
 
         public WpfCanvas(ICanvas canvas)
         {
-            _background = canvas.Background;
-            _snapX = canvas.SnapX;
-            _snapY = canvas.SnapY;
-            _enableSnap = canvas.EnableSnap;
+            _xcanvas = canvas;
 
-            History = canvas.History;
-
-            _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
+            _backgroundBrush = new SolidColorBrush(_xcanvas.Background.ToNativeColor());
             _backgroundBrush.Freeze();
 
-            Children = new ObservableCollection<INative>();
-
-            _canvas = new Canvas()
+            _ncanvas = new Canvas()
             {
                 Width = canvas.Width,
                 Height = canvas.Height,
@@ -992,120 +986,132 @@ namespace RxCanvas.Xaml
             };
 
             Downs = Observable.FromEventPattern<MouseButtonEventArgs>(
-                _canvas, 
+                _ncanvas, 
                 "PreviewMouseLeftButtonDown").Select(e =>
             {
-                var p = e.EventArgs.GetPosition(_canvas);
+                var p = e.EventArgs.GetPosition(_ncanvas);
                 return new ImmutablePoint(
-                    _enableSnap ? Snap(p.X, _snapX) : p.X, 
-                    _enableSnap ? Snap(p.Y, _snapY) : p.Y);
+                    _xcanvas.EnableSnap ? Snap(p.X, _xcanvas.SnapX) : p.X,
+                    _xcanvas.EnableSnap ? Snap(p.Y, _xcanvas.SnapY) : p.Y);
             });
 
             Ups = Observable.FromEventPattern<MouseButtonEventArgs>(
-                _canvas, 
+                _ncanvas, 
                 "PreviewMouseLeftButtonUp").Select(e =>
             {
-                var p = e.EventArgs.GetPosition(_canvas);
+                var p = e.EventArgs.GetPosition(_ncanvas);
                 return new ImmutablePoint(
-                    _enableSnap ? Snap(p.X, _snapX) : p.X, 
-                    _enableSnap ? Snap(p.Y, _snapY) : p.Y);
+                    _xcanvas.EnableSnap ? Snap(p.X, _xcanvas.SnapX) : p.X,
+                    _xcanvas.EnableSnap ? Snap(p.Y, _xcanvas.SnapY) : p.Y);
             });
 
             Moves = Observable.FromEventPattern<MouseEventArgs>(
-                _canvas, 
+                _ncanvas, 
                 "PreviewMouseMove").Select(e =>
             {
-                var p = e.EventArgs.GetPosition(_canvas);
+                var p = e.EventArgs.GetPosition(_ncanvas);
                 return new ImmutablePoint(
-                    _enableSnap ? Snap(p.X, _snapX) : p.X, 
-                    _enableSnap ? Snap(p.Y, _snapY) : p.Y);
+                    _xcanvas.EnableSnap ? Snap(p.X, _xcanvas.SnapX) : p.X,
+                    _xcanvas.EnableSnap ? Snap(p.Y, _xcanvas.SnapY) : p.Y);
             });
 
-            Native = _canvas;
+            Native = _ncanvas;
         }
 
-        public IList<INative> Children { get; set; }
+        public IList<INative> Children
+        {
+            get { return _xcanvas.Children; }
+            set { _xcanvas.Children = value; }
+        }
 
         public double Width
         {
-            get { return _canvas.Width; }
-            set { _canvas.Width = value; }
+            get { return _ncanvas.Width; }
+            set { _ncanvas.Width = value; }
         }
 
         public double Height
         {
-            get { return _canvas.Height; }
-            set { _canvas.Height = value; }
+            get { return _ncanvas.Height; }
+            set { _ncanvas.Height = value; }
         }
 
         public IColor Background
         {
-            get { return _background; }
+            get { return _xcanvas.Background; }
             set
             {
-                _background = value;
-                if (_background == null)
+                _xcanvas.Background = value;
+                if (_xcanvas.Background == null)
                 {
                     _backgroundBrush = null;
                 }
                 else
                 {
-                    _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
+                    _backgroundBrush = new SolidColorBrush(_xcanvas.Background.ToNativeColor());
                     _backgroundBrush.Freeze();
                 }
-                _canvas.Background = _backgroundBrush;
+                _ncanvas.Background = _backgroundBrush;
             }
         }
 
         public bool EnableSnap
         {
-            get { return _enableSnap; }
-            set { _enableSnap = value; }
+            get { return _xcanvas.EnableSnap; }
+            set { _xcanvas.EnableSnap = value; }
         }
 
         public double SnapX
         {
-            get { return _snapX; }
-            set { _snapX = value; }
+            get { return _xcanvas.SnapX; }
+            set { _xcanvas.SnapX = value; }
         }
 
         public double SnapY
         {
-            get { return _snapY; }
-            set { _snapY = value; }
+            get { return _xcanvas.SnapY; }
+            set { _xcanvas.SnapY = value; }
         }
 
         public bool IsCaptured
         {
-            get { return Mouse.Captured == _canvas; }
-            set { _canvas.CaptureMouse(); }
+            get { return Mouse.Captured == _ncanvas; }
+            set { _ncanvas.CaptureMouse(); }
         }
 
         public void Capture()
         {
-            _canvas.CaptureMouse();
+            _ncanvas.CaptureMouse();
         }
 
         public void ReleaseCapture()
         {
-            _canvas.ReleaseMouseCapture();
+            _ncanvas.ReleaseMouseCapture();
         }
 
         public void Add(INative value)
         {
-            _canvas.Children.Add(value.Native as UIElement);
+            if (value.Native != null)
+            {
+                _ncanvas.Children.Add(value.Native as UIElement);
+            }
+
             Children.Add(value);
         }
 
         public void Remove(INative value)
         {
-            _canvas.Children.Remove(value.Native as UIElement);
+            if (value.Native != null)
+            {
+                _ncanvas.Children.Remove(value.Native as UIElement);
+            }
+
             Children.Remove(value);
         }
 
         public void Clear()
         {
-            _canvas.Children.Clear();
+            _ncanvas.Children.Clear();
             Children.Clear();
         }
 
@@ -1149,6 +1155,11 @@ namespace RxCanvas.Xaml
         public IText Convert(IText text)
         {
             return new WpfText(text);
+        }
+
+        public IBlock Convert(IBlock block)
+        {
+            throw new NotImplementedException();
         }
 
         public ICanvas Convert(ICanvas canvas)
