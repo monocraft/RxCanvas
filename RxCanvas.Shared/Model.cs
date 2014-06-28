@@ -172,6 +172,18 @@ namespace RxCanvas.Model
         public IColor Backgroud { get; set; }
     }
 
+    public class XBlock : IBlock
+    {
+        public object Native { get; set; }
+        public IBounds Bounds { get; set; }
+        public IList<INative> Children { get; set; }
+
+        public XBlock()
+        {
+            Children = new ObservableCollection<INative>();
+        }
+    }
+
     public class XCanvas : ICanvas
     {
         public object Native { get; set; }

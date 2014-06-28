@@ -132,6 +132,11 @@ namespace RxCanvas.Interfaces
         IColor Backgroud { get; set; }
     }
 
+    public interface IBlock : INative
+    {
+        IList<INative> Children { get; set; }
+    }
+
     public interface ICanvas : INative
     {
         IObservable<ImmutablePoint> Downs { get; set; }
