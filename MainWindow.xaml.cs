@@ -17,6 +17,7 @@ using System.Diagnostics;
 using Autofac;
 using RxCanvas.Interfaces;
 using RxCanvas.Binary;
+using RxCanvas.Model;
 
 namespace RxCanvas
 {
@@ -241,8 +242,11 @@ namespace RxCanvas
             Open(xcanvas);
 
             // binary
-            //var xcanvas = (new BinaryFile()).Open(path);
-            //ConvertToNative(xcanvas);
+            /*
+            var file = _drawingScope.Resolve<IBinaryFile<ICanvas, System.IO.Stream>>();
+            var xcanvas = file.Open(path);
+            Open(xcanvas);
+            */
         }
 
         private void Save(string path, int index)
@@ -255,8 +259,22 @@ namespace RxCanvas
             file.Save(path, json);
 
             // binary
-            //var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            //(new BinaryFile()).Save(path, drawingCanvas);
+            /*
+            var file = _drawingScope.Resolve<IBinaryFile<ICanvas, System.IO.Stream>>();
+            var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
+            var xcanvas = canvasFactory.CreateCanvas();
+
+            var xblock = canvasFactory.CreateBlock();
+            var xline = canvasFactory.CreateLine();
+            xline.Point1.X = 150.0;
+            xline.Point1.Y = 150.0;
+            xline.Point2.X = 300.0;
+            xline.Point2.Y = 150.0;
+            xblock.Children.Add(xline);
+            xcanvas.Add(xblock);
+
+            file.Save(path, xcanvas);
+            */
         }
 
         private void Export(string path, int index)
@@ -275,7 +293,16 @@ namespace RxCanvas
 
             drawingCanvas.Clear();
 
-            foreach (var child in xcanvas.Children)
+            Add(nativeConverter, drawingCanvas, boundsFactory, xcanvas.Children);
+        }
+
+        private void Add(
+            IModelToNativeConverter nativeConverter, 
+            ICanvas drawingCanvas, 
+            IBoundsFactory boundsFactory, 
+            IList<INative> children)
+        {
+            foreach (var child in children)
             {
                 if (child is ILine)
                 {
@@ -353,6 +380,13 @@ namespace RxCanvas
                     {
                         native.Bounds.Update();
                     }
+                }
+                else if (child is IBlock)
+                {
+                    var block = child as IBlock;
+                    drawingCanvas.Add(block);
+
+                    Add(nativeConverter, drawingCanvas, boundsFactory, block.Children);
                 }
                 else
                 {
