@@ -180,6 +180,7 @@ namespace RxCanvas.Interfaces
         IRectangle CreateRectangle();
         IEllipse CreateEllipse();
         IText CreateText();
+        IBlock CreateBlock();
         ICanvas CreateCanvas();
     }
 

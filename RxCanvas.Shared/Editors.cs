@@ -1065,6 +1065,11 @@ namespace RxCanvas.Editors
             };
         }
 
+        public IBlock CreateBlock()
+        {
+            return new XBlock();
+        }
+
         public ICanvas CreateCanvas()
         {
             return new XCanvas()
