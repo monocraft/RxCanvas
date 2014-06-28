@@ -193,6 +193,7 @@ namespace RxCanvas.Interfaces
         IRectangle Convert(IRectangle rectangle);
         IEllipse Convert(IEllipse ellipse);
         IText Convert(IText text);
+        IBlock Convert(IBlock block);
         ICanvas Convert(ICanvas canvas);
     }
 

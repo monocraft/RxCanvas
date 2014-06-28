@@ -375,6 +375,11 @@ namespace RxCanvas.WinForms
             return text;
         }
 
+        public IBlock Convert(IBlock block)
+        {
+            return block;
+        }
+
         public ICanvas Convert(ICanvas canvas)
         {
             return new WinFormsCanvas(canvas, _control);

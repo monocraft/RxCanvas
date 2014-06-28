@@ -351,6 +351,11 @@ namespace RxCanvas.Model
             };
         }
 
+        public IBlock Convert(IBlock block)
+        {
+            throw new NotImplementedException();
+        }
+
         public INative Convert(INative native)
         {
             if (native is ILine)
@@ -380,6 +385,10 @@ namespace RxCanvas.Model
             else if (native is IText)
             {
                 return Convert(native as IText);
+            }
+            else if (native is IBlock)
+            {
+                throw new NotImplementedException();
             }
             else
             {
