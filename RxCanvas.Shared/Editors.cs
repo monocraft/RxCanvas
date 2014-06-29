@@ -55,11 +55,6 @@ namespace RxCanvas.Editors
         private IDisposable _ups;
         private IDisposable _drag;
 
-        private bool IsState(State state)
-        {
-            return (_state & state) == state;
-        }
-
         public XSelectionEditor(
             INativeConverter nativeConverter, 
             ICanvasFactory canvasFactory, 
@@ -74,46 +69,145 @@ namespace RxCanvas.Editors
 
             var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, _canvas.Moves);
 
-            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p => Down(p));
+            _ups = _canvas.Ups.Where(_ => IsEnabled).Subscribe(p => Up(p));
+            _drag = drags.Where(_ => IsEnabled).Subscribe(p => Drag(p));
+        }
+
+        private bool IsState(State state)
+        {
+            return (_state & state) == state;
+        }
+
+        private void Down(ImmutablePoint p)
+        {
+            bool render = false;
+
+            if (IsState(State.Selected))
             {
-                bool render = false;
-
-                if (IsState(State.Selected))
+                HideSelected();
+                render = true;
+            }
+            else
+            {
+                if (IsState(State.Point2))
                 {
-                    HideSelected();
+                    ResetSelection();
                     render = true;
                 }
+            }
 
-                if (IsState(State.Hover))
-                {
-                    HideHover();
-                    render = true;
-                }
+            if (IsState(State.Hover))
+            {
+                HideHover();
+                render = true;
+            }
 
-                if (!render)
-                {
-                    if (IsState(State.Point2))
-                    {
-                        ResetSelection();
-                        render = true;
-                    }
-                }
+            _selected = HitTest(p.X, p.Y);
+            if (_selected != null)
+            {
+                ShowSelected();
+                InitMove(p);
+                _canvas.Capture();
+                render = true;
+            }
 
-                _selected = HitTest(p.X, p.Y);
-                if (_selected != null)
+            if (!render)
+            {
+                if (IsState(State.None))
                 {
-                    ShowSelected();
-                    InitMove(p);
+                    InitSelection();
                     _canvas.Capture();
                     render = true;
                 }
-                
-                if (!render)
+            }
+
+            if (render)
+            {
+                _canvas.Render(null);
+            }
+        }
+
+        private void Up(ImmutablePoint p)
+        {
+            if (_canvas.IsCaptured)
+            {
+                if (IsState(State.Move))
                 {
-                    if (IsState(State.None))
+                    FinishMove(p);
+                    _canvas.ReleaseCapture();
+                }
+
+                if (IsState(State.Point1))
+                {
+                    FinishSelection();
+                    _canvas.ReleaseCapture();
+                }
+            }
+        }
+
+        private void Drag(ImmutablePoint p)
+        {
+            if (_canvas.IsCaptured)
+            {
+                if (IsState(State.Move))
+                {
+                    Move(p);
+                }
+
+                if (IsState(State.Point2))
+                {
+                    MoveSelection(p);
+                }
+            }
+            else
+            {
+                bool render = false;
+                var result = HitTest(p.X, p.Y);
+
+                if (IsState(State.Hover))
+                {
+                    if (IsState(State.Selected))
                     {
-                        InitSelection();
-                        _canvas.Capture();
+                        if (_hover != _selected && _hover != result)
+                        {
+                            HideHover();
+                            render = true;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (result != _hover)
+                        {
+                            HideHover();
+                            render = true;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                if (result != null)
+                {
+                    if (IsState(State.Selected))
+                    {
+                        if (result != _selected)
+                        {
+                            _hover = result;
+                            ShowHover();
+                            render = true;
+                        }
+                    }
+                    else
+                    {
+                        _hover = result;
+                        ShowHover();
                         render = true;
                     }
                 }
@@ -122,98 +216,7 @@ namespace RxCanvas.Editors
                 {
                     _canvas.Render(null);
                 }
-            });
-
-            _ups = _canvas.Ups.Where(_ => IsEnabled).Subscribe(p =>
-            {
-                if (_canvas.IsCaptured)
-                {
-                    if (IsState(State.Move))
-                    {
-                        FinishMove(p);
-                        _canvas.ReleaseCapture();
-                    }
-
-                    if (IsState(State.Point1))
-                    {
-                        FinishSelection();
-                        _canvas.ReleaseCapture();
-                    }
-                }
-            });
-
-            _drag = drags.Where(_ => IsEnabled).Subscribe(p =>
-            {
-                if (_canvas.IsCaptured)
-                {
-                    if (IsState(State.Move))
-                    {
-                        Move(p);
-                    }
-                    
-                    if (IsState(State.Point2))
-                    {
-                        MoveSelection(p);
-                    }
-                }
-                else
-                {
-                    bool render = false;
-                    var result = HitTest(p.X, p.Y);
-
-                    if (IsState(State.Hover))
-                    {
-                        if (IsState(State.Selected))
-                        {
-                            if (_hover != _selected && _hover != result)
-                            {
-                                HideHover();
-                                render = true;
-                            }
-                            else
-                            {
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            if (result != _hover)
-                            {
-                                HideHover();
-                                render = true;
-                            }
-                            else
-                            {
-                                return;
-                            }
-                        }
-                    }
-
-                    if (result != null)
-                    {
-                        if (IsState(State.Selected))
-                        {
-                            if (result != _selected)
-                            {
-                                _hover = result;
-                                ShowHover();
-                                render = true;
-                            }
-                        }
-                        else
-                        {
-                            _hover = result;
-                            ShowHover();
-                            render = true;
-                        }
-                    }
-
-                    if (render)
-                    {
-                        _canvas.Render(null);
-                    }
-                }
-            });
+            }
         }
 
         private void InitSelection()
