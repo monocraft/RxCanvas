@@ -767,7 +767,7 @@ namespace RxCanvas.Editors
         }
     }
 
-    public class XCanvasRectangleEditor : IEditor, IDisposable
+    public class XRectangleEditor : IEditor, IDisposable
     {
         public enum State { None, TopLeft, TopRight, BottomLeft, BottomRight }
 
@@ -783,7 +783,7 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drags;
 
-        public XCanvasRectangleEditor(
+        public XRectangleEditor(
             IModelToNativeConverter nativeConverter, 
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
@@ -849,7 +849,7 @@ namespace RxCanvas.Editors
         }
     }
 
-    public class XCanvasEllipseEditor : IEditor, IDisposable
+    public class XEllipseEditor : IEditor, IDisposable
     {
         public enum State { None, TopLeft, TopRight, BottomLeft, BottomRight }
 
@@ -865,7 +865,7 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drags;
 
-        public XCanvasEllipseEditor(
+        public XEllipseEditor(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
@@ -931,7 +931,7 @@ namespace RxCanvas.Editors
         }
     }
 
-    public class XCanvasTextEditor : IEditor, IDisposable
+    public class XTextEditor : IEditor, IDisposable
     {
         public enum State { None, TopLeft, TopRight, BottomLeft, BottomRight }
 
@@ -947,7 +947,7 @@ namespace RxCanvas.Editors
         private IDisposable _downs;
         private IDisposable _drags;
 
-        public XCanvasTextEditor(
+        public XTextEditor(
             IModelToNativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
@@ -1013,7 +1013,7 @@ namespace RxCanvas.Editors
         }
     }
 
-    public class XModelFactory : ICanvasFactory
+    public class XCanvasFactory : ICanvasFactory
     {
         public IColor CreateColor()
         {

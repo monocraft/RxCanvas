@@ -23,7 +23,7 @@ namespace RxCanvas.WinForms
             // register components
             var builder = new ContainerBuilder();
 
-            var editorAssembly = Assembly.GetAssembly(typeof(XModelFactory));
+            var editorAssembly = Assembly.GetAssembly(typeof(XCanvasFactory));
             builder.RegisterAssemblyTypes(editorAssembly)
                 .Where(t => t.Name.EndsWith("Editor"))
                 .AsImplementedInterfaces()
@@ -42,7 +42,7 @@ namespace RxCanvas.WinForms
                 .SingleInstance();
 
             builder.Register<ICoreToModelConverter>(c => new CoreToXModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(c => new XModelFactory()).SingleInstance();
+            builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
             builder.Register<IModelToNativeConverter>(c => new XModelToWinFormsConverter(panel)).SingleInstance();
 
             builder.Register<ITextFile>(c => new Utf8TextFile()).SingleInstance();
