@@ -30,13 +30,13 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            var serializerAssembly = Assembly.GetAssembly(typeof(JsonXModelSerializer));
+            var serializerAssembly = Assembly.GetAssembly(typeof(XJsonSerializer));
             builder.RegisterAssemblyTypes(serializerAssembly)
                 .Where(t => t.Name.EndsWith("Serializer"))
                 .AsImplementedInterfaces()
                 .SingleInstance();
 
-            var creatorAssembly = Assembly.GetAssembly(typeof(CoreCanvasPdfCreator));
+            var creatorAssembly = Assembly.GetAssembly(typeof(PdfCreator));
             builder.RegisterAssemblyTypes(creatorAssembly)
                 .Where(t => t.Name.EndsWith("Creator"))
                 .AsImplementedInterfaces()

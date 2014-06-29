@@ -12,7 +12,7 @@ using RxCanvas.Model;
 
 namespace RxCanvas.Serializers
 {
-    public class XModelSerializationBinder : SerializationBinder
+    public class XSerializationBinder : SerializationBinder
     {
         public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
@@ -71,7 +71,7 @@ namespace RxCanvas.Serializers
         }
     }
 
-    public class JsonXModelSerializer : ISerializer<ICanvas>
+    public class XJsonSerializer : ISerializer<ICanvas>
     {
         public string Name { get; set; }
         public string Extension { get; set; }
@@ -80,12 +80,12 @@ namespace RxCanvas.Serializers
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             TypeNameHandling = TypeNameHandling.Auto,
-            Binder = new XModelSerializationBinder(),
+            Binder = new XSerializationBinder(),
             NullValueHandling = NullValueHandling.Ignore,
             Converters =  { new XColorConverter(), new XPointConverter() }
         };
 
-        public JsonXModelSerializer()
+        public XJsonSerializer()
         {
             Name = "Json";
             Extension = "json";

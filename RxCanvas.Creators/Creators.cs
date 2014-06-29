@@ -10,7 +10,7 @@ using RxCanvas.Interfaces;
 
 namespace RxCanvas.Creators
 {
-    public class CoreCanvasPdfCreator : ICreator<ICanvas>
+    public class PdfCreator : ICreator<ICanvas>
     {
         public string Name { get; set; }
         public string Extension { get; set; }
@@ -18,7 +18,7 @@ namespace RxCanvas.Creators
         private Func<double, double> X;
         private Func<double, double> Y;
 
-        public CoreCanvasPdfCreator()
+        public PdfCreator()
         {
             Name = "Pdf";
             Extension = "pdf";
@@ -304,12 +304,12 @@ namespace RxCanvas.Creators
         }
     }
 
-    public class CoreCanvasDxfCreator : ICreator<ICanvas>
+    public class DxfCreator : ICreator<ICanvas>
     {
         public string Name { get; set; }
         public string Extension { get; set; }
 
-        public CoreCanvasDxfCreator()
+        public DxfCreator()
         {
             Name = "Dxf";
             Extension = "dxf";
