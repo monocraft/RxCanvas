@@ -373,7 +373,13 @@ namespace RxCanvas.WinForms
             CreateGrid(nativeConverter, canvasFactory, backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
         }
 
-        private INative CreateGridLine(INativeConverter nativeConverter, ICanvasFactory canvasFactory, IColor stroke, double thickness, double x1, double y1, double x2, double y2)
+        private INative CreateGridLine(
+            INativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory,
+            IColor stroke, 
+            double thickness, 
+            double x1, double y1, 
+            double x2, double y2)
         {
             var xline = canvasFactory.CreateLine();
             xline.Point1.X = x1;
@@ -385,7 +391,13 @@ namespace RxCanvas.WinForms
             return nativeConverter.Convert(xline);
         }
 
-        private void CreateGrid(INativeConverter nativeConverter, ICanvasFactory canvasFactory, ICanvas canvas, double width, double height, double size, double originX, double originY)
+        private void CreateGrid(
+            INativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            ICanvas canvas, 
+            double width, double height, 
+            double size, 
+            double originX, double originY)
         {
             double thickness = 2.0;
             var stroke = canvasFactory.CreateColor();
