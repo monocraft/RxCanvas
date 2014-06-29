@@ -19,6 +19,8 @@ namespace RxCanvas.Editors
             Hover = 1,
             Selected = 2,
             Move = 4,
+            Point1 = 8,
+            Point2 = 16,
             HoverSelected = Hover | Selected,
             HoverMove = Hover | Move,
             SelectedMove = Selected | Move
@@ -88,6 +90,15 @@ namespace RxCanvas.Editors
                     render = true;
                 }
 
+                if (!render)
+                {
+                    if (IsState(State.Point2))
+                    {
+                        ResetSelection();
+                        render = true;
+                    }
+                }
+
                 _selected = HitTest(p.X, p.Y);
                 if (_selected != null)
                 {
@@ -95,6 +106,16 @@ namespace RxCanvas.Editors
                     InitMove(p);
                     _canvas.Capture();
                     render = true;
+                }
+                
+                if (!render)
+                {
+                    if (IsState(State.None))
+                    {
+                        InitSelection();
+                        _canvas.Capture();
+                        render = true;
+                    }
                 }
 
                 if (render)
@@ -112,6 +133,12 @@ namespace RxCanvas.Editors
                         FinishMove(p);
                         _canvas.ReleaseCapture();
                     }
+
+                    if (IsState(State.Point1))
+                    {
+                        FinishSelection();
+                        _canvas.ReleaseCapture();
+                    }
                 }
             });
 
@@ -119,7 +146,15 @@ namespace RxCanvas.Editors
             {
                 if (_canvas.IsCaptured)
                 {
-                    Move(p);
+                    if (IsState(State.Move))
+                    {
+                        Move(p);
+                    }
+                    
+                    if (IsState(State.Point2))
+                    {
+                        MoveSelection(p);
+                    }
                 }
                 else
                 {
@@ -179,6 +214,33 @@ namespace RxCanvas.Editors
                     }
                 }
             });
+        }
+
+        private void InitSelection()
+        {
+            // TODO:
+            _state |= State.Point1;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void MoveSelection(ImmutablePoint p)
+        {
+            // TODO:
+        }
+
+        private void FinishSelection()
+        {
+            // TODO:
+            _state = _state & ~State.Point1;
+            _state |= State.Point2;
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void ResetSelection()
+        {
+            // TODO:
+            _state = _state & ~State.Point2;
+            Debug.Print("_state: {0}", _state);
         }
 
         private void ShowHover()
