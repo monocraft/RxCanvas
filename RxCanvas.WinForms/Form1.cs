@@ -424,8 +424,8 @@ namespace RxCanvas.WinForms
 
         private void ToggleSnap()
         {
-            var canvas = _drawingScope.Resolve<ICanvas>();
-            canvas.EnableSnap = canvas.EnableSnap ? false : true;
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            drawingCanvas.EnableSnap = drawingCanvas.EnableSnap ? false : true;
         }
 
         private void Clear()
