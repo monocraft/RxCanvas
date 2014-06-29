@@ -236,14 +236,14 @@ namespace RxCanvas.WinForms
 
         public double Width 
         {
-            get { return _control.Width; }
-            set { _control.Width = (int)value; }
+            get { return _panel.Width; }
+            set { _panel.Width = (int)value; }
         }
 
         public double Height
         {
-            get { return _control.Height; }
-            set { _control.Height = (int)value; }
+            get { return _panel.Height; }
+            set { _panel.Height = (int)value; }
         }
 
         public IColor Background { get; set; }
@@ -254,7 +254,7 @@ namespace RxCanvas.WinForms
 
         public bool IsCaptured { get; set; }
 
-        private WinFormsCanvasPanel _control;
+        private WinFormsCanvasPanel _panel;
 
         public double Snap(double val, double snap)
         {
@@ -262,7 +262,7 @@ namespace RxCanvas.WinForms
             return r >= snap / 2.0 ? val + snap - r : val - r;
         }
 
-        public WinFormsCanvas(ICanvas canvas, WinFormsCanvasPanel control)
+        public WinFormsCanvas(ICanvas canvas, WinFormsCanvasPanel panel)
         {
             Background = canvas.Background;
             SnapX = canvas.SnapX;
@@ -273,31 +273,31 @@ namespace RxCanvas.WinForms
 
             Children = new ObservableCollection<INative>();
 
-            Downs = Observable.FromEventPattern<MouseEventArgs>(control, "MouseDown").Select(e =>
+            Downs = Observable.FromEventPattern<MouseEventArgs>(panel, "MouseDown").Select(e =>
             {
                 var p = e.EventArgs.Location;
                 return new ImmutablePoint(EnableSnap ? Snap((double)p.X, SnapX) : (double)p.X,
                     EnableSnap ? Snap((double)p.Y, SnapY) : (double)p.Y);
             });
 
-            Ups = Observable.FromEventPattern<MouseEventArgs>(control, "MouseUp").Select(e =>
+            Ups = Observable.FromEventPattern<MouseEventArgs>(panel, "MouseUp").Select(e =>
             {
                 var p = e.EventArgs.Location;
                 return new ImmutablePoint(EnableSnap ? Snap((double)p.X, SnapX) : (double)p.X,
                     EnableSnap ? Snap((double)p.Y, SnapY) : (double)p.Y);
             });
 
-            Moves = Observable.FromEventPattern<MouseEventArgs>(control, "MouseMove").Select(e =>
+            Moves = Observable.FromEventPattern<MouseEventArgs>(panel, "MouseMove").Select(e =>
             {
                 var p = e.EventArgs.Location;
                 return new ImmutablePoint(EnableSnap ? Snap((double)p.X, SnapX) : (double)p.X,
                     EnableSnap ? Snap((double)p.Y, SnapY) : (double)p.Y);
             });
 
-            _control = control;
-            _control.Canvas = this;
+            _panel = panel;
+            _panel.Canvas = this;
 
-            Native = control;
+            Native = panel;
         }
 
         public void Capture()
@@ -327,17 +327,17 @@ namespace RxCanvas.WinForms
 
         public void Render(INative context)
         {
-            _control.Invalidate();
+            _panel.Invalidate();
         }
     }
 
     public class WinFormsConverter : INativeConverter
     {
-        private readonly WinFormsCanvasPanel _control;
+        private readonly WinFormsCanvasPanel _panel;
 
-        public WinFormsConverter(WinFormsCanvasPanel control)
+        public WinFormsConverter(WinFormsCanvasPanel panel)
         {
-            _control = control;
+            _panel = panel;
         }
 
         public ILine Convert(ILine line)
@@ -382,7 +382,7 @@ namespace RxCanvas.WinForms
 
         public ICanvas Convert(ICanvas canvas)
         {
-            return new WinFormsCanvas(canvas, _control);
+            return new WinFormsCanvas(canvas, _panel);
         }
     }
 }
