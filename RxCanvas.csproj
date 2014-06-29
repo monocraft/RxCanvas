@@ -90,7 +90,6 @@
     <Compile Include="SelectedItemControl.xaml.cs">
       <DependentUpon>SelectedItemControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utf8TextFile.cs" />
     <Compile Include="Xaml.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

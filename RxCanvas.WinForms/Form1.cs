@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autofac;
 using RxCanvas.Interfaces;
+using System.IO;
 
 namespace RxCanvas.WinForms
 {
@@ -19,7 +20,7 @@ namespace RxCanvas.WinForms
         private ILifetimeScope _backgroundScope;
         private ILifetimeScope _drawingScope;
         private ICollection<IEditor> _editors;
-        private IList<ISerializer<ICanvas>> _serializers;
+        private IList<IFile<ICanvas, Stream>> _files;
         private IList<ICreator<ICanvas>> _creators;
         private IDictionary<Tuple<Keys, Keys>, Action> _shortcuts;
         private ICanvas _backgroundCanvas;
@@ -46,7 +47,7 @@ namespace RxCanvas.WinForms
             _drawingCanvas = _drawingScope.Resolve<ICanvas>();
 
             _editors = _drawingScope.Resolve<ICollection<IEditor>>();
-            _serializers = _drawingScope.Resolve<IList<ISerializer<ICanvas>>>();
+            _files = _drawingScope.Resolve<IList<IFile<ICanvas, Stream>>>();
             _creators = _drawingScope.Resolve<IList<ICreator<ICanvas>>>();
 
             // set default editor
@@ -163,7 +164,7 @@ namespace RxCanvas.WinForms
         private void Open()
         {
             string filter = CreateSerializersFilter();
-            int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
+            int defaultFilterIndex = _files.IndexOf(_files.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
 
             openFileDialog1.Filter = filter;
             openFileDialog1.FilterIndex = defaultFilterIndex;
@@ -173,7 +174,7 @@ namespace RxCanvas.WinForms
         private void Save()
         {
             string filter = CreateSerializersFilter();
-            int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
+            int defaultFilterIndex = _files.IndexOf(_files.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
             
             saveFileDialog1.Filter = filter;
             saveFileDialog1.FilterIndex = defaultFilterIndex;
@@ -196,7 +197,7 @@ namespace RxCanvas.WinForms
         {
             bool first = true;
             string filter = string.Empty;
-            foreach (var serializer in _serializers)
+            foreach (var serializer in _files)
             {
                 filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
                 if (first == true)
@@ -224,20 +225,14 @@ namespace RxCanvas.WinForms
 
         private void Open(string path, int index)
         {
-            var file = _drawingScope.Resolve<ITextFile>();
-            var serializer = _serializers[index];
-            var json = file.Open(path);
-            var xcanvas = serializer.Deserialize(json);
+            var xcanvas = _files[index].Open(path);
             Open(xcanvas);
         }
 
         private void Save(string path, int index)
         {
-            var canvas = ConvertToModel();
-            var file = _drawingScope.Resolve<ITextFile>();
-            var serializer = _serializers[index];
-            var json = serializer.Serialize(canvas);
-            file.Save(path, json);
+            var xcanvas = ConvertToModel();
+            _files[index].Save(path, xcanvas);
         }
 
         private void Export(string path, int index)
@@ -246,6 +241,7 @@ namespace RxCanvas.WinForms
             var creator = _creators[index];
             creator.Save(path, canvas);
         }
+        
         private void Open(ICanvas xcanvas)
         {
             var nativeConverter = _drawingScope.Resolve<INativeConverter>();

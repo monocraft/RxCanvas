@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization;
-using System.Globalization;
+﻿using Newtonsoft.Json;
 using RxCanvas.Interfaces;
 using RxCanvas.Model;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace RxCanvas.Serializers
 {
-    public class XSerializationBinder : SerializationBinder
+    public class JsonSerializationBinder : SerializationBinder
     {
         public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
@@ -27,7 +28,7 @@ namespace RxCanvas.Serializers
         }
     }
 
-    public class XColorConverter : JsonConverter
+    public class ColorJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -49,7 +50,7 @@ namespace RxCanvas.Serializers
         }
     }
 
-    public class XPointConverter : JsonConverter
+    public class PointJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -71,7 +72,7 @@ namespace RxCanvas.Serializers
         }
     }
 
-    public class XJsonSerializer : ISerializer<ICanvas>
+    public class JsonFile : IFile<ICanvas, Stream>
     {
         public string Name { get; set; }
         public string Extension { get; set; }
@@ -80,25 +81,49 @@ namespace RxCanvas.Serializers
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             TypeNameHandling = TypeNameHandling.Auto,
-            Binder = new XSerializationBinder(),
+            Binder = new JsonSerializationBinder(),
             NullValueHandling = NullValueHandling.Ignore,
-            Converters =  { new XColorConverter(), new XPointConverter() }
+            Converters =  { new ColorJsonConverter(), new PointJsonConverter() }
         };
 
-        public XJsonSerializer()
+        public JsonFile()
         {
             Name = "Json";
             Extension = "json";
         }
 
-        public string Serialize(ICanvas canvas)
+        public ICanvas Open(string path)
         {
-            return JsonConvert.SerializeObject(canvas, Formatting.Indented, Settings);
+            using (var file = File.Open(path, FileMode.Open))
+            {
+                return Read(file);
+            }
         }
 
-        public ICanvas Deserialize(string json)
+        public void Save(string path, ICanvas canvas)
         {
-            return JsonConvert.DeserializeObject<XCanvas>(json, Settings);
+            using (var file = File.Create(path))
+            {
+                Write(file, canvas);
+            }
+        }
+
+        public ICanvas Read(Stream stream)
+        {
+            using (var reader = new StreamReader(stream))
+            {
+                string json = reader.ReadToEnd();
+                return JsonConvert.DeserializeObject<XCanvas>(json, Settings);
+            }
+        }
+
+        public void Write(Stream stream, ICanvas canvas)
+        {
+            using (var writer = new StreamWriter(stream))
+            {
+                string json = JsonConvert.SerializeObject(canvas, Formatting.Indented, Settings);
+                writer.Write(json);
+            }
         }
     }
 }

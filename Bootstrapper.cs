@@ -30,9 +30,9 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            var serializerAssembly = Assembly.GetAssembly(typeof(XJsonSerializer));
+            var serializerAssembly = Assembly.GetAssembly(typeof(JsonFile));
             builder.RegisterAssemblyTypes(serializerAssembly)
-                .Where(t => t.Name.EndsWith("Serializer"))
+                .Where(t => t.Name.EndsWith("File"))
                 .AsImplementedInterfaces()
                 .SingleInstance();
 
@@ -46,9 +46,6 @@ namespace RxCanvas
             builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
             builder.Register<INativeConverter>(c => new WpfConverter()).SingleInstance();
 
-            builder.Register<ITextFile>(c => new Utf8TextFile()).SingleInstance();
-            builder.Register<IBinaryFile<ICanvas, Stream>>(c => new BinaryFile()).SingleInstance();
-
             builder.Register<IBoundsFactory>(c =>
             {
                 var nativeConverter = c.Resolve<INativeConverter>();
@@ -60,7 +57,7 @@ namespace RxCanvas
             {
                 var nativeConverter = c.Resolve<INativeConverter>();
                 var canvasFactory = c.Resolve<ICanvasFactory>();
-                var binaryFile = c.Resolve<IBinaryFile<ICanvas, Stream>>();
+                var binaryFile = c.Resolve<IList<IFile<ICanvas, Stream>>>().Where(e => e.Name == "Binary").FirstOrDefault();
                 var xcanvas = canvasFactory.CreateCanvas();
                 xcanvas.History = new BinaryHistory(binaryFile);
                 return nativeConverter.Convert(xcanvas);

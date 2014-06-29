@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RxCanvas.Binary
+namespace RxCanvas.Serializers
 {
     internal static class BinaryReaderExtensions
     {
@@ -413,7 +413,7 @@ namespace RxCanvas.Binary
         Text            = 0x27,
     }
 
-    public class BinaryFile : IBinaryFile<ICanvas, Stream>
+    public class BinaryFile : IFile<ICanvas, Stream>
     {
         public string Name { get; set; }
         public string Extension { get; set; }

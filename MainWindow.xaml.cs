@@ -18,6 +18,7 @@ using Autofac;
 using RxCanvas.Interfaces;
 using RxCanvas.Binary;
 using RxCanvas.Model;
+using System.IO;
 
 namespace RxCanvas
 {
@@ -26,7 +27,7 @@ namespace RxCanvas
         private ILifetimeScope _backgroundScope;
         private ILifetimeScope _drawingScope;
         private ICollection<IEditor> _editors;
-        private IList<ISerializer<ICanvas>> _serializers;
+        private IList<IFile<ICanvas, Stream>> _files;
         private IList<ICreator<ICanvas>> _creators;
         private IDictionary<Tuple<Key, ModifierKeys>, Action> _shortcuts;
         private ICanvas _backgroundCanvas;
@@ -52,7 +53,7 @@ namespace RxCanvas
             _drawingCanvas = _drawingScope.Resolve<ICanvas>();
 
             _editors = _drawingScope.Resolve<ICollection<IEditor>>();
-            _serializers = _drawingScope.Resolve<IList<ISerializer<ICanvas>>>();
+            _files = _drawingScope.Resolve<IList<IFile<ICanvas, Stream>>>();
             _creators = _drawingScope.Resolve<IList<ICreator<ICanvas>>>();
 
             // set default editor
@@ -71,7 +72,6 @@ namespace RxCanvas
             // handle keyboard input
             PreviewKeyDown += (sender, e) =>
             {
-                //MessageBox.Show(Keyboard.Modifiers.ToString());
                 Action action;
                 bool result = _shortcuts.TryGetValue(new Tuple<Key, ModifierKeys>(e.Key, Keyboard.Modifiers), out action);
                 if (result == true && action != null)
@@ -149,7 +149,7 @@ namespace RxCanvas
         private void Open()
         {
             string filter = CreateSerializersFilter();
-            int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
+            int defaultFilterIndex = _files.IndexOf(_files.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
             var dlg = new OpenFileDialog()
             {
                 Filter = filter,
@@ -167,7 +167,7 @@ namespace RxCanvas
         private void Save()
         {
             string filter = CreateSerializersFilter();
-            int defaultFilterIndex = _serializers.IndexOf(_serializers.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
+            int defaultFilterIndex = _files.IndexOf(_files.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
             var dlg = new SaveFileDialog()
             {
                 Filter = filter,
@@ -206,7 +206,7 @@ namespace RxCanvas
         {
             bool first = true;
             string filter = string.Empty;
-            foreach (var serializer in _serializers)
+            foreach (var serializer in _files)
             {
                 filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
                 if (first == true)
@@ -234,33 +234,17 @@ namespace RxCanvas
 
         private void Open(string path, int index)
         {
-            // text
-            var file = _drawingScope.Resolve<ITextFile>();
-            var serializer = _serializers[index];
-            var json = file.Open(path);
-            var xcanvas = serializer.Deserialize(json);
+            var xcanvas = _files[index].Open(path);
             Open(xcanvas);
-
-            // binary
-            /*
-            var file = _drawingScope.Resolve<IBinaryFile<ICanvas, System.IO.Stream>>();
-            var xcanvas = file.Open(path);
-            Open(xcanvas);
-            */
         }
 
         private void Save(string path, int index)
         {
-            // text
-            var canvas = ConvertToModel();
-            var file = _drawingScope.Resolve<ITextFile>();
-            var serializer = _serializers[index];
-            var json = serializer.Serialize(canvas);
-            file.Save(path, json);
+            var xcanvas = ConvertToModel();
+            _files[index].Save(path, xcanvas);
 
-            // binary
+            // block demo
             /*
-            var file = _drawingScope.Resolve<IBinaryFile<ICanvas, System.IO.Stream>>();
             var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
             var xcanvas = canvasFactory.CreateCanvas();
 
@@ -273,7 +257,7 @@ namespace RxCanvas
             xblock.Children.Add(xline);
             xcanvas.Add(xblock);
 
-            file.Save(path, xcanvas);
+            _files[index].Save(path, xcanvas);
             */
         }
 

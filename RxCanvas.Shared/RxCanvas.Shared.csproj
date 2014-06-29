@@ -51,7 +51,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Binary.cs" />
     <Compile Include="Bounds.cs" />
     <Compile Include="History.cs" />
     <Compile Include="Interfaces.cs" />

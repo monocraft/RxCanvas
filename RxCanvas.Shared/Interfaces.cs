@@ -217,14 +217,6 @@ namespace RxCanvas.Interfaces
         IBounds Create(ICanvas canvas, IText text);
     }
 
-    public interface ISerializer<T> where T : class
-    {
-        string Name { get; set; }
-        string Extension { get; set; }
-        string Serialize(T item);
-        T Deserialize(string text);
-    }
-
     public interface ICreator<T> where T : class
     {
         string Name { get; set; }
@@ -233,7 +225,9 @@ namespace RxCanvas.Interfaces
         void Save(string path, IEnumerable<T> items);
     }
 
-    public interface IBinaryFile<T, S>
+    public interface IFile<T, S> 
+        where T : class
+        where S : class
     {
         string Name { get; set; }
         string Extension { get; set; }
@@ -241,12 +235,6 @@ namespace RxCanvas.Interfaces
         void Save(string path, T value);
         T Read(S stream);
         void Write(S stream, T value);
-    }
-
-    public interface ITextFile
-    {
-        string Open(string path);
-        void Save(string path, string text);
     }
 
     public interface IHistory

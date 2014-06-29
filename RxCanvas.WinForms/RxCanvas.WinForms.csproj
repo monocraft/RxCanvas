@@ -75,9 +75,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Utf8TextFile.cs">
-      <Link>Utf8TextFile.cs</Link>
-    </Compile>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
