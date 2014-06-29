@@ -331,11 +331,11 @@ namespace RxCanvas.WinForms
         }
     }
 
-    public class XModelToWinFormsConverter : IModelToNativeConverter
+    public class WinFormsConverter : INativeConverter
     {
         private readonly WinFormsCanvasPanel _control;
 
-        public XModelToWinFormsConverter(WinFormsCanvasPanel control)
+        public WinFormsConverter(WinFormsCanvasPanel control)
         {
             _control = control;
         }

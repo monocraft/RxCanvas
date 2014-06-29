@@ -9,6 +9,44 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Model
 {
+    public static class XModelExtenstion
+    {
+        private static char[] Separators = new char[] { ',' };
+
+        public static IColor FromHtml(this string str)
+        {
+            return new XColor(byte.Parse(str.Substring(1, 2), NumberStyles.HexNumber),
+                byte.Parse(str.Substring(3, 2), NumberStyles.HexNumber),
+                byte.Parse(str.Substring(5, 2), NumberStyles.HexNumber),
+                byte.Parse(str.Substring(7, 2), NumberStyles.HexNumber));
+        }
+
+        public static string ToHtml(this IColor color)
+        {
+            return string.Concat('#',
+                color.A.ToString("X2"),
+                color.R.ToString("X2"),
+                color.G.ToString("X2"),
+                color.B.ToString("X2"));
+        }
+
+        public static string ToText(this IPoint point)
+        {
+            return string.Concat(
+                point.X.ToString(CultureInfo.GetCultureInfo("en-GB")),
+                Separators[0],
+                point.Y.ToString(CultureInfo.GetCultureInfo("en-GB")));
+        }
+
+        public static IPoint FromText(this string str)
+        {
+            string[] values = str.Split(Separators);
+            return new XPoint(
+                double.Parse(values[0], CultureInfo.GetCultureInfo("en-GB")),
+                double.Parse(values[1], CultureInfo.GetCultureInfo("en-GB")));
+        }
+    }
+
     public class XColor : IColor
     {
         public byte A { get; set; }
@@ -242,7 +280,7 @@ namespace RxCanvas.Model
         }
     }
 
-    public class CoreToXModelConverter : ICoreToModelConverter
+    public class XModelConverter : IModelConverter
     {
         public IColor Convert(IColor color)
         {
@@ -414,44 +452,6 @@ namespace RxCanvas.Model
             }
             xcanvas.Children = children;
             return xcanvas;
-        }
-    }
-
-    public static class ModelExtenstion
-    {
-        private static char[] Separators = new char[] { ',' };
-
-        public static IColor FromHtml(this string str)
-        {
-            return new XColor(byte.Parse(str.Substring(1, 2), NumberStyles.HexNumber),
-                byte.Parse(str.Substring(3, 2), NumberStyles.HexNumber),
-                byte.Parse(str.Substring(5, 2), NumberStyles.HexNumber),
-                byte.Parse(str.Substring(7, 2), NumberStyles.HexNumber));
-        }
-
-        public static string ToHtml(this IColor color)
-        {
-            return string.Concat('#', 
-                color.A.ToString("X2"), 
-                color.R.ToString("X2"), 
-                color.G.ToString("X2"), 
-                color.B.ToString("X2"));
-        }
-
-        public static string ToText(this IPoint point)
-        {
-            return string.Concat(
-                point.X.ToString(CultureInfo.GetCultureInfo("en-GB")), 
-                Separators[0], 
-                point.Y.ToString(CultureInfo.GetCultureInfo("en-GB")));
-        }
-
-        public static IPoint FromText(this string str)
-        {
-            string[] values = str.Split(Separators);
-            return new XPoint(
-                double.Parse(values[0], CultureInfo.GetCultureInfo("en-GB")),
-                double.Parse(values[1], CultureInfo.GetCultureInfo("en-GB")));
         }
     }
 }

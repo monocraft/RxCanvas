@@ -1120,7 +1120,7 @@ namespace RxCanvas.Xaml
         }
     }
 
-    public class XModelToWpfConverter : IModelToNativeConverter
+    public class WpfConverter : INativeConverter
     {
         public ILine Convert(ILine line)
         {

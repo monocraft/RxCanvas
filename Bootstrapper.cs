@@ -42,23 +42,23 @@ namespace RxCanvas
                 .AsImplementedInterfaces()
                 .SingleInstance();
 
-            builder.Register<ICoreToModelConverter>(c => new CoreToXModelConverter()).SingleInstance();
+            builder.Register<IModelConverter>(c => new XModelConverter()).SingleInstance();
             builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
-            builder.Register<IModelToNativeConverter>(c => new XModelToWpfConverter()).SingleInstance();
+            builder.Register<INativeConverter>(c => new WpfConverter()).SingleInstance();
 
             builder.Register<ITextFile>(c => new Utf8TextFile()).SingleInstance();
             builder.Register<IBinaryFile<ICanvas, Stream>>(c => new BinaryFile()).SingleInstance();
 
             builder.Register<IBoundsFactory>(c =>
             {
-                var nativeConverter = c.Resolve<IModelToNativeConverter>();
+                var nativeConverter = c.Resolve<INativeConverter>();
                 var canvasFactory = c.Resolve<ICanvasFactory>();
                 return new BoundsFactory(nativeConverter, canvasFactory);
             }).InstancePerLifetimeScope();
 
             builder.Register<ICanvas>(c =>
             {
-                var nativeConverter = c.Resolve<IModelToNativeConverter>();
+                var nativeConverter = c.Resolve<INativeConverter>();
                 var canvasFactory = c.Resolve<ICanvasFactory>();
                 var binaryFile = c.Resolve<IBinaryFile<ICanvas, Stream>>();
                 var xcanvas = canvasFactory.CreateCanvas();

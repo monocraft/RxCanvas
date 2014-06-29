@@ -61,7 +61,7 @@ namespace RxCanvas.Editors
         }
 
         public XSelectionEditor(
-            IModelToNativeConverter nativeConverter, 
+            INativeConverter nativeConverter, 
             ICanvasFactory canvasFactory, 
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -365,7 +365,7 @@ namespace RxCanvas.Editors
         private IDisposable _drags;
 
         public XLineEditor(
-            IModelToNativeConverter nativeConverter, 
+            INativeConverter nativeConverter, 
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -447,7 +447,7 @@ namespace RxCanvas.Editors
         private IDisposable _drags;
 
         public XBezierEditor(
-            IModelToNativeConverter nativeConverter, 
+            INativeConverter nativeConverter, 
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -588,7 +588,7 @@ namespace RxCanvas.Editors
         private IDisposable _drags;
 
         public XQuadraticBezierEditor(
-            IModelToNativeConverter nativeConverter, 
+            INativeConverter nativeConverter, 
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -702,7 +702,7 @@ namespace RxCanvas.Editors
         private IDisposable _drags;
 
         public XArcEditor(
-            IModelToNativeConverter nativeConverter, 
+            INativeConverter nativeConverter, 
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -784,7 +784,7 @@ namespace RxCanvas.Editors
         private IDisposable _drags;
 
         public XRectangleEditor(
-            IModelToNativeConverter nativeConverter, 
+            INativeConverter nativeConverter, 
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -866,7 +866,7 @@ namespace RxCanvas.Editors
         private IDisposable _drags;
 
         public XEllipseEditor(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
@@ -948,7 +948,7 @@ namespace RxCanvas.Editors
         private IDisposable _drags;
 
         public XTextEditor(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)

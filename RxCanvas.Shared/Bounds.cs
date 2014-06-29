@@ -25,7 +25,7 @@ namespace RxCanvas.Bounds
         }
 
         public static IPolygon CreateBoundsPolygon(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             int points)
         {
@@ -158,7 +158,7 @@ namespace RxCanvas.Bounds
         private HitResult _hitResult;
 
         public LineBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             ILine line,
@@ -176,7 +176,7 @@ namespace RxCanvas.Bounds
         }
 
         private void InitBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory)
         {
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
@@ -363,7 +363,7 @@ namespace RxCanvas.Bounds
         private HitResult _hitResult;
 
         public BezierBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IBezier bezier,
@@ -379,7 +379,7 @@ namespace RxCanvas.Bounds
         }
 
         private void InitBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory)
         {
             _polygonStart = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
@@ -664,7 +664,7 @@ namespace RxCanvas.Bounds
         private HitResult _hitResult;
 
         public QuadraticBezierBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IQuadraticBezier quadraticBezier,
@@ -680,7 +680,7 @@ namespace RxCanvas.Bounds
         }
 
         private void InitBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory)
         {
             _polygonStart = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
@@ -915,7 +915,7 @@ namespace RxCanvas.Bounds
         private HitResult _hitResult;
 
         public ArcBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IArc arc,
@@ -933,7 +933,7 @@ namespace RxCanvas.Bounds
         }
 
         private void InitBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory)
         {
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
@@ -1099,7 +1099,7 @@ namespace RxCanvas.Bounds
         private HitResult _hitResult;
 
         public RectangleBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IRectangle rectangle,
@@ -1117,7 +1117,7 @@ namespace RxCanvas.Bounds
         }
 
         private void InitBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory)
         {
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
@@ -1283,7 +1283,7 @@ namespace RxCanvas.Bounds
         private HitResult _hitResult;
 
         public EllipseBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IEllipse ellipse,
@@ -1301,7 +1301,7 @@ namespace RxCanvas.Bounds
         }
 
         private void InitBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory)
         {
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
@@ -1467,7 +1467,7 @@ namespace RxCanvas.Bounds
         private HitResult _hitResult;
 
         public TextBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
             IText text,
@@ -1485,7 +1485,7 @@ namespace RxCanvas.Bounds
         }
 
         private void InitBounds(
-            IModelToNativeConverter nativeConverter,
+            INativeConverter nativeConverter,
             ICanvasFactory canvasFactory)
         {
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
@@ -1638,10 +1638,10 @@ namespace RxCanvas.Bounds
 
     public class BoundsFactory : IBoundsFactory
     {
-        private readonly IModelToNativeConverter _nativeConverter;
+        private readonly INativeConverter _nativeConverter;
         private readonly ICanvasFactory _canvasFactory;
 
-        public BoundsFactory(IModelToNativeConverter nativeConverter, ICanvasFactory canvasFactory)
+        public BoundsFactory(INativeConverter nativeConverter, ICanvasFactory canvasFactory)
         {
             _nativeConverter = nativeConverter;
             _canvasFactory = canvasFactory;

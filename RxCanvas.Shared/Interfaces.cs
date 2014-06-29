@@ -197,11 +197,11 @@ namespace RxCanvas.Interfaces
         ICanvas Convert(ICanvas canvas);
     }
 
-    public interface ICoreToModelConverter : IConverter
+    public interface IModelConverter : IConverter
     { 
     }
 
-    public interface IModelToNativeConverter : IConverter
+    public interface INativeConverter : IConverter
     { 
     }
 
