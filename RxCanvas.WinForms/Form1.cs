@@ -22,6 +22,7 @@ namespace RxCanvas.WinForms
         public Form1()
         {
             InitializeComponent();
+
             this.SetStyle(
                 ControlStyles.AllPaintingInWmPaint 
                 | ControlStyles.UserPaint 
@@ -30,7 +31,6 @@ namespace RxCanvas.WinForms
                 true);
 
             _mainView = new MainView();
-            _mainView.Build();
 
             SetBackgrounds();
 

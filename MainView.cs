@@ -20,7 +20,7 @@ namespace RxCanvas.Views
         public ICanvas BackgroundCanvas { get; set; }
         public ICanvas DrawingCanvas { get; set; }
 
-        public void Build()
+        public MainView()
         {
             var bootstrapper = new Bootstrapper();
             var container = bootstrapper.Build();

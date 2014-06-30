@@ -29,7 +29,6 @@ namespace RxCanvas
             InitializeComponent();
 
             _mainView = new MainView();
-            _mainView.Build();
 
             InitlializeShortucts();
             Initialize();
