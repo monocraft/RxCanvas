@@ -87,6 +87,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="MainView.cs" />
     <Compile Include="SelectedItemControl.xaml.cs">
       <DependentUpon>SelectedItemControl.xaml</DependentUpon>
     </Compile>
