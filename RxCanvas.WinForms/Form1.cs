@@ -23,10 +23,24 @@ namespace RxCanvas.WinForms
         public Form1()
         {
             InitializeComponent();
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
+            this.SetStyle(
+                ControlStyles.AllPaintingInWmPaint 
+                | ControlStyles.UserPaint 
+                | ControlStyles.DoubleBuffer
+                | ControlStyles.SupportsTransparentBackColor, 
+                true);
 
             _mainView = new MainView();
-            _mainView.Build(this.canvasPanel1);
+            _mainView.Build();
+
+            _mainView.BackgroundCanvas.Background.A = 0xFF;
+            _mainView.BackgroundCanvas.Background.R = 0xFF;
+            _mainView.BackgroundCanvas.Background.G = 0xFF;
+            _mainView.BackgroundCanvas.Background.B = 0xFF;
+            _mainView.DrawingCanvas.Background.A = 0xFF;
+            _mainView.DrawingCanvas.Background.R = 0xF5;
+            _mainView.DrawingCanvas.Background.G = 0xF5;
+            _mainView.DrawingCanvas.Background.B = 0xF5;
 
             InitlializeShortucts();
             Initialize();
@@ -96,8 +110,14 @@ namespace RxCanvas.WinForms
 
         private void Initialize()
         {
+            // add canvas to root layout
+            this.SuspendLayout();
+            //this.Controls.Add(_mainView.BackgroundCanvas.Native as WinFormsCanvasPanel);
+            this.Controls.Add(_mainView.DrawingCanvas.Native as WinFormsCanvasPanel);
+            this.ResumeLayout(false);
+
             // create grid canvas
-            //CreateGrid();
+            _mainView.CreateGrid();
 
             // handle keyboard input
             KeyDown += (sender, e) =>
@@ -136,7 +156,8 @@ namespace RxCanvas.WinForms
             };
 
             // draw canvas panel
-            this.canvasPanel1.Invalidate();
+            _mainView.BackgroundCanvas.Render(null);
+            _mainView.DrawingCanvas.Render(null);
         }
 
         private string FilesFilter()
@@ -213,10 +234,10 @@ namespace RxCanvas.WinForms
         public ICanvas BackgroundCanvas { get; set; }
         public ICanvas DrawingCanvas { get; set; }
 
-        public void Build(WinFormsCanvasPanel panel)
+        public void Build()
         {
             var bootstrapper = new Bootstrapper();
-            var container = bootstrapper.Build(panel);
+            var container = bootstrapper.Build();
 
             // create scopes
             _backgroundScope = container.BeginLifetimeScope();
@@ -243,6 +264,24 @@ namespace RxCanvas.WinForms
         public void Save(string path, int index)
         {
             var xcanvas = ConvertToModel();
+            Files[index].Save(path, xcanvas);
+            //SaveBlockDemo(path, index);
+        }
+
+        private void SaveBlockDemo(string path, int index)
+        {
+            var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
+            var xcanvas = canvasFactory.CreateCanvas();
+
+            var xblock = canvasFactory.CreateBlock();
+            var xline = canvasFactory.CreateLine();
+            xline.Point1.X = 150.0;
+            xline.Point1.Y = 150.0;
+            xline.Point2.X = 300.0;
+            xline.Point2.Y = 150.0;
+            xblock.Children.Add(xline);
+            xcanvas.Add(xblock);
+
             Files[index].Save(path, xcanvas);
         }
 
@@ -442,6 +481,7 @@ namespace RxCanvas.WinForms
         public void Clear()
         {
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            drawingCanvas.History.Snapshot(drawingCanvas);
             drawingCanvas.Clear();
             drawingCanvas.Render(null);
         }
@@ -470,7 +510,9 @@ namespace RxCanvas.WinForms
 
         public void Render()
         {
+            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            backgroundCanvas.Render(null);
             drawingCanvas.Render(null);
         }
     }

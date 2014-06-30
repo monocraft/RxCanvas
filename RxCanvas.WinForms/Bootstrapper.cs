@@ -18,7 +18,7 @@ namespace RxCanvas.WinForms
 {
     public class Bootstrapper
     {
-        public IContainer Build(WinFormsCanvasPanel panel)
+        public IContainer Build()
         {
             // register components
             var builder = new ContainerBuilder();
@@ -43,7 +43,7 @@ namespace RxCanvas.WinForms
 
             builder.Register<IModelConverter>(c => new XModelConverter()).SingleInstance();
             builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
-            builder.Register<INativeConverter>(c => new WinFormsConverter(panel)).SingleInstance();
+            builder.Register<INativeConverter>(c => new WinFormsConverter()).SingleInstance();
 
             builder.Register<IBoundsFactory>(c =>
             {
