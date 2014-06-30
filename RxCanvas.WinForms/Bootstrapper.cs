@@ -6,6 +6,7 @@ using RxCanvas.Editors;
 using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using RxCanvas.Serializers;
+using RxCanvas.WinForms;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +15,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RxCanvas.WinForms
+namespace RxCanvas.Views
 {
     public class Bootstrapper
     {
@@ -42,8 +43,8 @@ namespace RxCanvas.WinForms
                 .SingleInstance();
 
             builder.Register<IModelConverter>(c => new XModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
             builder.Register<INativeConverter>(c => new WinFormsConverter()).SingleInstance();
+            builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
 
             builder.Register<IBoundsFactory>(c =>
             {

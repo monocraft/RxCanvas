@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RxCanvas
+namespace RxCanvas.Views
 {
     public class Bootstrapper
     {
@@ -43,8 +43,8 @@ namespace RxCanvas
                 .SingleInstance();
 
             builder.Register<IModelConverter>(c => new XModelConverter()).SingleInstance();
-            builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
             builder.Register<INativeConverter>(c => new WpfConverter()).SingleInstance();
+            builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
 
             builder.Register<IBoundsFactory>(c =>
             {
