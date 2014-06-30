@@ -32,17 +32,23 @@ namespace RxCanvas.WinForms
             _mainView = new MainView();
             _mainView.Build();
 
+            SetBackgrounds();
+
+            InitlializeShortucts();
+            Initialize();
+        }
+
+        private void SetBackgrounds()
+        {
             _mainView.BackgroundCanvas.Background.A = 0xFF;
             _mainView.BackgroundCanvas.Background.R = 0xFF;
             _mainView.BackgroundCanvas.Background.G = 0xFF;
             _mainView.BackgroundCanvas.Background.B = 0xFF;
+
             _mainView.DrawingCanvas.Background.A = 0xFF;
             _mainView.DrawingCanvas.Background.R = 0xF5;
             _mainView.DrawingCanvas.Background.G = 0xF5;
             _mainView.DrawingCanvas.Background.B = 0xF5;
-
-            InitlializeShortucts();
-            Initialize();
         }
 
         private void InitlializeShortucts()
