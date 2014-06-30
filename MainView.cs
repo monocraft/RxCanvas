@@ -87,13 +87,13 @@ namespace RxCanvas.Views
 
             drawingCanvas.Clear();
 
-            Add(nativeConverter, drawingCanvas, boundsFactory, xcanvas.Children);
+            Add(nativeConverter, boundsFactory, drawingCanvas, xcanvas.Children);
         }
 
         private void Add(
             INativeConverter nativeConverter,
-            ICanvas drawingCanvas,
             IBoundsFactory boundsFactory,
+            ICanvas canvas,
             IList<INative> children)
         {
             foreach (var child in children)
@@ -101,9 +101,9 @@ namespace RxCanvas.Views
                 if (child is ILine)
                 {
                     var native = nativeConverter.Convert(child as ILine);
-                    drawingCanvas.Add(native);
+                    canvas.Add(native);
 
-                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    native.Bounds = boundsFactory.Create(canvas, native);
                     if (native.Bounds != null)
                     {
                         native.Bounds.Update();
@@ -112,9 +112,9 @@ namespace RxCanvas.Views
                 else if (child is IBezier)
                 {
                     var native = nativeConverter.Convert(child as IBezier);
-                    drawingCanvas.Add(native);
+                    canvas.Add(native);
 
-                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    native.Bounds = boundsFactory.Create(canvas, native);
                     if (native.Bounds != null)
                     {
                         native.Bounds.Update();
@@ -123,9 +123,9 @@ namespace RxCanvas.Views
                 else if (child is IQuadraticBezier)
                 {
                     var native = nativeConverter.Convert(child as IQuadraticBezier);
-                    drawingCanvas.Add(native);
+                    canvas.Add(native);
 
-                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    native.Bounds = boundsFactory.Create(canvas, native);
                     if (native.Bounds != null)
                     {
                         native.Bounds.Update();
@@ -134,9 +134,9 @@ namespace RxCanvas.Views
                 else if (child is IArc)
                 {
                     var native = nativeConverter.Convert(child as IArc);
-                    drawingCanvas.Add(native);
+                    canvas.Add(native);
 
-                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    native.Bounds = boundsFactory.Create(canvas, native);
                     if (native.Bounds != null)
                     {
                         native.Bounds.Update();
@@ -145,9 +145,9 @@ namespace RxCanvas.Views
                 else if (child is IRectangle)
                 {
                     var native = nativeConverter.Convert(child as IRectangle);
-                    drawingCanvas.Add(native);
+                    canvas.Add(native);
 
-                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    native.Bounds = boundsFactory.Create(canvas, native);
                     if (native.Bounds != null)
                     {
                         native.Bounds.Update();
@@ -156,9 +156,9 @@ namespace RxCanvas.Views
                 else if (child is IEllipse)
                 {
                     var native = nativeConverter.Convert(child as IEllipse);
-                    drawingCanvas.Add(native);
+                    canvas.Add(native);
 
-                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    native.Bounds = boundsFactory.Create(canvas, native);
                     if (native.Bounds != null)
                     {
                         native.Bounds.Update();
@@ -167,9 +167,9 @@ namespace RxCanvas.Views
                 else if (child is IText)
                 {
                     var native = nativeConverter.Convert(child as IText);
-                    drawingCanvas.Add(native);
+                    canvas.Add(native);
 
-                    native.Bounds = boundsFactory.Create(drawingCanvas, native);
+                    native.Bounds = boundsFactory.Create(canvas, native);
                     if (native.Bounds != null)
                     {
                         native.Bounds.Update();
@@ -178,9 +178,9 @@ namespace RxCanvas.Views
                 else if (child is IBlock)
                 {
                     var block = child as IBlock;
-                    drawingCanvas.Add(block);
+                    canvas.Add(block);
 
-                    Add(nativeConverter, drawingCanvas, boundsFactory, block.Children);
+                    Add(nativeConverter, boundsFactory, canvas, block.Children);
                 }
                 else
                 {
