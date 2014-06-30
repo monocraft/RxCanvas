@@ -253,9 +253,11 @@ namespace RxCanvas
         {
             var xcanvas = ConvertToModel();
             Files[index].Save(path, xcanvas);
+            //SaveBlockDemo(path, index);
+        }
 
-            // block demo
-            /*
+        private void SaveBlockDemo(string path, int index)
+        {
             var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
             var xcanvas = canvasFactory.CreateCanvas();
 
@@ -268,8 +270,7 @@ namespace RxCanvas
             xblock.Children.Add(xline);
             xcanvas.Add(xblock);
 
-            _files[index].Save(path, xcanvas);
-            */
+            Files[index].Save(path, xcanvas);
         }
 
         public void Export(string path, int index)
@@ -470,6 +471,7 @@ namespace RxCanvas
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
             drawingCanvas.History.Snapshot(drawingCanvas);
             drawingCanvas.Clear();
+            drawingCanvas.Render(null);
         }
 
         public void Undo()
@@ -479,6 +481,7 @@ namespace RxCanvas
             if (xcanvas != null)
             {
                 Open(xcanvas);
+                Render();
             }
         }
 
@@ -489,7 +492,16 @@ namespace RxCanvas
             if (xcanvas != null)
             {
                 Open(xcanvas);
+                Render();
             }
+        }
+
+        public void Render()
+        {
+            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            backgroundCanvas.Render(null);
+            drawingCanvas.Render(null);
         }
     }
 }
