@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -62,44 +59,51 @@ namespace RxCanvas.WinForms
 
             // open shortcut
             _shortcuts.Add(
-                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("O"),
-                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("O"),
+                    (Keys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Open());
 
             // save shortcut
             _shortcuts.Add(
-                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("S"),
-                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("S"),
+                    (Keys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Save());
 
             // export shortcut
             _shortcuts.Add(
-                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("E"),
-                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("E"),
+                    (Keys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => Export());
 
             // undo shortcut
             _shortcuts.Add(
-                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("Z"),
-                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("Z"),
+                    (Keys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => _mainView.Undo());
 
             // redo shortcut
             _shortcuts.Add(
-                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("Y"),
-                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("Y"),
+                    (Keys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => _mainView.Redo());
 
             // snap shortcut
             _shortcuts.Add(
-                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("S"),
-                                      Keys.None),
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("S"),
+                    Keys.None),
                 () => _mainView.ToggleSnap());
 
             // clear shortcut
             _shortcuts.Add(
-                new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString("Delete"),
-                                      (Keys)modifiersKeyConverter.ConvertFromString("Control")),
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("Delete"),
+                    (Keys)modifiersKeyConverter.ConvertFromString("Control")),
                 () => _mainView.Clear());
 
             // editor shortcuts
@@ -107,8 +111,9 @@ namespace RxCanvas.WinForms
             {
                 var _editor = editor;
                 _shortcuts.Add(
-                    new Tuple<Keys, Keys>((Keys)keyConverter.ConvertFromString(editor.Key),
-                                          editor.Modifiers == "" ? Keys.None : (Keys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
+                    new Tuple<Keys, Keys>(
+                        (Keys)keyConverter.ConvertFromString(editor.Key),
+                        editor.Modifiers == "" ? Keys.None : (Keys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
                     () => _mainView.EnableEditor(_editor));
             }
         }
@@ -128,7 +133,10 @@ namespace RxCanvas.WinForms
             KeyDown += (sender, e) =>
             {
                 Action action;
-                bool result = _shortcuts.TryGetValue(new Tuple<Keys, Keys>(e.KeyCode, e.Modifiers), out action);
+                bool result = _shortcuts.TryGetValue(
+                    new Tuple<Keys, Keys>(e.KeyCode, e.Modifiers), 
+                    out action);
+
                 if (result == true && action != null)
                 {
                     action();
@@ -161,8 +169,7 @@ namespace RxCanvas.WinForms
             };
 
             // draw canvas panel
-            _mainView.BackgroundCanvas.Render(null);
-            _mainView.DrawingCanvas.Render(null);
+            _mainView.Render();
         }
 
         private string FilesFilter()
@@ -171,7 +178,12 @@ namespace RxCanvas.WinForms
             string filter = string.Empty;
             foreach (var serializer in _mainView.Files)
             {
-                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, serializer.Name, serializer.Extension);
+                filter += string.Format(
+                    "{0}{1} File (*.{2})|*.{2}", 
+                    first == false ? "|" : string.Empty, 
+                    serializer.Name, 
+                    serializer.Extension);
+
                 if (first == true)
                 {
                     first = false;
@@ -186,7 +198,12 @@ namespace RxCanvas.WinForms
             string filter = string.Empty;
             foreach (var creator in _mainView.Creators)
             {
-                filter += string.Format("{0}{1} File (*.{2})|*.{2}", first == false ? "|" : string.Empty, creator.Name, creator.Extension);
+                filter += string.Format(
+                    "{0}{1} File (*.{2})|*.{2}", 
+                    first == false ? "|" : string.Empty, 
+                    creator.Name, 
+                    creator.Extension);
+
                 if (first == true)
                 {
                     first = false;
@@ -198,7 +215,9 @@ namespace RxCanvas.WinForms
         private void Open()
         {
             string filter = FilesFilter();
-            int defaultFilterIndex = _mainView.Files.IndexOf(_mainView.Files.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
+            int defaultFilterIndex = _mainView.Files
+                .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
+                .FirstOrDefault()) + 1;
 
             openFileDialog1.Filter = filter;
             openFileDialog1.FilterIndex = defaultFilterIndex;
@@ -208,7 +227,9 @@ namespace RxCanvas.WinForms
         private void Save()
         {
             string filter = FilesFilter();
-            int defaultFilterIndex = _mainView.Files.IndexOf(_mainView.Files.Where(c => c.Name == "Json").FirstOrDefault()) + 1;
+            int defaultFilterIndex = _mainView.Files
+                .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
+                .FirstOrDefault()) + 1;
             
             saveFileDialog1.Filter = filter;
             saveFileDialog1.FilterIndex = defaultFilterIndex;
@@ -219,7 +240,9 @@ namespace RxCanvas.WinForms
         private void Export()
         {
             string filter = CreatorsFilter();
-            int defaultFilterIndex = _mainView.Creators.IndexOf(_mainView.Creators.Where(c => c.Name == "Pdf").FirstOrDefault()) + 1;
+            int defaultFilterIndex = _mainView.Creators
+                .IndexOf(_mainView.Creators.Where(c => c.Name == "Pdf")
+                .FirstOrDefault()) + 1;
 
             saveFileDialog2.Filter = filter;
             saveFileDialog2.FilterIndex = defaultFilterIndex;
