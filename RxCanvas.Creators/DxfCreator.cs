@@ -1,13 +1,15 @@
-﻿using System;
+﻿using RxCanvas.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RxCanvas.Interfaces;
 
 namespace RxCanvas.Creators
 {
-    public class DxfCreator : ICreator<ICanvas>
+    [Export(typeof(ICreator))]
+    public class DxfCreator : ICreator
     {
         public string Name { get; set; }
         public string Extension { get; set; }

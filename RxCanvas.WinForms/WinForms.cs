@@ -16,7 +16,7 @@ namespace RxCanvas.WinForms
 {
     public class WinFormsCanvasPanel : Panel
     {
-        public ICanvas Canvas { get; set; }
+        public IList<ICanvas> Layers { get; set; }
 
         public WinFormsCanvasPanel()
         {
@@ -28,6 +28,8 @@ namespace RxCanvas.WinForms
                 true);
             
             this.BackColor = Color.Transparent;
+
+            this.Layers = new List<ICanvas>();
         }
 
         protected override CreateParams CreateParams
@@ -46,15 +48,15 @@ namespace RxCanvas.WinForms
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            Draw(e.Graphics, Canvas);
+            Draw(e.Graphics, Layers);
         }
 
         private Color ToNativeColor(IColor color)
         {
             return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
-       
-        private void Draw(Graphics g, ICanvas canvas)
+
+        private void Draw(Graphics g, IList<ICanvas> layers)
         {
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
@@ -62,27 +64,30 @@ namespace RxCanvas.WinForms
             g.CompositingQuality = CompositingQuality.HighQuality;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-            g.Clear(ToNativeColor(canvas.Background));
+            g.Clear(ToNativeColor(layers.FirstOrDefault().Background));
 
-            if (Canvas == null)
+            for (int i = 0; i < layers.Count; i++)
             {
-                return;
+                DrawLayer(g, layers[i]);
             }
+        }
 
+        private void DrawLayer(Graphics g, ICanvas canvas)
+        {
             foreach (var child in canvas.Children)
             {
                 if (child is ILine)
                 {
                     var line = child as ILine;
                     Pen pen = new Pen(
-                        ToNativeColor(line.Stroke), 
+                        ToNativeColor(line.Stroke),
                         (float)line.StrokeThickness);
 
                     g.DrawLine(
-                        pen, 
-                        (float)line.Point1.X, 
-                        (float)line.Point1.Y, 
-                        (float)line.Point2.X, 
+                        pen,
+                        (float)line.Point1.X,
+                        (float)line.Point1.Y,
+                        (float)line.Point2.X,
                         (float)line.Point2.Y);
 
                     pen.Dispose();
@@ -91,18 +96,18 @@ namespace RxCanvas.WinForms
                 {
                     var bezier = child as IBezier;
                     Pen pen = new Pen(
-                        ToNativeColor(bezier.Stroke), 
+                        ToNativeColor(bezier.Stroke),
                         (float)bezier.StrokeThickness);
 
                     g.DrawBezier(
                         pen,
-                        (float)bezier.Start.X, 
+                        (float)bezier.Start.X,
                         (float)bezier.Start.Y,
-                        (float)bezier.Point1.X, 
+                        (float)bezier.Point1.X,
                         (float)bezier.Point1.Y,
-                        (float)bezier.Point2.X, 
+                        (float)bezier.Point2.X,
                         (float)bezier.Point2.Y,
-                        (float)bezier.Point3.X, 
+                        (float)bezier.Point3.X,
                         (float)bezier.Point3.Y);
 
                     pen.Dispose();
@@ -111,7 +116,7 @@ namespace RxCanvas.WinForms
                 {
                     var quadraticBezier = child as IQuadraticBezier;
                     Pen pen = new Pen(
-                        ToNativeColor(quadraticBezier.Stroke), 
+                        ToNativeColor(quadraticBezier.Stroke),
                         (float)quadraticBezier.StrokeThickness);
 
                     double x1 = quadraticBezier.Start.X;
@@ -125,13 +130,13 @@ namespace RxCanvas.WinForms
 
                     g.DrawBezier(
                         pen,
-                        (float)x1, 
+                        (float)x1,
                         (float)y1,
-                        (float)x2, 
+                        (float)x2,
                         (float)y2,
-                        (float)x3, 
+                        (float)x3,
                         (float)y3,
-                        (float)x4, 
+                        (float)x4,
                         (float)y4);
 
                     pen.Dispose();
@@ -148,16 +153,16 @@ namespace RxCanvas.WinForms
                     if (width > 0.0 && height > 0.0)
                     {
                         Pen pen = new Pen(
-                            ToNativeColor(arc.Stroke), 
+                            ToNativeColor(arc.Stroke),
                             (float)arc.StrokeThickness);
 
                         g.DrawArc(
-                            pen, 
-                            (float)x, 
-                            (float)y, 
-                            (float)width, 
-                            (float)height, 
-                            (float)arc.StartAngle, 
+                            pen,
+                            (float)x,
+                            (float)y,
+                            (float)width,
+                            (float)height,
+                            (float)arc.StartAngle,
                             (float)arc.SweepAngle);
 
                         pen.Dispose();
@@ -167,7 +172,7 @@ namespace RxCanvas.WinForms
                 {
                     var rectangle = child as IRectangle;
                     Pen pen = new Pen(
-                        ToNativeColor(rectangle.Stroke), 
+                        ToNativeColor(rectangle.Stroke),
                         (float)rectangle.StrokeThickness);
 
                     double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
@@ -176,8 +181,8 @@ namespace RxCanvas.WinForms
                     double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
 
                     g.DrawRectangle(
-                        pen, 
-                        (float)(x), 
+                        pen,
+                        (float)(x),
                         (float)(y),
                         (float)(width),
                         (float)(height));
@@ -188,7 +193,7 @@ namespace RxCanvas.WinForms
                 {
                     var ellipse = child as IEllipse;
                     Pen pen = new Pen(
-                        ToNativeColor(ellipse.Stroke), 
+                        ToNativeColor(ellipse.Stroke),
                         (float)ellipse.StrokeThickness);
 
                     double x = Math.Min(ellipse.Point1.X, ellipse.Point2.X);
@@ -217,20 +222,20 @@ namespace RxCanvas.WinForms
                     double height = Math.Abs(text.Point2.Y - text.Point1.Y);
 
                     g.DrawString(
-                        text.Text, 
-                        font, 
+                        text.Text,
+                        font,
                         brush,
                         new RectangleF(
                             (float)(x),
                             (float)(y),
                             (float)(width),
                             (float)(height)),
-                        new StringFormat() 
-                        { 
-                            Alignment = (StringAlignment)text.HorizontalAlignment, 
-                            LineAlignment = (StringAlignment)text.VerticalAlignment 
+                        new StringFormat()
+                        {
+                            Alignment = (StringAlignment)text.HorizontalAlignment,
+                            LineAlignment = (StringAlignment)text.VerticalAlignment
                         });
-                    
+
                     brush.Dispose();
                     font.Dispose();
                 }
@@ -279,7 +284,7 @@ namespace RxCanvas.WinForms
             return r >= snap / 2.0 ? val + snap - r : val - r;
         }
 
-        public WinFormsCanvas(ICanvas canvas)
+        public WinFormsCanvas(ICanvas canvas, WinFormsCanvasPanel panel)
         {
             Background = canvas.Background;
             SnapX = canvas.SnapX;
@@ -290,12 +295,8 @@ namespace RxCanvas.WinForms
 
             Children = new ObservableCollection<INative>();
 
-            _panel = new WinFormsCanvasPanel();
-            _panel.Canvas = this;
-            _panel.Location = new Point(100, 12);
-            _panel.Name = "canvasPanel";
-            _panel.Size = new Size(600, 600);
-            _panel.TabIndex = 0;
+            _panel = panel;
+            _panel.Layers.Add(this);
 
             Downs = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseDown").Select(e =>
             {
@@ -354,6 +355,13 @@ namespace RxCanvas.WinForms
 
     public class WinFormsConverter : INativeConverter
     {
+        private readonly WinFormsCanvasPanel _panel;
+
+        public WinFormsConverter(WinFormsCanvasPanel panel)
+        {
+            _panel = panel;
+        }
+
         public ILine Convert(ILine line)
         {
             return line;
@@ -396,7 +404,7 @@ namespace RxCanvas.WinForms
 
         public ICanvas Convert(ICanvas canvas)
         {
-            return new WinFormsCanvas(canvas);
+            return new WinFormsCanvas(canvas, _panel);
         }
     }
 }

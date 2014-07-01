@@ -12,8 +12,8 @@ namespace RxCanvas.Views
     public class MainView
     {
         public IList<IEditor> Editors { get; set; }
-        public IList<IFile<ICanvas, Stream>> Files { get; set; }
-        public IList<ICreator<ICanvas>> Creators { get; set; }
+        public IList<IFile> Files { get; set; }
+        public IList<ICreator> Creators { get; set; }
         public IList<ICanvas> Layers { get; set; }
         public IList<ILifetimeScope> Scopes { get; set; }
 
@@ -36,8 +36,8 @@ namespace RxCanvas.Views
             // drawing layer
             var scope = Scopes.LastOrDefault();
             Editors = scope.Resolve<IList<IEditor>>();
-            Files = scope.Resolve<IList<IFile<ICanvas, Stream>>>();
-            Creators = scope.Resolve<IList<ICreator<ICanvas>>>();
+            Files = scope.Resolve<IList<IFile>>();
+            Creators = scope.Resolve<IList<ICreator>>();
 
             // default editor
             Editors.Where(e => e.Name == "Line")

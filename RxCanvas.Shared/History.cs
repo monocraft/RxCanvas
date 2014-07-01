@@ -10,12 +10,12 @@ namespace RxCanvas.Binary
 {
     public class BinaryHistory : IHistory
     {
-        private IFile<ICanvas, Stream> _file;
+        private IFile _file;
 
         private Stack<byte[]> _undos;
         private Stack<byte[]> _redos;
 
-        public BinaryHistory(IFile<ICanvas, Stream> file)
+        public BinaryHistory(IFile file)
         {
             _file = file;
             _undos = new Stack<byte[]>();

@@ -3,6 +3,7 @@ using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -71,8 +72,9 @@ namespace RxCanvas.Serializers
             throw new ArgumentException("objectType");
         }
     }
-
-    public class JsonFile : IFile<ICanvas, Stream>
+    
+    [Export(typeof(IFile))]
+    public class JsonFile : IFile
     {
         public string Name { get; set; }
         public string Extension { get; set; }

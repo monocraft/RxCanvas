@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -217,24 +218,22 @@ namespace RxCanvas.Interfaces
         IBounds Create(ICanvas canvas, IText text);
     }
 
-    public interface ICreator<T> where T : class
+    public interface ICreator
     {
         string Name { get; set; }
         string Extension { get; set; }
-        void Save(string path, T item);
-        void Save(string path, IEnumerable<T> items);
+        void Save(string path, ICanvas item);
+        void Save(string path, IEnumerable<ICanvas> items);
     }
 
-    public interface IFile<T, S> 
-        where T : class
-        where S : class
+    public interface IFile
     {
         string Name { get; set; }
         string Extension { get; set; }
-        T Open(string path);
-        void Save(string path, T value);
-        T Read(S stream);
-        void Write(S stream, T value);
+        ICanvas Open(string path);
+        void Save(string path, ICanvas value);
+        ICanvas Read(Stream stream);
+        void Write(Stream stream, ICanvas value);
     }
 
     public interface IHistory

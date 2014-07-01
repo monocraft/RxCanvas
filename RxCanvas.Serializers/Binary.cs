@@ -2,6 +2,7 @@
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -413,7 +414,8 @@ namespace RxCanvas.Serializers
         Text            = 0x27,
     }
 
-    public class BinaryFile : IFile<ICanvas, Stream>
+    [Export(typeof(IFile))]
+    public class BinaryFile : IFile
     {
         public string Name { get; set; }
         public string Extension { get; set; }

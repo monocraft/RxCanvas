@@ -117,10 +117,9 @@ namespace RxCanvas.WinForms
 
         private void Initialize()
         {
-            // add canvas layers to root layout
+            // add canvas panel to root layout, same panel is used for all layers
             this.SuspendLayout();
-            //this.Controls.Add(_mainView.Layers[0].Native as WinFormsCanvasPanel);
-            this.Controls.Add(_mainView.Layers[1].Native as WinFormsCanvasPanel);
+            this.Controls.Add(_mainView.Layers.LastOrDefault().Native as WinFormsCanvasPanel);
             this.ResumeLayout(false);
 
             // create grid canvas

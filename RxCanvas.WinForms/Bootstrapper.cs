@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Integration.Mef;
 using RxCanvas.Binary;
 using RxCanvas.Bounds;
 using RxCanvas.Creators;
@@ -9,6 +10,7 @@ using RxCanvas.Serializers;
 using RxCanvas.WinForms;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,29 +23,19 @@ namespace RxCanvas.Views
     {
         public IContainer Build()
         {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
             // register components
             var builder = new ContainerBuilder();
+            var catalog = new DirectoryCatalog(AppDomain.CurrentDomain.BaseDirectory);
 
-            var editorAssembly = Assembly.GetAssembly(typeof(XCanvasFactory));
-            builder.RegisterAssemblyTypes(editorAssembly)
-                .Where(t => t.Name.EndsWith("Editor"))
-                .AsImplementedInterfaces()
+            builder.RegisterComposablePartCatalog(catalog);
+
+            builder.RegisterAssemblyTypes(assemblies)
+                .As<IEditor>()
                 .InstancePerLifetimeScope();
 
-            var serializerAssembly = Assembly.GetAssembly(typeof(JsonFile));
-            builder.RegisterAssemblyTypes(serializerAssembly)
-                .Where(t => t.Name.EndsWith("File"))
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
-            var creatorAssembly = Assembly.GetAssembly(typeof(PdfCreator));
-            builder.RegisterAssemblyTypes(creatorAssembly)
-                .Where(t => t.Name.EndsWith("Creator"))
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
             builder.Register<IModelConverter>(c => new XModelConverter()).SingleInstance();
-            builder.Register<INativeConverter>(c => new WinFormsConverter()).SingleInstance();
             builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
 
             builder.Register<IBoundsFactory>(c =>
@@ -57,11 +49,21 @@ namespace RxCanvas.Views
             {
                 var nativeConverter = c.Resolve<INativeConverter>();
                 var canvasFactory = c.Resolve<ICanvasFactory>();
-                var binaryFile = c.Resolve<IList<IFile<ICanvas, Stream>>>().Where(e => e.Name == "Binary").FirstOrDefault();
+                var binaryFile = c.Resolve<IList<IFile>>().Where(e => e.Name == "Binary").FirstOrDefault();
                 var xcanvas = canvasFactory.CreateCanvas();
                 xcanvas.History = new BinaryHistory(binaryFile);
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
+
+            builder.Register<INativeConverter>(c =>
+            {
+                var panel = new WinFormsCanvasPanel();
+                panel.Location = new System.Drawing.Point(100, 12);
+                panel.Name = "canvasPanel";
+                panel.Size = new System.Drawing.Size(600, 600);
+                panel.TabIndex = 0;
+                return new WinFormsConverter(panel);
+            }).SingleInstance();
 
             // create container
             return builder.Build();
