@@ -29,23 +29,20 @@ namespace RxCanvas.WinForms
 
             _mainView = new MainView();
 
-            SetBackgrounds();
-
-            InitlializeShortucts();
-            Initialize();
-        }
-
-        private void SetBackgrounds()
-        {
+            // background layer
             _mainView.Layers[0].Background.A = 0xFF;
             _mainView.Layers[0].Background.R = 0xFF;
             _mainView.Layers[0].Background.G = 0xFF;
             _mainView.Layers[0].Background.B = 0xFF;
 
+            // drawing layer
             _mainView.Layers[1].Background.A = 0xFF;
             _mainView.Layers[1].Background.R = 0xF5;
             _mainView.Layers[1].Background.G = 0xF5;
             _mainView.Layers[1].Background.B = 0xF5;
+
+            InitlializeShortucts();
+            Initialize();
         }
 
         private void InitlializeShortucts()
@@ -120,7 +117,7 @@ namespace RxCanvas.WinForms
 
         private void Initialize()
         {
-            // add canvas to root layout
+            // add canvas layers to root layout
             this.SuspendLayout();
             //this.Controls.Add(_mainView.Layers[0].Native as WinFormsCanvasPanel);
             this.Controls.Add(_mainView.Layers[1].Native as WinFormsCanvasPanel);
@@ -172,7 +169,7 @@ namespace RxCanvas.WinForms
             _mainView.Render();
         }
 
-        private string FilesFilter()
+        private string ToFileFilter()
         {
             bool first = true;
             string filter = string.Empty;
@@ -192,7 +189,7 @@ namespace RxCanvas.WinForms
             return filter;
         }
 
-        private string CreatorsFilter()
+        private string ToCreatorFilter()
         {
             bool first = true;
             string filter = string.Empty;
@@ -214,7 +211,7 @@ namespace RxCanvas.WinForms
 
         private void Open()
         {
-            string filter = FilesFilter();
+            string filter = ToFileFilter();
             int defaultFilterIndex = _mainView.Files
                 .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
                 .FirstOrDefault()) + 1;
@@ -226,7 +223,7 @@ namespace RxCanvas.WinForms
 
         private void Save()
         {
-            string filter = FilesFilter();
+            string filter = ToFileFilter();
             int defaultFilterIndex = _mainView.Files
                 .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
                 .FirstOrDefault()) + 1;
@@ -239,7 +236,7 @@ namespace RxCanvas.WinForms
 
         private void Export()
         {
-            string filter = CreatorsFilter();
+            string filter = ToCreatorFilter();
             int defaultFilterIndex = _mainView.Creators
                 .IndexOf(_mainView.Creators.Where(c => c.Name == "Pdf")
                 .FirstOrDefault()) + 1;

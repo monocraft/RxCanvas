@@ -104,9 +104,11 @@ namespace RxCanvas
 
         private void Initialize()
         {
-            // add canvas to root layout
-            Layout.Children.Add(_mainView.Layers[0].Native as UIElement);
-            Layout.Children.Add(_mainView.Layers[1].Native as UIElement);
+            // add canvas layers to root layout
+            for (int i = 0; i < _mainView.Layers.Count; i++)
+            {
+                Layout.Children.Add(_mainView.Layers[i].Native as UIElement);
+            }
 
             // create grid canvas
             _mainView.CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
@@ -126,10 +128,10 @@ namespace RxCanvas
             };
 
             // set data context
-            DataContext = _mainView.Layers[1];
+            DataContext = _mainView.Layers.LastOrDefault();
         }
 
-        private string FilesFilter()
+        private string ToFileFilter()
         {
             bool first = true;
             string filter = string.Empty;
@@ -149,7 +151,7 @@ namespace RxCanvas
             return filter;
         }
 
-        private string CreatorsFilter()
+        private string ToCreatorFilter()
         {
             bool first = true;
             string filter = string.Empty;
@@ -171,7 +173,7 @@ namespace RxCanvas
 
         private void Open()
         {
-            string filter = FilesFilter();
+            string filter = ToFileFilter();
             int defaultFilterIndex = _mainView.Files
                 .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
                 .FirstOrDefault()) + 1;
@@ -192,7 +194,7 @@ namespace RxCanvas
 
         private void Save()
         {
-            string filter = FilesFilter();
+            string filter = ToFileFilter();
             int defaultFilterIndex = _mainView.Files
                 .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
                 .FirstOrDefault()) + 1;
@@ -214,7 +216,7 @@ namespace RxCanvas
 
         private void Export()
         {
-            string filter = CreatorsFilter();
+            string filter = ToCreatorFilter();
             int defaultFilterIndex = _mainView.Creators
                 .IndexOf(_mainView.Creators.Where(c => c.Name == "Pdf")
                 .FirstOrDefault()) + 1;
