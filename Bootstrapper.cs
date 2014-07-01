@@ -7,13 +7,11 @@ using RxCanvas.Editors;
 using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using RxCanvas.Serializers;
-using RxCanvas.Xaml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,7 +53,7 @@ namespace RxCanvas.Views
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 
-            builder.Register<INativeConverter>(c => new WpfConverter()).SingleInstance();
+            builder.RegisterModule<NativeModule>();
 
             // create container
             return builder.Build();
