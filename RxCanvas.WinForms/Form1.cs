@@ -114,7 +114,7 @@ namespace RxCanvas.WinForms
                     new Tuple<Keys, Keys>(
                         (Keys)keyConverter.ConvertFromString(editor.Key),
                         editor.Modifiers == "" ? Keys.None : (Keys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
-                    () => _mainView.EnableEditor(_editor));
+                    () => _mainView.Enable(_editor));
             }
         }
 
@@ -127,7 +127,7 @@ namespace RxCanvas.WinForms
             this.ResumeLayout(false);
 
             // create grid canvas
-            _mainView.CreateGrid();
+            _mainView.CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
 
             // handle keyboard input
             KeyDown += (sender, e) =>

@@ -11,14 +11,14 @@ namespace RxCanvas.Views
 {
     public class MainView
     {
-        private ILifetimeScope _backgroundScope;
-        private ILifetimeScope _drawingScope;
-
-        public ICollection<IEditor> Editors { get; set; }
+        public IList<IEditor> Editors { get; set; }
         public IList<IFile<ICanvas, Stream>> Files { get; set; }
         public IList<ICreator<ICanvas>> Creators { get; set; }
         public ICanvas BackgroundCanvas { get; set; }
         public ICanvas DrawingCanvas { get; set; }
+
+        private ILifetimeScope _backgroundScope;
+        private ILifetimeScope _drawingScope;
 
         public MainView()
         {
@@ -33,229 +33,42 @@ namespace RxCanvas.Views
             BackgroundCanvas = _backgroundScope.Resolve<ICanvas>();
             DrawingCanvas = _drawingScope.Resolve<ICanvas>();
 
-            Editors = _drawingScope.Resolve<ICollection<IEditor>>();
+            Editors = _drawingScope.Resolve<IList<IEditor>>();
             Files = _drawingScope.Resolve<IList<IFile<ICanvas, Stream>>>();
             Creators = _drawingScope.Resolve<IList<ICreator<ICanvas>>>();
 
-            // set default editor
-            Editors.Where(e => e.Name == "Line").FirstOrDefault().IsEnabled = true;
+            // default editor
+            Editors.Where(e => e.Name == "Line")
+                .FirstOrDefault()
+                .IsEnabled = true;
         }
 
         public void Open(string path, int index)
         {
             var xcanvas = Files[index].Open(path);
-            Open(xcanvas);
+            AsNative(xcanvas);
         }
 
         public void Save(string path, int index)
         {
-            var xcanvas = ConvertToModel();
-            Files[index].Save(path, xcanvas);
-            //SaveBlockDemo(path, index);
-        }
-
-        private void SaveBlockDemo(string path, int index)
-        {
-            var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
-            var xcanvas = canvasFactory.CreateCanvas();
-
-            var xblock = canvasFactory.CreateBlock();
-            var xline = canvasFactory.CreateLine();
-            xline.Point1.X = 150.0;
-            xline.Point1.Y = 150.0;
-            xline.Point2.X = 300.0;
-            xline.Point2.Y = 150.0;
-            xblock.Children.Add(xline);
-            xcanvas.Add(xblock);
-
+            var xcanvas = ToModel();
             Files[index].Save(path, xcanvas);
         }
 
         public void Export(string path, int index)
         {
-            var canvas = ConvertToModel();
-            var creator = Creators[index];
-            creator.Save(path, canvas);
+            var xcanvas = ToModel();
+            Creators[index].Save(path, xcanvas);
         }
 
-        private void Open(ICanvas xcanvas)
+        public void Enable(IEditor editor)
         {
-            var nativeConverter = _drawingScope.Resolve<INativeConverter>();
-            var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            var boundsFactory = _drawingScope.Resolve<IBoundsFactory>();
-
-            drawingCanvas.Clear();
-
-            Add(nativeConverter, boundsFactory, drawingCanvas, xcanvas.Children);
-        }
-
-        private void Add(
-            INativeConverter nativeConverter,
-            IBoundsFactory boundsFactory,
-            ICanvas canvas,
-            IList<INative> children)
-        {
-            foreach (var child in children)
+            for (int i = 0; i < Editors.Count; i++)
             {
-                if (child is ILine)
-                {
-                    var native = nativeConverter.Convert(child as ILine);
-                    canvas.Add(native);
-
-                    native.Bounds = boundsFactory.Create(canvas, native);
-                    if (native.Bounds != null)
-                    {
-                        native.Bounds.Update();
-                    }
-                }
-                else if (child is IBezier)
-                {
-                    var native = nativeConverter.Convert(child as IBezier);
-                    canvas.Add(native);
-
-                    native.Bounds = boundsFactory.Create(canvas, native);
-                    if (native.Bounds != null)
-                    {
-                        native.Bounds.Update();
-                    }
-                }
-                else if (child is IQuadraticBezier)
-                {
-                    var native = nativeConverter.Convert(child as IQuadraticBezier);
-                    canvas.Add(native);
-
-                    native.Bounds = boundsFactory.Create(canvas, native);
-                    if (native.Bounds != null)
-                    {
-                        native.Bounds.Update();
-                    }
-                }
-                else if (child is IArc)
-                {
-                    var native = nativeConverter.Convert(child as IArc);
-                    canvas.Add(native);
-
-                    native.Bounds = boundsFactory.Create(canvas, native);
-                    if (native.Bounds != null)
-                    {
-                        native.Bounds.Update();
-                    }
-                }
-                else if (child is IRectangle)
-                {
-                    var native = nativeConverter.Convert(child as IRectangle);
-                    canvas.Add(native);
-
-                    native.Bounds = boundsFactory.Create(canvas, native);
-                    if (native.Bounds != null)
-                    {
-                        native.Bounds.Update();
-                    }
-                }
-                else if (child is IEllipse)
-                {
-                    var native = nativeConverter.Convert(child as IEllipse);
-                    canvas.Add(native);
-
-                    native.Bounds = boundsFactory.Create(canvas, native);
-                    if (native.Bounds != null)
-                    {
-                        native.Bounds.Update();
-                    }
-                }
-                else if (child is IText)
-                {
-                    var native = nativeConverter.Convert(child as IText);
-                    canvas.Add(native);
-
-                    native.Bounds = boundsFactory.Create(canvas, native);
-                    if (native.Bounds != null)
-                    {
-                        native.Bounds.Update();
-                    }
-                }
-                else if (child is IBlock)
-                {
-                    var block = child as IBlock;
-                    canvas.Add(block);
-
-                    Add(nativeConverter, boundsFactory, canvas, block.Children);
-                }
-                else
-                {
-                    throw new NotSupportedException();
-                }
-            }
-        }
-
-        private ICanvas ConvertToModel()
-        {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            var modelConverter = _drawingScope.Resolve<IModelConverter>();
-            var canvas = modelConverter.Convert(drawingCanvas);
-            return canvas;
-        }
-
-        public void CreateGrid()
-        {
-            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
-            var nativeConverter = _backgroundScope.Resolve<INativeConverter>();
-            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
-            CreateGrid(nativeConverter, canvasFactory, backgroundCanvas, 600.0, 600.0, 30.0, 0.0, 0.0);
-        }
-
-        private INative CreateGridLine(
-            INativeConverter nativeConverter,
-            ICanvasFactory canvasFactory,
-            IColor stroke,
-            double thickness,
-            double x1, double y1,
-            double x2, double y2)
-        {
-            var xline = canvasFactory.CreateLine();
-            xline.Point1.X = x1;
-            xline.Point1.Y = y1;
-            xline.Point2.X = x2;
-            xline.Point2.Y = y2;
-            xline.Stroke = stroke;
-            xline.StrokeThickness = thickness;
-            return nativeConverter.Convert(xline);
-        }
-
-        private void CreateGrid(
-            INativeConverter nativeConverter,
-            ICanvasFactory canvasFactory,
-            ICanvas canvas,
-            double width, double height,
-            double size,
-            double originX, double originY)
-        {
-            double thickness = 2.0;
-            var stroke = canvasFactory.CreateColor();
-            stroke.A = 0xFF;
-            stroke.R = 0xE8;
-            stroke.G = 0xE8;
-            stroke.B = 0xE8;
-
-            for (double y = size; y < height; y += size)
-            {
-                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, originX, y, width, y));
+                Editors[i].IsEnabled = false;
             }
 
-            for (double x = size; x < width; x += size)
-            {
-                canvas.Add(CreateGridLine(nativeConverter, canvasFactory, stroke, thickness, x, originY, x, height));
-            }
-        }
-
-        public void EnableEditor(IEditor _editor)
-        {
-            foreach (var editor in Editors)
-            {
-                editor.IsEnabled = false;
-            };
-            _editor.IsEnabled = true;
+            editor.IsEnabled = true;
         }
 
         public void ToggleSnap()
@@ -264,21 +77,13 @@ namespace RxCanvas.Views
             drawingCanvas.EnableSnap = drawingCanvas.EnableSnap ? false : true;
         }
 
-        public void Clear()
-        {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            drawingCanvas.History.Snapshot(drawingCanvas);
-            drawingCanvas.Clear();
-            drawingCanvas.Render(null);
-        }
-
         public void Undo()
         {
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
             var xcanvas = drawingCanvas.History.Undo(drawingCanvas);
             if (xcanvas != null)
             {
-                Open(xcanvas);
+                AsNative(xcanvas);
                 Render();
             }
         }
@@ -289,9 +94,17 @@ namespace RxCanvas.Views
             var xcanvas = drawingCanvas.History.Redo(drawingCanvas);
             if (xcanvas != null)
             {
-                Open(xcanvas);
+                AsNative(xcanvas);
                 Render();
             }
+        }
+
+        public void Clear()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            drawingCanvas.History.Snapshot(drawingCanvas);
+            drawingCanvas.Clear();
+            drawingCanvas.Render(null);
         }
 
         public void Render()
@@ -300,6 +113,180 @@ namespace RxCanvas.Views
             var drawingCanvas = _drawingScope.Resolve<ICanvas>();
             backgroundCanvas.Render(null);
             drawingCanvas.Render(null);
+        }
+
+        public void CreateGrid(
+            double width, 
+            double height, 
+            double size, 
+            double originX, 
+            double originY)
+        {
+            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
+            var nativeConverter = _backgroundScope.Resolve<INativeConverter>();
+            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
+
+            double thickness = 2.0;
+
+            var stroke = canvasFactory.CreateColor();
+            stroke.A = 0xFF;
+            stroke.R = 0xE8;
+            stroke.G = 0xE8;
+            stroke.B = 0xE8;
+
+            // horizontal
+            for (double y = size; y < height; y += size)
+            {
+                var xline = canvasFactory.CreateLine();
+                xline.Point1.X = originX;
+                xline.Point1.Y = y;
+                xline.Point2.X = width;
+                xline.Point2.Y = y;
+                xline.Stroke = stroke;
+                xline.StrokeThickness = thickness;
+                var nline = nativeConverter.Convert(xline);
+                backgroundCanvas.Add(nline);
+            }
+
+            // vertical lines
+            for (double x = size; x < width; x += size)
+            {
+                var xline = canvasFactory.CreateLine();
+                xline.Point1.X = x;
+                xline.Point1.Y = originY;
+                xline.Point2.X = x;
+                xline.Point2.Y = height;
+                xline.Stroke = stroke;
+                xline.StrokeThickness = thickness;
+                var nline = nativeConverter.Convert(xline);
+                backgroundCanvas.Add(nline);
+            }
+        }
+
+        private ICanvas ToModel()
+        {
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var modelConverter = _drawingScope.Resolve<IModelConverter>();
+            return modelConverter.Convert(drawingCanvas);
+        }
+
+        public void AsNative(ICanvas xcanvas)
+        {
+            var nativeConverter = _drawingScope.Resolve<INativeConverter>();
+            var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
+            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var boundsFactory = _drawingScope.Resolve<IBoundsFactory>();
+
+            drawingCanvas.Clear();
+
+            AsNative(
+                nativeConverter,
+                boundsFactory,
+                drawingCanvas,
+                xcanvas.Children);
+        }
+
+        private void AsNative(
+            INativeConverter nativeConverter,
+            IBoundsFactory boundsFactory,
+            ICanvas nativeCanvas,
+            IList<INative> xchildren)
+        {
+            foreach (var child in xchildren)
+            {
+                if (child is ILine)
+                {
+                    var native = nativeConverter.Convert(child as ILine);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is IBezier)
+                {
+                    var native = nativeConverter.Convert(child as IBezier);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is IQuadraticBezier)
+                {
+                    var native = nativeConverter.Convert(child as IQuadraticBezier);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is IArc)
+                {
+                    var native = nativeConverter.Convert(child as IArc);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is IRectangle)
+                {
+                    var native = nativeConverter.Convert(child as IRectangle);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is IEllipse)
+                {
+                    var native = nativeConverter.Convert(child as IEllipse);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is IText)
+                {
+                    var native = nativeConverter.Convert(child as IText);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is IBlock)
+                {
+                    var block = child as IBlock;
+                    nativeCanvas.Add(block);
+
+                    AsNative(
+                        nativeConverter,
+                        boundsFactory,
+                        nativeCanvas,
+                        block.Children);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+            }
         }
     }
 }

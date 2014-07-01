@@ -98,7 +98,7 @@ namespace RxCanvas
                     new Tuple<Key, ModifierKeys>(
                         (Key)keyConverter.ConvertFromString(editor.Key),
                         editor.Modifiers == "" ? ModifierKeys.None : (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
-                    () => _mainView.EnableEditor(_editor));
+                    () => _mainView.Enable(_editor));
             }
         }
 
@@ -109,7 +109,7 @@ namespace RxCanvas
             Layout.Children.Add(_mainView.DrawingCanvas.Native as UIElement);
 
             // create grid canvas
-            _mainView.CreateGrid();
+            _mainView.CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
 
             // handle keyboard input
             PreviewKeyDown += (sender, e) =>
