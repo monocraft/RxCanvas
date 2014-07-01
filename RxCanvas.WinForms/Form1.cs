@@ -37,15 +37,15 @@ namespace RxCanvas.WinForms
 
         private void SetBackgrounds()
         {
-            _mainView.BackgroundCanvas.Background.A = 0xFF;
-            _mainView.BackgroundCanvas.Background.R = 0xFF;
-            _mainView.BackgroundCanvas.Background.G = 0xFF;
-            _mainView.BackgroundCanvas.Background.B = 0xFF;
+            _mainView.Layers[0].Background.A = 0xFF;
+            _mainView.Layers[0].Background.R = 0xFF;
+            _mainView.Layers[0].Background.G = 0xFF;
+            _mainView.Layers[0].Background.B = 0xFF;
 
-            _mainView.DrawingCanvas.Background.A = 0xFF;
-            _mainView.DrawingCanvas.Background.R = 0xF5;
-            _mainView.DrawingCanvas.Background.G = 0xF5;
-            _mainView.DrawingCanvas.Background.B = 0xF5;
+            _mainView.Layers[1].Background.A = 0xFF;
+            _mainView.Layers[1].Background.R = 0xF5;
+            _mainView.Layers[1].Background.G = 0xF5;
+            _mainView.Layers[1].Background.B = 0xF5;
         }
 
         private void InitlializeShortucts()
@@ -122,8 +122,8 @@ namespace RxCanvas.WinForms
         {
             // add canvas to root layout
             this.SuspendLayout();
-            //this.Controls.Add(_mainView.BackgroundCanvas.Native as WinFormsCanvasPanel);
-            this.Controls.Add(_mainView.DrawingCanvas.Native as WinFormsCanvasPanel);
+            //this.Controls.Add(_mainView.Layers[0].Native as WinFormsCanvasPanel);
+            this.Controls.Add(_mainView.Layers[1].Native as WinFormsCanvasPanel);
             this.ResumeLayout(false);
 
             // create grid canvas

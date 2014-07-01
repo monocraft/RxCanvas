@@ -105,8 +105,8 @@ namespace RxCanvas
         private void Initialize()
         {
             // add canvas to root layout
-            Layout.Children.Add(_mainView.BackgroundCanvas.Native as UIElement);
-            Layout.Children.Add(_mainView.DrawingCanvas.Native as UIElement);
+            Layout.Children.Add(_mainView.Layers[0].Native as UIElement);
+            Layout.Children.Add(_mainView.Layers[1].Native as UIElement);
 
             // create grid canvas
             _mainView.CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
@@ -126,7 +126,7 @@ namespace RxCanvas
             };
 
             // set data context
-            DataContext = _mainView.DrawingCanvas;
+            DataContext = _mainView.Layers[1];
         }
 
         private string FilesFilter()

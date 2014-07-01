@@ -14,11 +14,9 @@ namespace RxCanvas.Views
         public IList<IEditor> Editors { get; set; }
         public IList<IFile<ICanvas, Stream>> Files { get; set; }
         public IList<ICreator<ICanvas>> Creators { get; set; }
-        public ICanvas BackgroundCanvas { get; set; }
-        public ICanvas DrawingCanvas { get; set; }
+        public IList<ICanvas> Layers { get; set; }
 
-        private ILifetimeScope _backgroundScope;
-        private ILifetimeScope _drawingScope;
+        private IList<ILifetimeScope> _scopes;
 
         public MainView()
         {
@@ -26,16 +24,18 @@ namespace RxCanvas.Views
             var container = bootstrapper.Build();
 
             // create scopes
-            _backgroundScope = container.BeginLifetimeScope();
-            _drawingScope = container.BeginLifetimeScope();
+            _scopes = new List<ILifetimeScope>();
+            _scopes.Add(container.BeginLifetimeScope());
+            _scopes.Add(container.BeginLifetimeScope());
 
             // resolve dependencies
-            BackgroundCanvas = _backgroundScope.Resolve<ICanvas>();
-            DrawingCanvas = _drawingScope.Resolve<ICanvas>();
+            Layers = new List<ICanvas>();
+            Layers.Add(_scopes[0].Resolve<ICanvas>());
+            Layers.Add(_scopes[1].Resolve<ICanvas>());
 
-            Editors = _drawingScope.Resolve<IList<IEditor>>();
-            Files = _drawingScope.Resolve<IList<IFile<ICanvas, Stream>>>();
-            Creators = _drawingScope.Resolve<IList<ICreator<ICanvas>>>();
+            Editors = _scopes[1].Resolve<IList<IEditor>>();
+            Files = _scopes[1].Resolve<IList<IFile<ICanvas, Stream>>>();
+            Creators = _scopes[1].Resolve<IList<ICreator<ICanvas>>>();
 
             // default editor
             Editors.Where(e => e.Name == "Line")
@@ -73,13 +73,13 @@ namespace RxCanvas.Views
 
         public void ToggleSnap()
         {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var drawingCanvas = _scopes[1].Resolve<ICanvas>();
             drawingCanvas.EnableSnap = drawingCanvas.EnableSnap ? false : true;
         }
 
         public void Undo()
         {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var drawingCanvas = _scopes[1].Resolve<ICanvas>();
             var xcanvas = drawingCanvas.History.Undo(drawingCanvas);
             if (xcanvas != null)
             {
@@ -90,7 +90,7 @@ namespace RxCanvas.Views
 
         public void Redo()
         {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var drawingCanvas = _scopes[1].Resolve<ICanvas>();
             var xcanvas = drawingCanvas.History.Redo(drawingCanvas);
             if (xcanvas != null)
             {
@@ -101,7 +101,7 @@ namespace RxCanvas.Views
 
         public void Clear()
         {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var drawingCanvas = _scopes[1].Resolve<ICanvas>();
             drawingCanvas.History.Snapshot(drawingCanvas);
             drawingCanvas.Clear();
             drawingCanvas.Render(null);
@@ -109,8 +109,8 @@ namespace RxCanvas.Views
 
         public void Render()
         {
-            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
+            var backgroundCanvas = _scopes[0].Resolve<ICanvas>();
+            var drawingCanvas = _scopes[1].Resolve<ICanvas>();
             backgroundCanvas.Render(null);
             drawingCanvas.Render(null);
         }
@@ -122,9 +122,9 @@ namespace RxCanvas.Views
             double originX, 
             double originY)
         {
-            var backgroundCanvas = _backgroundScope.Resolve<ICanvas>();
-            var nativeConverter = _backgroundScope.Resolve<INativeConverter>();
-            var canvasFactory = _backgroundScope.Resolve<ICanvasFactory>();
+            var backgroundCanvas = _scopes[0].Resolve<ICanvas>();
+            var nativeConverter = _scopes[0].Resolve<INativeConverter>();
+            var canvasFactory = _scopes[0].Resolve<ICanvasFactory>();
 
             double thickness = 2.0;
 
@@ -165,17 +165,17 @@ namespace RxCanvas.Views
 
         private ICanvas ToModel()
         {
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            var modelConverter = _drawingScope.Resolve<IModelConverter>();
+            var drawingCanvas = _scopes[1].Resolve<ICanvas>();
+            var modelConverter = _scopes[1].Resolve<IModelConverter>();
             return modelConverter.Convert(drawingCanvas);
         }
 
         public void AsNative(ICanvas xcanvas)
         {
-            var nativeConverter = _drawingScope.Resolve<INativeConverter>();
-            var canvasFactory = _drawingScope.Resolve<ICanvasFactory>();
-            var drawingCanvas = _drawingScope.Resolve<ICanvas>();
-            var boundsFactory = _drawingScope.Resolve<IBoundsFactory>();
+            var nativeConverter = _scopes[1].Resolve<INativeConverter>();
+            var canvasFactory = _scopes[1].Resolve<ICanvasFactory>();
+            var drawingCanvas = _scopes[1].Resolve<ICanvas>();
+            var boundsFactory = _scopes[1].Resolve<IBoundsFactory>();
 
             drawingCanvas.Clear();
 
