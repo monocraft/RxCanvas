@@ -13,7 +13,7 @@ namespace RxCanvas.WinForms
 {
     public partial class Form1 : Form
     {
-        private MainView _mainView;
+        private DrawingView _mainView;
         private IDictionary<Tuple<Keys, Keys>, Action> _shortcuts;
 
         public Form1()
@@ -27,7 +27,8 @@ namespace RxCanvas.WinForms
                 | ControlStyles.SupportsTransparentBackColor, 
                 true);
 
-            _mainView = new MainView();
+            _mainView = new DrawingView();
+            _mainView.Initialize();
 
             // background layer
             _mainView.Layers[0].Background.A = 0xFF;

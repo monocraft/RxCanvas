@@ -5,10 +5,6 @@ VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas", "RxCanvas.csproj", "{25EDC1D3-F943-465D-BCE3-5EAF110FE68F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Serializers", "RxCanvas.Serializers\RxCanvas.Serializers.csproj", "{9DD40808-5705-4CA4-9672-A23E5F585A61}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Creators", "RxCanvas.Creators\RxCanvas.Creators.csproj", "{D80AF44A-F33F-441E-9FD4-25781AEB25AA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.WinForms", "RxCanvas.WinForms\RxCanvas.WinForms.csproj", "{E10EC08B-B037-41B9-9F29-D3299990B298}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxCanvas.Shared", "RxCanvas.Shared\RxCanvas.Shared.csproj", "{BFC8B726-F060-4582-BC73-6463323C403F}"
@@ -23,14 +19,6 @@ Global
 		{25EDC1D3-F943-465D-BCE3-5EAF110FE68F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25EDC1D3-F943-465D-BCE3-5EAF110FE68F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25EDC1D3-F943-465D-BCE3-5EAF110FE68F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9DD40808-5705-4CA4-9672-A23E5F585A61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DD40808-5705-4CA4-9672-A23E5F585A61}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DD40808-5705-4CA4-9672-A23E5F585A61}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DD40808-5705-4CA4-9672-A23E5F585A61}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D80AF44A-F33F-441E-9FD4-25781AEB25AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D80AF44A-F33F-441E-9FD4-25781AEB25AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D80AF44A-F33F-441E-9FD4-25781AEB25AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D80AF44A-F33F-441E-9FD4-25781AEB25AA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E10EC08B-B037-41B9-9F29-D3299990B298}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E10EC08B-B037-41B9-9F29-D3299990B298}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E10EC08B-B037-41B9-9F29-D3299990B298}.Release|Any CPU.ActiveCfg = Release|Any CPU

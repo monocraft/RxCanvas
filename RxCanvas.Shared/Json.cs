@@ -3,11 +3,12 @@ using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+#if !__ANDROID__
 using System.Runtime.Serialization;
+#endif
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,8 +73,7 @@ namespace RxCanvas.Serializers
             throw new ArgumentException("objectType");
         }
     }
-    
-    [Export(typeof(IFile))]
+
     public class JsonFile : IFile
     {
         public string Name { get; set; }

@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Autofac.Integration.Mef;
 using RxCanvas.Binary;
 using RxCanvas.Bounds;
 using RxCanvas.Editors;
@@ -7,7 +6,6 @@ using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
 
@@ -18,15 +16,16 @@ namespace RxCanvas.Views
         public IContainer Build()
         {
             var builder = new ContainerBuilder();
-
-            // mef exports
-            var catalog = new DirectoryCatalog(AppDomain.CurrentDomain.BaseDirectory);
-            builder.RegisterComposablePartCatalog(catalog);
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             // shared editors
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             builder.RegisterAssemblyTypes(assemblies)
                 .As<IEditor>()
+                .InstancePerLifetimeScope();
+
+            // shared files
+            builder.RegisterAssemblyTypes(assemblies)
+                .As<IFile>()
                 .InstancePerLifetimeScope();
 
             // shared model

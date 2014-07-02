@@ -52,7 +52,6 @@
       <HintPath>..\packages\Splat.1.3.3\lib\Net45\Splat.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Reactive.Core">
       <HintPath>..\packages\Rx-Core.2.2.4\lib\net45\System.Reactive.Core.dll</HintPath>
@@ -79,25 +78,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Bootstrapper.cs">
-      <Link>Bootstrapper.cs</Link>
+    <Compile Include="..\Shared\Bootstrapper.cs">
+      <Link>Shared\Bootstrapper.cs</Link>
     </Compile>
-    <Compile Include="..\MainView.cs">
-      <Link>MainView.cs</Link>
+    <Compile Include="..\Shared\DrawingView.cs">
+      <Link>Shared\DrawingView.cs</Link>
     </Compile>
-    <Compile Include="Form1.cs">
+    <Compile Include="..\Shared\DxfCreator.cs">
+      <Link>Shared\DxfCreator.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\PdfCreator.cs">
+      <Link>Shared\PdfCreator.cs</Link>
+    </Compile>
+    <Compile Include="WinForms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="WinForms\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="WinFormsModule.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="WinForms\WinFormsModule.cs" />
+    <Compile Include="WinForms\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WinForms.cs">
+    <Compile Include="WinForms\WinForms.cs">
       <SubType>Component</SubType>
     </Compile>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="WinForms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -124,14 +129,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RxCanvas.Creators\RxCanvas.Creators.csproj">
-      <Project>{d80af44a-f33f-441e-9fd4-25781aeb25aa}</Project>
-      <Name>RxCanvas.Creators</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RxCanvas.Serializers\RxCanvas.Serializers.csproj">
-      <Project>{9dd40808-5705-4ca4-9672-a23e5f585a61}</Project>
-      <Name>RxCanvas.Serializers</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RxCanvas.Shared\RxCanvas.Shared.csproj">
       <Project>{bfc8b726-f060-4582-bc73-6463323c403f}</Project>
       <Name>RxCanvas.Shared</Name>

@@ -72,9 +72,9 @@ namespace RxCanvas.WinForms
             }
         }
 
-        private void DrawLayer(Graphics g, ICanvas canvas)
+        private void DrawLayer(Graphics g, ICanvas layer)
         {
-            foreach (var child in canvas.Children)
+            foreach (var child in layer.Children)
             {
                 if (child is ILine)
                 {

@@ -9,32 +9,38 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Views
 {
-    public class MainView
+    public class DrawingView
     {
+        public IList<ICanvas> Layers { get; set; }
+
         public IList<IEditor> Editors { get; set; }
         public IList<IFile> Files { get; set; }
         public IList<ICreator> Creators { get; set; }
-        public IList<ICanvas> Layers { get; set; }
-        public IList<ILifetimeScope> Scopes { get; set; }
 
-        public MainView()
+        private IList<ILifetimeScope> _scopes;
+
+        public DrawingView()
         {
             var bootstrapper = new Bootstrapper();
             var container = bootstrapper.Build();
 
+            // create scopes
+            _scopes = new List<ILifetimeScope>();
+            _scopes.Add(container.BeginLifetimeScope());
+            _scopes.Add(container.BeginLifetimeScope());
+
             // create layers
-            Scopes = new List<ILifetimeScope>();
-            Scopes.Add(container.BeginLifetimeScope());
-            Scopes.Add(container.BeginLifetimeScope());
-
             Layers = new List<ICanvas>();
-            for (int i = 0; i < Scopes.Count; i++)
+            for (int i = 0; i < _scopes.Count; i++)
             {
-                Layers.Add(Scopes[i].Resolve<ICanvas>());
+                Layers.Add(_scopes[i].Resolve<ICanvas>());
             }
+        }
 
+        public void Initialize()
+        {
             // drawing layer
-            var scope = Scopes.LastOrDefault();
+            var scope = _scopes.LastOrDefault();
             Editors = scope.Resolve<IList<IEditor>>();
             Files = scope.Resolve<IList<IFile>>();
             Creators = scope.Resolve<IList<ICreator>>();
@@ -123,7 +129,7 @@ namespace RxCanvas.Views
             double originX, 
             double originY)
         {
-            var scope = Scopes.FirstOrDefault();
+            var scope = _scopes.FirstOrDefault();
             var backgroundCanvas = scope.Resolve<ICanvas>();
             var nativeConverter = scope.Resolve<INativeConverter>();
             var canvasFactory = scope.Resolve<ICanvasFactory>();
@@ -167,7 +173,7 @@ namespace RxCanvas.Views
 
         private ICanvas ToModel()
         {
-            var scope = Scopes.LastOrDefault();
+            var scope = _scopes.LastOrDefault();
             var drawingCanvas = scope.Resolve<ICanvas>();
             var modelConverter = scope.Resolve<IModelConverter>();
             return modelConverter.Convert(drawingCanvas);
@@ -175,7 +181,7 @@ namespace RxCanvas.Views
 
         public void AsNative(ICanvas xcanvas)
         {
-            var scope = Scopes.LastOrDefault();
+            var scope = _scopes.LastOrDefault();
             var nativeConverter = scope.Resolve<INativeConverter>();
             var canvasFactory = scope.Resolve<ICanvasFactory>();
             var drawingCanvas = scope.Resolve<ICanvas>();

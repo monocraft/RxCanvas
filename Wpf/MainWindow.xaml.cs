@@ -19,14 +19,15 @@ namespace RxCanvas
 {
     public partial class MainWindow : Window
     {
-        private MainView _mainView;
+        private DrawingView _mainView;
         private IDictionary<Tuple<Key, ModifierKeys>, Action> _shortcuts;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _mainView = new MainView();
+            _mainView = new DrawingView();
+            _mainView.Initialize();
 
             InitlializeShortucts();
             Initialize();
