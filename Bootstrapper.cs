@@ -2,18 +2,14 @@
 using Autofac.Integration.Mef;
 using RxCanvas.Binary;
 using RxCanvas.Bounds;
-using RxCanvas.Creators;
 using RxCanvas.Editors;
 using RxCanvas.Interfaces;
 using RxCanvas.Model;
-using RxCanvas.Serializers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace RxCanvas.Views
 {
@@ -21,21 +17,23 @@ namespace RxCanvas.Views
     {
         public IContainer Build()
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-            // register components
             var builder = new ContainerBuilder();
-            var catalog = new DirectoryCatalog(AppDomain.CurrentDomain.BaseDirectory);
 
+            // mef exports
+            var catalog = new DirectoryCatalog(AppDomain.CurrentDomain.BaseDirectory);
             builder.RegisterComposablePartCatalog(catalog);
 
+            // shared editors
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             builder.RegisterAssemblyTypes(assemblies)
                 .As<IEditor>()
                 .InstancePerLifetimeScope();
 
+            // shared model
             builder.Register<IModelConverter>(c => new XModelConverter()).SingleInstance();
             builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
 
+            // native bounds
             builder.Register<IBoundsFactory>(c =>
             {
                 var nativeConverter = c.Resolve<INativeConverter>();
@@ -43,6 +41,7 @@ namespace RxCanvas.Views
                 return new BoundsFactory(nativeConverter, canvasFactory);
             }).InstancePerLifetimeScope();
 
+            // native canvas
             builder.Register<ICanvas>(c =>
             {
                 var nativeConverter = c.Resolve<INativeConverter>();
@@ -53,9 +52,9 @@ namespace RxCanvas.Views
                 return nativeConverter.Convert(xcanvas);
             }).InstancePerLifetimeScope();
 
-            builder.RegisterModule<NativeModule>();
+            // native modules
+            builder.RegisterAssemblyModules(Assembly.GetExecutingAssembly());
 
-            // create container
             return builder.Build();
         }
     }

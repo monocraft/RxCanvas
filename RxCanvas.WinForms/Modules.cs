@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Views
 {
-    public class NativeModule : Module
+    public class WinFormsModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

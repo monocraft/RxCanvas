@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RxCanvas
 {
-    public class NativeModule : Module
+    public class WpfModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
