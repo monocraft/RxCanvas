@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using RxCanvas.Interfaces;
-using RxCanvas.Xaml;
+using RxCanvas.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;

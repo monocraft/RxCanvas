@@ -96,7 +96,7 @@
     <Compile Include="SelectedItemControl.xaml.cs">
       <DependentUpon>SelectedItemControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Xaml.cs" />
+    <Compile Include="Wpf.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
