@@ -16,6 +16,7 @@ namespace RxCanvas.Views
             builder.Register<INativeConverter>(c =>
             {
                 var panel = new WinFormsCanvasPanel();
+                panel.Anchor = System.Windows.Forms.AnchorStyles.None;
                 panel.Location = new System.Drawing.Point(100, 12);
                 panel.Name = "canvasPanel";
                 panel.Size = new System.Drawing.Size(600, 600);
