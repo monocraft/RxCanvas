@@ -25,7 +25,11 @@ namespace RxCanvas.Serializers
 
         public override Type BindToType(string assemblyName, string typeName)
         {
+            #if !__ANDROID__
             string resolvedTypeName = string.Format("RxCanvas.Model.{0}, RxCanvas.Shared", 'X' + typeName);
+            #else
+            string resolvedTypeName = string.Format("RxCanvas.Model.{0}, CanvasDiagram.Droid", 'X' + typeName);
+            #endif
             return Type.GetType(resolvedTypeName, true);
         }
     }
