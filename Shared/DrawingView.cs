@@ -75,7 +75,11 @@ namespace RxCanvas.Views
             {
                 Editors[i].IsEnabled = false;
             }
-            editor.IsEnabled = true;
+
+            if (editor != null)
+            {
+                editor.IsEnabled = true;
+            }
         }
 
         public void ToggleSnap()
