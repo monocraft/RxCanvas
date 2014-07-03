@@ -118,16 +118,21 @@ namespace RxCanvas.WinForms
 
         private void Initialize()
         {
+            var panel = _mainView.Layers.LastOrDefault().Native as WinFormsCanvasPanel;
+
             // add canvas panel to root layout, same panel is used for all layers
             this.SuspendLayout();
-            this.Controls.Add(_mainView.Layers.LastOrDefault().Native as WinFormsCanvasPanel);
+            this.Controls.Add(panel);
             this.ResumeLayout(false);
+
+            // focus panel to enable mouse wheel event
+            panel.Select();
 
             // create grid canvas
             _mainView.CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
 
             // handle keyboard input
-            KeyDown += (sender, e) =>
+            panel.KeyDown += (sender, e) =>
             {
                 Action action;
                 bool result = _shortcuts.TryGetValue(

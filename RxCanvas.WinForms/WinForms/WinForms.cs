@@ -18,6 +18,12 @@ namespace RxCanvas.WinForms
     {
         public IList<ICanvas> Layers { get; set; }
 
+        public double Zoom { get; set; }
+        public double PanX { get; set; }
+        public double PanY { get; set; }
+
+        private Point previous;
+
         public WinFormsCanvasPanel()
         {
             this.SetStyle(
@@ -30,6 +36,46 @@ namespace RxCanvas.WinForms
             this.BackColor = Color.Transparent;
 
             this.Layers = new List<ICanvas>();
+
+            this.Zoom = 1.0;
+            this.PanX = 0.0;
+            this.PanY = 0.0;
+            
+            this.MouseDown += (sender, e) =>
+            {
+                if (e.Button == MouseButtons.Right)
+                {
+                    previous = e.Location;
+                }
+            };
+
+            this.MouseMove += (sender, e) =>
+            {
+                if (e.Button == MouseButtons.Right)
+                {
+                    Point p = e.Location;
+                    float dx = p.X - previous.X;
+                    float dy = p.Y - previous.Y;
+                    previous = p;
+                    this.PanX += dx;
+                    this.PanY += dy;
+                    this.Invalidate();
+                }
+            };
+
+            this.MouseWheel += (sender, e) =>
+            {
+                double zoom = e.Delta > 0 ? .2 : -.2;
+                if (!(e.Delta > 0) && this.Zoom < .4)
+                    return;
+                Point relative = e.Location;
+                double abosuluteX = relative.X * this.Zoom + this.PanX;
+                double abosuluteY = relative.Y * this.Zoom + this.PanY;
+                this.Zoom += zoom;
+                this.PanX = abosuluteX - relative.X * this.Zoom;
+                this.PanY = abosuluteY - relative.Y * this.Zoom;
+                this.Invalidate();
+            };
         }
 
         protected override CreateParams CreateParams
@@ -63,9 +109,21 @@ namespace RxCanvas.WinForms
             g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             g.CompositingQuality = CompositingQuality.HighQuality;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            
+            // pan
+            g.TranslateTransform(
+                (float)PanX, 
+                (float)PanY);
 
+            // zoom
+            g.ScaleTransform(
+                (float)Zoom, 
+                (float)Zoom);
+
+            // background
             g.Clear(ToNativeColor(layers.FirstOrDefault().Background));
 
+            // layers
             for (int i = 0; i < layers.Count; i++)
             {
                 DrawLayer(g, layers[i]);
@@ -182,10 +240,10 @@ namespace RxCanvas.WinForms
 
                     g.DrawRectangle(
                         pen,
-                        (float)(x),
-                        (float)(y),
-                        (float)(width),
-                        (float)(height));
+                        (float)x,
+                        (float)y,
+                        (float)width,
+                        (float)height);
 
                     pen.Dispose();
                 }
@@ -203,10 +261,10 @@ namespace RxCanvas.WinForms
 
                     g.DrawEllipse(
                         pen,
-                        (float)(x),
-                        (float)(y),
-                        (float)(width),
-                        (float)(height));
+                        (float)x,
+                        (float)y,
+                        (float)width,
+                        (float)height);
 
                     pen.Dispose();
                 }
@@ -226,10 +284,10 @@ namespace RxCanvas.WinForms
                         font,
                         brush,
                         new RectangleF(
-                            (float)(x),
-                            (float)(y),
-                            (float)(width),
-                            (float)(height)),
+                            (float)x,
+                            (float)y,
+                            (float)width,
+                            (float)height),
                         new StringFormat()
                         {
                             Alignment = (StringAlignment)text.HorizontalAlignment,
@@ -270,6 +328,10 @@ namespace RxCanvas.WinForms
 
         public IColor Background { get; set; }
 
+        public double Zoom { get; set; }
+        public double PanX { get; set; }
+        public double PanY { get; set; }
+
         public bool EnableSnap { get; set; }
         public double SnapX { get; set; }
         public double SnapY { get; set; }
@@ -298,26 +360,40 @@ namespace RxCanvas.WinForms
             _panel = panel;
             _panel.Layers.Add(this);
 
-            Downs = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseDown").Select(e =>
-            {
-                var p = e.EventArgs.Location;
-                return new ImmutablePoint(EnableSnap ? Snap((double)p.X, SnapX) : (double)p.X,
-                    EnableSnap ? Snap((double)p.Y, SnapY) : (double)p.Y);
-            });
+            Downs = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseDown")
+                .Where(e => e.EventArgs.Button == MouseButtons.Left)
+                .Select(e =>
+                {
+                    var p = e.EventArgs.Location;
+                    double x = EnableSnap ? Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
+                    double y = EnableSnap ? Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
+                    x /= _panel.Zoom;
+                    y /= _panel.Zoom;
+                    return new ImmutablePoint(x, y);
+                });
 
-            Ups = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseUp").Select(e =>
-            {
-                var p = e.EventArgs.Location;
-                return new ImmutablePoint(EnableSnap ? Snap((double)p.X, SnapX) : (double)p.X,
-                    EnableSnap ? Snap((double)p.Y, SnapY) : (double)p.Y);
-            });
+            Ups = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseUp")
+                .Where(e => e.EventArgs.Button == MouseButtons.Left)
+                .Select(e =>
+                {
+                    var p = e.EventArgs.Location;
+                    double x = EnableSnap ? Snap((double)(p.X) - _panel.PanX, SnapX * Zoom) : (double)(p.X) - _panel.PanX;
+                    double y = EnableSnap ? Snap((double)(p.Y) - _panel.PanY, SnapY * Zoom) : (double)(p.Y) - _panel.PanY;
+                    x /= _panel.Zoom;
+                    y /= _panel.Zoom;
+                    return new ImmutablePoint(x, y);
+                });
 
-            Moves = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseMove").Select(e =>
-            {
-                var p = e.EventArgs.Location;
-                return new ImmutablePoint(EnableSnap ? Snap((double)p.X, SnapX) : (double)p.X,
-                    EnableSnap ? Snap((double)p.Y, SnapY) : (double)p.Y);
-            });
+            Moves = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseMove")
+                .Select(e =>
+                {
+                    var p = e.EventArgs.Location;
+                    double x = EnableSnap ? Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
+                    double y = EnableSnap ? Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
+                    x /= _panel.Zoom;
+                    y /= _panel.Zoom;
+                    return new ImmutablePoint(x, y);
+                });
 
             Native = _panel;
         }
