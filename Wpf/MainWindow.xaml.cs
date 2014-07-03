@@ -19,15 +19,15 @@ namespace RxCanvas
 {
     public partial class MainWindow : Window
     {
-        private DrawingView _mainView;
+        private DrawingView _view;
         private IDictionary<Tuple<Key, ModifierKeys>, Action> _shortcuts;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _mainView = new DrawingView();
-            _mainView.Initialize();
+            _view = new DrawingView();
+            _view.Initialize();
 
             InitlializeShortucts();
             Initialize();
@@ -68,51 +68,51 @@ namespace RxCanvas
                 new Tuple<Key, ModifierKeys>(
                     (Key)keyConverter.ConvertFromString("Z"),
                     (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => _mainView.Undo());
+                () => _view.Undo());
 
             // redo shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>(
                     (Key)keyConverter.ConvertFromString("Y"),
                     (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => _mainView.Redo());
+                () => _view.Redo());
 
             // snap shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>(
                     (Key)keyConverter.ConvertFromString("S"),
                     ModifierKeys.None),
-                () => _mainView.ToggleSnap());
+                () => _view.ToggleSnap());
 
             // clear shortcut
             _shortcuts.Add(
                 new Tuple<Key, ModifierKeys>(
                     (Key)keyConverter.ConvertFromString("Delete"),
                     (ModifierKeys)modifiersKeyConverter.ConvertFromString("Control")),
-                () => _mainView.Clear());
+                () => _view.Clear());
 
             // editor shortcuts
-            foreach (var editor in _mainView.Editors)
+            foreach (var editor in _view.Editors)
             {
                 var _editor = editor;
                 _shortcuts.Add(
                     new Tuple<Key, ModifierKeys>(
                         (Key)keyConverter.ConvertFromString(editor.Key),
                         editor.Modifiers == "" ? ModifierKeys.None : (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
-                    () => _mainView.Enable(_editor));
+                    () => _view.Enable(_editor));
             }
         }
 
         private void Initialize()
         {
             // add canvas layers to root layout
-            for (int i = 0; i < _mainView.Layers.Count; i++)
+            for (int i = 0; i < _view.Layers.Count; i++)
             {
-                Layout.Children.Add(_mainView.Layers[i].Native as UIElement);
+                Layout.Children.Add(_view.Layers[i].Native as UIElement);
             }
 
             // create grid canvas
-            _mainView.CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
+            _view.CreateGrid(600.0, 600.0, 30.0, 0.0, 0.0);
 
             // handle keyboard input
             PreviewKeyDown += (sender, e) =>
@@ -129,14 +129,14 @@ namespace RxCanvas
             };
 
             // set data context
-            DataContext = _mainView.Layers.LastOrDefault();
+            DataContext = _view.Layers.LastOrDefault();
         }
 
         private string ToFileFilter()
         {
             bool first = true;
             string filter = string.Empty;
-            foreach (var serializer in _mainView.Files)
+            foreach (var serializer in _view.Files)
             {
                 filter += string.Format(
                     "{0}{1} File (*.{2})|*.{2}", 
@@ -156,7 +156,7 @@ namespace RxCanvas
         {
             bool first = true;
             string filter = string.Empty;
-            foreach (var creator in _mainView.Creators)
+            foreach (var creator in _view.Creators)
             {
                 filter += string.Format(
                     "{0}{1} File (*.{2})|*.{2}", 
@@ -175,8 +175,8 @@ namespace RxCanvas
         private void Open()
         {
             string filter = ToFileFilter();
-            int defaultFilterIndex = _mainView.Files
-                .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
+            int defaultFilterIndex = _view.Files
+                .IndexOf(_view.Files.Where(c => c.Name == "Json")
                 .FirstOrDefault()) + 1;
 
             var dlg = new OpenFileDialog()
@@ -189,15 +189,15 @@ namespace RxCanvas
             {
                 string path = dlg.FileName;
                 int filterIndex = dlg.FilterIndex;
-                _mainView.Open(path, filterIndex - 1);
+                _view.Open(path, filterIndex - 1);
             }
         }
 
         private void Save()
         {
             string filter = ToFileFilter();
-            int defaultFilterIndex = _mainView.Files
-                .IndexOf(_mainView.Files.Where(c => c.Name == "Json")
+            int defaultFilterIndex = _view.Files
+                .IndexOf(_view.Files.Where(c => c.Name == "Json")
                 .FirstOrDefault()) + 1;
 
             var dlg = new SaveFileDialog()
@@ -211,15 +211,15 @@ namespace RxCanvas
             {
                 string path = dlg.FileName;
                 int filterIndex = dlg.FilterIndex;
-                _mainView.Save(path, filterIndex - 1);
+                _view.Save(path, filterIndex - 1);
             }
         }
 
         private void Export()
         {
             string filter = ToCreatorFilter();
-            int defaultFilterIndex = _mainView.Creators
-                .IndexOf(_mainView.Creators.Where(c => c.Name == "Pdf")
+            int defaultFilterIndex = _view.Creators
+                .IndexOf(_view.Creators.Where(c => c.Name == "Pdf")
                 .FirstOrDefault()) + 1;
 
             var dlg = new SaveFileDialog()
@@ -233,7 +233,7 @@ namespace RxCanvas
             {
                 string path = dlg.FileName;
                 int filterIndex = dlg.FilterIndex;
-                _mainView.Export(path, filterIndex - 1);
+                _view.Export(path, filterIndex - 1);
             }
         }
     }
