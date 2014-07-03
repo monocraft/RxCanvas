@@ -171,7 +171,7 @@ namespace RxCanvas.Views
             }
         }
 
-        private ICanvas ToModel()
+        public ICanvas ToModel()
         {
             var scope = _scopes.LastOrDefault();
             var drawingCanvas = scope.Resolve<ICanvas>();
