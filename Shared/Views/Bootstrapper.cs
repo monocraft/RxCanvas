@@ -16,15 +16,15 @@ namespace RxCanvas.Views
         public IContainer Build()
         {
             var builder = new ContainerBuilder();
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var assembly = Assembly.GetExecutingAssembly();
 
             // shared editors
-            builder.RegisterAssemblyTypes(assemblies)
+            builder.RegisterAssemblyTypes(assembly)
                 .As<IEditor>()
                 .InstancePerLifetimeScope();
 
             // shared files
-            builder.RegisterAssemblyTypes(assemblies)
+            builder.RegisterAssemblyTypes(assembly)
                 .As<IFile>()
                 .InstancePerLifetimeScope();
 
@@ -52,7 +52,7 @@ namespace RxCanvas.Views
             }).InstancePerLifetimeScope();
 
             // native modules
-            builder.RegisterAssemblyModules(Assembly.GetExecutingAssembly());
+            builder.RegisterAssemblyModules(assembly);
 
             return builder.Build();
         }

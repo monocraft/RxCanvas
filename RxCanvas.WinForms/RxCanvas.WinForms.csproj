@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RxCanvas.WinForms</RootNamespace>
-    <AssemblyName>RxCanvas.WinForms</AssemblyName>
+    <AssemblyName>RxCanvas</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -76,17 +76,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Shared\Bootstrapper.cs">
-      <Link>Shared\Bootstrapper.cs</Link>
+    <Compile Include="..\Shared\Bounds.cs">
+      <Link>Shared\Bounds.cs</Link>
     </Compile>
-    <Compile Include="..\Shared\DrawingView.cs">
-      <Link>Shared\DrawingView.cs</Link>
+    <Compile Include="..\Shared\Creators\DxfCreator.cs">
+      <Link>Shared\Creators\DxfCreator.cs</Link>
     </Compile>
-    <Compile Include="..\Shared\DxfCreator.cs">
-      <Link>Shared\DxfCreator.cs</Link>
+    <Compile Include="..\Shared\Creators\PdfCreator.cs">
+      <Link>Shared\Creators\PdfCreator.cs</Link>
     </Compile>
-    <Compile Include="..\Shared\PdfCreator.cs">
-      <Link>Shared\PdfCreator.cs</Link>
+    <Compile Include="..\Shared\Editors.cs">
+      <Link>Shared\Editors.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\Files\Binary.cs">
+      <Link>Shared\Files\Binary.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\Files\Json.cs">
+      <Link>Shared\Files\Json.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\History.cs">
+      <Link>Shared\History.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\Interfaces.cs">
+      <Link>Shared\Interfaces.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\Model.cs">
+      <Link>Shared\Model.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\Views\Bootstrapper.cs">
+      <Link>Shared\Views\Bootstrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\Views\DrawingView.cs">
+      <Link>Shared\Views\DrawingView.cs</Link>
     </Compile>
     <Compile Include="WinForms\Form1.cs">
       <SubType>Form</SubType>
@@ -126,12 +147,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RxCanvas.Shared\RxCanvas.Shared.csproj">
-      <Project>{bfc8b726-f060-4582-bc73-6463323c403f}</Project>
-      <Name>RxCanvas.Shared</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
