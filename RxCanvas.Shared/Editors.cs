@@ -301,12 +301,15 @@ namespace RxCanvas.Editors
 
         private void Move(ImmutablePoint p)
         {
-            double dx = _start.X - p.X;
-            double dy = _start.Y - p.Y;
-            _start = p;
-            _selected.Bounds.Move(dx, dy);
-            _selected.Bounds.Update();
-            _canvas.Render(null);
+            if (_selected != null)
+            {
+                double dx = _start.X - p.X;
+                double dy = _start.Y - p.Y;
+                _start = p;
+                _selected.Bounds.Move(dx, dy);
+                _selected.Bounds.Update();
+                _canvas.Render(null);
+            }
         }
 
         private INative HitTest(double x, double y)
