@@ -134,7 +134,27 @@ namespace RxCanvas.WinForms
         {
             foreach (var child in layer.Children)
             {
-                if (child is ILine)
+                if (child is IPin)
+                {
+                    var pin = child as IPin;
+                    var color = Color.FromArgb(0xFF, 0x00, 0x00, 0x00);
+                    Brush brush = new SolidBrush(color);
+
+                    double x = pin.Point.X - 4.0;
+                    double y = pin.Point.Y - 4.0;
+                    double width = 8.0;
+                    double height = 8.0;
+
+                    g.FillEllipse(
+                        brush,
+                        (float)x,
+                        (float)y,
+                        (float)width,
+                        (float)height);
+
+                    brush.Dispose();
+                }
+                else if (child is ILine)
                 {
                     var line = child as ILine;
                     Pen pen = new Pen(
@@ -454,6 +474,11 @@ namespace RxCanvas.WinForms
         public WinFormsConverter(WinFormsCanvasPanel panel)
         {
             _panel = panel;
+        }
+
+        public IPin Convert(IPin pin)
+        {
+            return pin;
         }
 
         public ILine Convert(ILine line)

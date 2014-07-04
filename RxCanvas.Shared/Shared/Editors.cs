@@ -354,6 +354,54 @@ namespace RxCanvas.Editors
         }
     }
 
+    public class XPinEditor : IEditor, IDisposable
+    {
+        public string Name { get; set; }
+        public bool IsEnabled { get; set; }
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
+
+        private ICanvas _canvas;
+        private IPin _xpin;
+        private IPin _npin;
+        private IDisposable _downs;
+
+        public XPinEditor(
+            INativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
+            IBoundsFactory boundsFactory,
+            ICanvas canvas)
+        {
+            _canvas = canvas;
+
+            Name = "Pin";
+            Key = "P";
+            Modifiers = "";
+
+            var moves = _canvas.Moves.Where(_ => _canvas.IsCaptured);
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, moves);
+
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p =>
+            {
+                _xpin = canvasFactory.CreatePin();
+                _xpin.Point.X = p.X;
+                _xpin.Point.Y = p.Y;
+                _npin = nativeConverter.Convert(_xpin);
+                _canvas.History.Snapshot(_canvas);
+                _canvas.Add(_npin);
+                _npin.Bounds = boundsFactory.Create(_canvas, _npin);
+                _npin.Bounds.Update();
+                _canvas.Render(null);
+            });
+
+        }
+
+        public void Dispose()
+        {
+            _downs.Dispose();
+        }
+    }
+
     public class XLineEditor : IEditor, IDisposable
     {
         public enum State { None, Start, End }
@@ -1034,6 +1082,24 @@ namespace RxCanvas.Editors
         public IPolygon CreatePolygon()
         {
             return new XPolygon();
+        }
+
+        public IPin CreatePin()
+        {
+            var shape = new XEllipse()
+            {
+                Point1 = new XPoint(-4.0, -4.0),
+                Point2 = new XPoint(4.0, 4.0),
+                Stroke = new XColor(0x00, 0x00, 0x00, 0x00),
+                StrokeThickness = 0.0,
+                Fill = new XColor(0xFF, 0x00, 0x00, 0x00)
+            };
+
+            return new XPin()
+            {
+                Point = new XPoint(0.0, 0.0),
+                Shape = shape,
+            };
         }
 
         public ILine CreateLine()

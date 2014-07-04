@@ -17,6 +17,35 @@ namespace RxCanvas.Serializers
             return (NativeType)reader.ReadByte();
         }
 
+        public static INative ReadNative(this BinaryReader reader)
+        {
+            var type = reader.ReadNativeType();
+            switch (type)
+            {
+                case NativeType.Pin:
+                    return reader.ReadPin();
+                case NativeType.Line:
+                    return reader.ReadLine();
+                case NativeType.Bezier:
+                    return reader.ReadBezier();
+                case NativeType.QuadraticBezier:
+                    return reader.ReadQuadraticBezier();
+                case NativeType.Arc:
+                    return reader.ReadArc();
+                case NativeType.Rectangle:
+                    return reader.ReadRectangle();
+                case NativeType.Ellipse:
+                    return reader.ReadEllipse();
+                case NativeType.Text:
+                    return reader.ReadText();
+                case NativeType.Block:
+                    return reader.ReadBlock();
+                default:
+                    throw new InvalidDataException();
+            }
+
+        }
+
         public static IPoint ReadPoint(this BinaryReader reader)
         {
             return new XPoint(
@@ -31,6 +60,15 @@ namespace RxCanvas.Serializers
                 reader.ReadByte(), 
                 reader.ReadByte(), 
                 reader.ReadByte());
+        }
+
+        public static IPin ReadPin(this BinaryReader reader)
+        {
+            return new XPin()
+            {
+                Point = reader.ReadPoint(),
+                Shape = reader.ReadNative(),
+            };
         }
 
         public static ILine ReadLine(this BinaryReader reader)
@@ -140,6 +178,9 @@ namespace RxCanvas.Serializers
                 var type = reader.ReadNativeType();
                 switch (type)
                 {
+                    case NativeType.Pin:
+                        children.Add(reader.ReadPin());
+                        break;
                     case NativeType.Line:
                         children.Add(reader.ReadLine());
                         break;
@@ -192,6 +233,9 @@ namespace RxCanvas.Serializers
                 var type = reader.ReadNativeType();
                 switch (type)
                 {
+                    case NativeType.Pin:
+                        children.Add(reader.ReadPin());
+                        break;
                     case NativeType.Line:
                         children.Add(reader.ReadLine());
                         break;
@@ -246,6 +290,13 @@ namespace RxCanvas.Serializers
             writer.Write(color.R);
             writer.Write(color.G);
             writer.Write(color.B);
+        }
+
+        public static void Write(this BinaryWriter writer, IPin pin)
+        {
+            writer.Write(NativeType.Pin);
+            writer.Write(pin.Point);
+            writer.Write(pin.Shape);
         }
 
         public static void Write(this BinaryWriter writer, ILine line)
@@ -336,40 +387,47 @@ namespace RxCanvas.Serializers
             int count = children.Count;
             for (int i = 0; i < count; i++)
             {
-                var child = children[i];
+                writer.Write(children[i]);
+            }
+        }
 
-                if (child is ILine)
-                {
-                    writer.Write(child as ILine);
-                }
-                else if (child is IBezier)
-                {
-                    writer.Write(child as IBezier);
-                }
-                else if (child is IQuadraticBezier)
-                {
-                    writer.Write(child as IQuadraticBezier);
-                }
-                else if (child is IArc)
-                {
-                    writer.Write(child as IArc);
-                }
-                else if (child is IRectangle)
-                {
-                    writer.Write(child as IRectangle);
-                }
-                else if (child is IEllipse)
-                {
-                    writer.Write(child as IEllipse);
-                }
-                else if (child is IText)
-                {
-                    writer.Write(child as IText);
-                }
-                else if (child is IBlock)
-                {
-                    writer.Write(child as IBlock);
-                }
+        public static void Write(this BinaryWriter writer, INative child)
+        {
+            if (child is IPin)
+            {
+                writer.Write(child as IPin);
+            }
+            else if (child is ILine)
+            {
+                writer.Write(child as ILine);
+            }
+            else if (child is IBezier)
+            {
+                writer.Write(child as IBezier);
+            }
+            else if (child is IQuadraticBezier)
+            {
+                writer.Write(child as IQuadraticBezier);
+            }
+            else if (child is IArc)
+            {
+                writer.Write(child as IArc);
+            }
+            else if (child is IRectangle)
+            {
+                writer.Write(child as IRectangle);
+            }
+            else if (child is IEllipse)
+            {
+                writer.Write(child as IEllipse);
+            }
+            else if (child is IText)
+            {
+                writer.Write(child as IText);
+            }
+            else if (child is IBlock)
+            {
+                writer.Write(child as IBlock);
             }
         }
 
@@ -404,13 +462,14 @@ namespace RxCanvas.Serializers
         Block           = 0x11,
         End             = 0x12,
         // Primitive
-        Line            = 0x21,
-        Bezier          = 0x22,
-        QuadraticBezier = 0x23,
-        Arc             = 0x24,
-        Rectangle       = 0x25,
-        Ellipse         = 0x26,
-        Text            = 0x27,
+        Pin             = 0x21,
+        Line            = 0x22,
+        Bezier          = 0x23,
+        QuadraticBezier = 0x24,
+        Arc             = 0x25,
+        Rectangle       = 0x26,
+        Ellipse         = 0x27,
+        Text            = 0x28,
     }
 
     public class BinaryFile : IFile

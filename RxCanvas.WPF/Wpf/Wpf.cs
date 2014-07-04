@@ -23,6 +23,72 @@ namespace RxCanvas.WPF
         }
     }
 
+    public class WpfPin : IPin
+    {
+        public object Native { get; set; }
+        public IBounds Bounds { get; set; }
+
+        private SolidColorBrush _strokeBrush;
+        private SolidColorBrush _fillBrush;
+        private Ellipse _ellipse;
+        private double _size;
+        private IPoint _point;
+        private INative _shape;
+
+        public WpfPin(IPin pin)
+        {
+            _point = pin.Point;
+            _shape = pin.Shape;
+
+            _size = 8.0;
+
+            _strokeBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0x00));
+            _strokeBrush.Freeze();
+            _fillBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0x00));
+            _fillBrush.Freeze();
+
+            _ellipse = new Ellipse()
+            {
+                Stroke = _strokeBrush,
+                StrokeThickness = 2.0,
+                Fill = _fillBrush
+            };
+
+            Update();
+
+            Native = _ellipse;
+        }
+
+        public INative Shape
+        {
+            get { return _shape; }
+            set
+            {
+                _shape = value;
+                Update();
+            }
+        }
+
+        public IPoint Point
+        {
+            get { return _point; }
+            set
+            {
+                _point = value;
+                Update();
+            }
+        }
+
+        private void Update()
+        {
+            double hsize = _size / 2.0;
+            Canvas.SetLeft(_ellipse, _point.X - hsize);
+            Canvas.SetTop(_ellipse, _point.Y - hsize);
+            _ellipse.Width = _size;
+            _ellipse.Height = _size;
+        }
+    }
+
     public class WpfLine : ILine
     {
         public object Native { get; set; }
@@ -1122,6 +1188,11 @@ namespace RxCanvas.WPF
 
     public class WpfConverter : INativeConverter
     {
+        public IPin Convert(IPin pin)
+        {
+            return new WpfPin(pin);
+        }
+
         public ILine Convert(ILine line)
         {
             return new WpfLine(line);

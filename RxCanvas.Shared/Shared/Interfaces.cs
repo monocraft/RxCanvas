@@ -19,26 +19,18 @@ namespace RxCanvas.Interfaces
         }
     }
 
-    public interface IColor
-    {
-        byte A { get; set; }
-        byte R { get; set; }
-        byte G { get; set; }
-        byte B { get; set; }
-    }
-
     public interface IPoint
     {
         double X { get; set; }
         double Y { get; set; }
     }
 
-    public interface IPolygon
+    public interface IColor
     {
-        IPoint[] Points { get; set; }
-        ILine[] Lines { get; set; }
-        bool Contains(IPoint point);
-        bool Contains(double x, double y);
+        byte A { get; set; }
+        byte R { get; set; }
+        byte G { get; set; }
+        byte B { get; set; }
     }
 
     public interface IBounds
@@ -55,6 +47,20 @@ namespace RxCanvas.Interfaces
     {
         object Native { get; set; }
         IBounds Bounds { get; set; }
+    }
+
+    public interface IPolygon
+    {
+        IPoint[] Points { get; set; }
+        ILine[] Lines { get; set; }
+        bool Contains(IPoint point);
+        bool Contains(double x, double y);
+    }
+
+    public interface IPin : INative
+    {
+        IPoint Point { get; set; }
+        INative Shape { get; set; }
     }
 
     public interface ILine : INative
@@ -174,6 +180,7 @@ namespace RxCanvas.Interfaces
         IColor CreateColor();
         IPoint CreatePoint();
         IPolygon CreatePolygon();
+        IPin CreatePin();
         ILine CreateLine();
         IBezier CreateBezier();
         IQuadraticBezier CreateQuadraticBezier();
@@ -187,6 +194,7 @@ namespace RxCanvas.Interfaces
 
     public interface IConverter
     {
+        IPin Convert(IPin pin);
         ILine Convert(ILine line);
         IBezier Convert(IBezier bezier);
         IQuadraticBezier Convert(IQuadraticBezier quadraticBezier);
@@ -208,7 +216,7 @@ namespace RxCanvas.Interfaces
 
     public interface IBoundsFactory
     {
-        IBounds Create(ICanvas canvas, IPoint point);
+        IBounds Create(ICanvas canvas, IPin pin);
         IBounds Create(ICanvas canvas, ILine line);
         IBounds Create(ICanvas canvas, IBezier bezier);
         IBounds Create(ICanvas canvas, IQuadraticBezier quadraticBezier);

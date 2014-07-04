@@ -62,33 +62,6 @@ namespace RxCanvas.Model
         }
     }
 
-    public class XPoint : IPoint, IComparable<XPoint>
-    {
-        public double X { get; set; }
-        public double Y { get; set; }
-
-        public XPoint(double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public static bool operator <(XPoint p1, XPoint p2)
-        {
-            return p1.X < p2.X || (p1.X == p2.X && p1.Y < p2.Y);
-        }
-
-        public static bool operator >(XPoint p1, XPoint p2)
-        {
-            return p1.X > p2.X || (p1.X == p2.X && p1.Y > p2.Y);
-        }
-
-        public int CompareTo(XPoint other)
-        {
-            return (this > other) ? -1 : ((this < other) ? 1 : 0);
-        }
-    }
-
     public class XPolygon : IPolygon
     {
         public IPoint[] Points { get; set; }
@@ -118,6 +91,41 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
+    }
+
+    public class XPoint : IPoint, IComparable<XPoint>
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+
+        public XPoint(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public static bool operator <(XPoint p1, XPoint p2)
+        {
+            return p1.X < p2.X || (p1.X == p2.X && p1.Y < p2.Y);
+        }
+
+        public static bool operator >(XPoint p1, XPoint p2)
+        {
+            return p1.X > p2.X || (p1.X == p2.X && p1.Y > p2.Y);
+        }
+
+        public int CompareTo(XPoint other)
+        {
+            return (this > other) ? -1 : ((this < other) ? 1 : 0);
+        }
+    }
+
+    public class XPin : IPin
+    {
+        public object Native { get; set; }
+        public IBounds Bounds { get; set; }
+        public IPoint Point { get; set; }
+        public INative Shape { get; set; }
     }
 
     public class XLine : ILine
@@ -282,14 +290,23 @@ namespace RxCanvas.Model
 
     public class XModelConverter : IModelConverter
     {
-        public IColor Convert(IColor color)
+        private IColor Convert(IColor color)
         {
             return new XColor(color.A, color.R, color.G, color.B);
         }
 
-        public IPoint Convert(IPoint point)
+        private IPoint Convert(IPoint point)
         {
             return new XPoint(point.X, point.Y);
+        }
+
+        public IPin Convert(IPin pin)
+        {
+            return new XPin()
+            {
+                Point = Convert(pin.Point),
+                Shape = Convert(pin.Shape),
+            };
         }
 
         public ILine Convert(ILine line)
@@ -396,7 +413,11 @@ namespace RxCanvas.Model
 
         public INative Convert(INative native)
         {
-            if (native is ILine)
+            if (native is IPin)
+            {
+                return Convert(native as IPin);
+            }
+            else if (native is ILine)
             {
                 return Convert(native as ILine);
             }

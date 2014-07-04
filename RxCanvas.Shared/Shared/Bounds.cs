@@ -143,9 +143,9 @@ namespace RxCanvas.Bounds
         }
     }
 
-    public class PointBounds : IBounds
+    public class PinBounds : IBounds
     {
-        private IPoint _point;
+        private IPin _pin;
         private double _size;
         private double _offset;
         private ICanvas _canvas;
@@ -155,15 +155,15 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point };
         private HitResult _hitResult;
 
-        public PointBounds(
+        public PinBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
             ICanvas canvas,
-            IPoint point,
+            IPin pin,
             double size,
             double offset)
         {
-            _point = point;
+            _pin = pin;
             _size = size;
             _offset = offset;
             _canvas = canvas;
@@ -184,7 +184,7 @@ namespace RxCanvas.Bounds
         {
             var ps = _polygonPoint.Points;
             var ls = _polygonPoint.Lines;
-            Helper.UpdatePointBounds(_point, ps, ls, _size, _offset);
+            Helper.UpdatePointBounds(_pin.Point, ps, ls, _size, _offset);
         }
 
         public void Update()
@@ -239,10 +239,11 @@ namespace RxCanvas.Bounds
             {
                 case HitResult.Point:
                     {
-                        double x = _point.X - dx;
-                        double y = _point.Y - dy;
-                        _point.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
-                        _point.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        double x = _pin.Point.X - dx;
+                        double y = _pin.Point.Y - dy;
+                        _pin.Point.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _pin.Point.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                        _pin.Point = _pin.Point;
                     }
                     break;
             }
@@ -1753,9 +1754,9 @@ namespace RxCanvas.Bounds
             _canvasFactory = canvasFactory;
         }
 
-        public IBounds Create(ICanvas canvas, IPoint point)
+        public IBounds Create(ICanvas canvas, IPin pin)
         {
-            return new PointBounds(_nativeConverter, _canvasFactory, canvas, point, 15.0, 0.0);
+            return new PinBounds(_nativeConverter, _canvasFactory, canvas, pin, 15.0, 0.0);
         }
 
         public IBounds Create(ICanvas canvas, ILine line)

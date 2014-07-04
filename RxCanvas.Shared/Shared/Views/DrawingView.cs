@@ -208,7 +208,18 @@ namespace RxCanvas.Views
         {
             foreach (var child in xchildren)
             {
-                if (child is ILine)
+                if (child is IPin)
+                {
+                    var native = nativeConverter.Convert(child as IPin);
+                    nativeCanvas.Add(native);
+
+                    native.Bounds = boundsFactory.Create(nativeCanvas, native);
+                    if (native.Bounds != null)
+                    {
+                        native.Bounds.Update();
+                    }
+                }
+                else if (child is ILine)
                 {
                     var native = nativeConverter.Convert(child as ILine);
                     nativeCanvas.Add(native);
