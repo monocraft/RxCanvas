@@ -19,14 +19,25 @@ namespace RxCanvas.WinForms
         public Form1()
         {
             InitializeComponent();
+            InitializeStyle();
 
+            InitializeDrawingView();
+            InitlializeShortucts();
+            Initialize();
+        }
+
+        private void InitializeStyle()
+        {
             this.SetStyle(
-                ControlStyles.AllPaintingInWmPaint 
-                | ControlStyles.UserPaint 
+                ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.UserPaint
                 | ControlStyles.DoubleBuffer
-                | ControlStyles.SupportsTransparentBackColor, 
+                | ControlStyles.SupportsTransparentBackColor,
                 true);
+        }
 
+        private void InitializeDrawingView()
+        {
             _view = new DrawingView();
             _view.Initialize();
 
@@ -41,9 +52,6 @@ namespace RxCanvas.WinForms
             _view.Layers[1].Background.R = 0xF5;
             _view.Layers[1].Background.G = 0xF5;
             _view.Layers[1].Background.B = 0xF5;
-
-            InitlializeShortucts();
-            Initialize();
         }
 
         private void InitlializeShortucts()

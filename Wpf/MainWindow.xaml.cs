@@ -26,11 +26,15 @@ namespace RxCanvas
         {
             InitializeComponent();
 
-            _view = new DrawingView();
-            _view.Initialize();
-
+            InitializeDrawingView();
             InitlializeShortucts();
             Initialize();
+        }
+
+        private void InitializeDrawingView()
+        {
+            _view = new DrawingView();
+            _view.Initialize();
         }
 
         private void InitlializeShortucts()
