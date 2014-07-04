@@ -12,11 +12,19 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace RxCanvas.Serializers
 {
     public class JsonSerializationBinder : SerializationBinder
     {
+        private readonly string _assemblyName;
+
+        public JsonSerializationBinder()
+        {
+            _assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        }
+
         public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
             assemblyName = null;
@@ -25,7 +33,7 @@ namespace RxCanvas.Serializers
 
         public override Type BindToType(string assemblyName, string typeName)
         {
-            string resolvedTypeName = string.Format("RxCanvas.Model.{0}, RxCanvas", 'X' + typeName);
+            string resolvedTypeName = string.Format("RxCanvas.Model.{0}, {1}", 'X' + typeName, _assemblyName);
             return Type.GetType(resolvedTypeName, true);
         }
     }

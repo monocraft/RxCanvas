@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RxCanvas
+namespace RxCanvas.WPF
 {
     public partial class SelectedItemControl : UserControl
     {

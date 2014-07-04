@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E10EC08B-B037-41B9-9F29-D3299990B298}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{96374000-DA52-4D22-9D39-2E5722A48F2A}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RxCanvas.WinForms</RootNamespace>
-    <AssemblyName>RxCanvas</AssemblyName>
+    <RootNamespace>RxCanvas.Shared</RootNamespace>
+    <AssemblyName>RxCanvas.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,8 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Autofac">
       <HintPath>..\packages\Autofac.3.5.0\lib\net40\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -51,6 +48,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Reactive.Core">
       <HintPath>..\packages\Rx-Core.2.2.4\lib\net45\System.Reactive.Core.dll</HintPath>
     </Reference>
@@ -63,91 +61,29 @@
     <Reference Include="System.Reactive.PlatformServices">
       <HintPath>..\packages\Rx-PlatformServices.2.2.4\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive.Windows.Forms">
-      <HintPath>..\packages\Rx-WinForms.2.2.4\lib\net45\System.Reactive.Windows.Forms.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\RxCanvas.Shared\Shared\Bounds.cs">
-      <Link>Shared\Bounds.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Creators\DxfCreator.cs">
-      <Link>Shared\Creators\DxfCreator.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Creators\PdfCreator.cs">
-      <Link>Shared\Creators\PdfCreator.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Editors.cs">
-      <Link>Shared\Editors.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Files\Binary.cs">
-      <Link>Shared\Files\Binary.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Files\Json.cs">
-      <Link>Shared\Files\Json.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\History.cs">
-      <Link>Shared\History.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Interfaces.cs">
-      <Link>Shared\Interfaces.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Model.cs">
-      <Link>Shared\Model.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Views\Bootstrapper.cs">
-      <Link>Shared\Views\Bootstrapper.cs</Link>
-    </Compile>
-    <Compile Include="..\RxCanvas.Shared\Shared\Views\DrawingView.cs">
-      <Link>Shared\Views\DrawingView.cs</Link>
-    </Compile>
-    <Compile Include="WinForms\Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="WinForms\Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="WinForms\WinFormsModule.cs" />
-    <Compile Include="WinForms\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WinForms\WinForms.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <EmbeddedResource Include="WinForms\Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
+    <Compile Include="Shared\Bounds.cs" />
+    <Compile Include="Shared\Creators\DxfCreator.cs" />
+    <Compile Include="Shared\Creators\PdfCreator.cs" />
+    <Compile Include="Shared\Editors.cs" />
+    <Compile Include="Shared\Files\Binary.cs" />
+    <Compile Include="Shared\Files\Json.cs" />
+    <Compile Include="Shared\History.cs" />
+    <Compile Include="Shared\Interfaces.cs" />
+    <Compile Include="Shared\Model.cs" />
+    <Compile Include="Shared\Views\Bootstrapper.cs" />
+    <Compile Include="Shared\Views\DrawingView.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

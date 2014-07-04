@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace RxCanvas
+namespace RxCanvas.WPF
 {
     public partial class App : Application
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RxCanvas.Properties
+namespace RxCanvas.WPF.Properties
 {
 
 

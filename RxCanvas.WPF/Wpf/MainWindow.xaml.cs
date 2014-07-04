@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RxCanvas
+namespace RxCanvas.WPF
 {
     public partial class MainWindow : Window
     {
@@ -123,7 +123,7 @@ namespace RxCanvas
             {
                 Action action;
                 bool result = _shortcuts.TryGetValue(
-                    new Tuple<Key, ModifierKeys>(e.Key, Keyboard.Modifiers), 
+                    new Tuple<Key, ModifierKeys>(e.Key, Keyboard.Modifiers),
                     out action);
 
                 if (result == true && action != null)
@@ -143,9 +143,9 @@ namespace RxCanvas
             foreach (var serializer in _view.Files)
             {
                 filter += string.Format(
-                    "{0}{1} File (*.{2})|*.{2}", 
-                    first == false ? "|" : string.Empty, 
-                    serializer.Name, 
+                    "{0}{1} File (*.{2})|*.{2}",
+                    first == false ? "|" : string.Empty,
+                    serializer.Name,
                     serializer.Extension);
 
                 if (first == true)
@@ -163,9 +163,9 @@ namespace RxCanvas
             foreach (var creator in _view.Creators)
             {
                 filter += string.Format(
-                    "{0}{1} File (*.{2})|*.{2}", 
-                    first == false ? "|" : string.Empty, 
-                    creator.Name, 
+                    "{0}{1} File (*.{2})|*.{2}",
+                    first == false ? "|" : string.Empty,
+                    creator.Name,
                     creator.Extension);
 
                 if (first == true)

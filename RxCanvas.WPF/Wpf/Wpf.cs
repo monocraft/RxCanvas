@@ -13,7 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace RxCanvas.Wpf
+namespace RxCanvas.WPF
 {
     internal static class WpfExtensions
     {
