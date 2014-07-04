@@ -389,9 +389,9 @@ namespace RxCanvas.Editors
             {
                 if (_canvas.IsCaptured)
                 {
-                    _xline.Point2.X = p.X;
-                    _xline.Point2.Y = p.Y;
-                    _nline.Point2 = _xline.Point2;
+                    //_xline.Point2.X = p.X;
+                    //_xline.Point2.Y = p.Y;
+                    //_nline.Point2 = _xline.Point2;
                     _nline.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -475,12 +475,12 @@ namespace RxCanvas.Editors
                     {
                         case State.Start:
                             {
-                                _xb.Point3.X = p.X;
-                                _xb.Point3.Y = p.Y;
-                                _nb.Point3 = _xb.Point3;
-                                _xb.Point2.X = p.X;
-                                _xb.Point2.Y = p.Y;
-                                _nb.Point2 = _xb.Point2;
+                                //_xb.Point3.X = p.X;
+                                //_xb.Point3.Y = p.Y;
+                                //_nb.Point3 = _xb.Point3;
+                                //_xb.Point2.X = p.X;
+                                //_xb.Point2.Y = p.Y;
+                                //_nb.Point2 = _xb.Point2;
                                 _nb.Bounds.Update();
                                 _canvas.Render(null);
                                 _state = State.Point1;
@@ -488,9 +488,9 @@ namespace RxCanvas.Editors
                             break;
                         case State.Point1:
                             {
-                                _xb.Point1.X = p.X;
-                                _xb.Point1.Y = p.Y;
-                                _nb.Point1 = _xb.Point1;
+                                //_xb.Point1.X = p.X;
+                                //_xb.Point1.Y = p.Y;
+                                //_nb.Point1 = _xb.Point1;
                                 _nb.Bounds.Update();
                                 _canvas.Render(null);
                                 _state = State.Point2;
@@ -498,9 +498,9 @@ namespace RxCanvas.Editors
                             break;
                         case State.Point2:
                             {
-                                _xb.Point2.X = p.X;
-                                _xb.Point2.Y = p.Y;
-                                _nb.Point2 = _xb.Point2;
+                                //_xb.Point2.X = p.X;
+                                //_xb.Point2.Y = p.Y;
+                                //_nb.Point2 = _xb.Point2;
                                 _nb.Bounds.Hide();
                                 _canvas.Render(null);
                                 _state = State.None;
@@ -616,9 +616,9 @@ namespace RxCanvas.Editors
                     {
                         case State.Start:
                             {
-                                _xqb.Point2.X = p.X;
-                                _xqb.Point2.Y = p.Y;
-                                _nqb.Point2 = _xqb.Point2;
+                                //_xqb.Point2.X = p.X;
+                                //_xqb.Point2.Y = p.Y;
+                                //_nqb.Point2 = _xqb.Point2;
                                 _nqb.Bounds.Update();
                                 _canvas.Render(null);
                                 _state = State.Point1;
@@ -626,9 +626,9 @@ namespace RxCanvas.Editors
                             break;
                         case State.Point1:
                             {
-                                _xqb.Point1.X = p.X;
-                                _xqb.Point1.Y = p.Y;
-                                _nqb.Point1 = _xqb.Point1;
+                                //_xqb.Point1.X = p.X;
+                                //_xqb.Point1.Y = p.Y;
+                                //_nqb.Point1 = _xqb.Point1;
                                 _nqb.Bounds.Hide();
                                 _canvas.Render(null);
                                 _state = State.None;
@@ -726,9 +726,9 @@ namespace RxCanvas.Editors
             {
                 if (_canvas.IsCaptured)
                 {
-                    _xarc.Point2.X = p.X;
-                    _xarc.Point2.Y = p.Y;
-                    _narc.Point2 = _xarc.Point2;
+                    //_xarc.Point2.X = p.X;
+                    //_xarc.Point2.Y = p.Y;
+                    //_narc.Point2 = _xarc.Point2;
                     _narc.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -808,9 +808,9 @@ namespace RxCanvas.Editors
             {
                 if (_canvas.IsCaptured)
                 {
-                    _xrectangle.Point2.X = p.X;
-                    _xrectangle.Point2.Y = p.Y;
-                    _nrectangle.Point2 = _xrectangle.Point2;
+                    //_xrectangle.Point2.X = p.X;
+                    //_xrectangle.Point2.Y = p.Y;
+                    //_nrectangle.Point2 = _xrectangle.Point2;
                     _nrectangle.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -890,9 +890,9 @@ namespace RxCanvas.Editors
             {
                 if (_canvas.IsCaptured)
                 {
-                    _xellipse.Point2.X = p.X;
-                    _xellipse.Point2.Y = p.Y;
-                    _nellipse.Point2 = _xellipse.Point2;
+                    //_xellipse.Point2.X = p.X;
+                    //_xellipse.Point2.Y = p.Y;
+                    //_nellipse.Point2 = _xellipse.Point2;
                     _nellipse.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -972,9 +972,9 @@ namespace RxCanvas.Editors
             {
                 if (_canvas.IsCaptured)
                 {
-                    _xtext.Point2.X = p.X;
-                    _xtext.Point2.Y = p.Y;
-                    _ntext.Point2 = _xtext.Point2;
+                    //_xtext.Point2.X = p.X;
+                    //_xtext.Point2.Y = p.Y;
+                    //_ntext.Point2 = _xtext.Point2;
                     _ntext.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
