@@ -365,10 +365,16 @@ namespace RxCanvas.WinForms
                 .Select(e =>
                 {
                     var p = e.EventArgs.Location;
-                    double x = EnableSnap ? Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
-                    double y = EnableSnap ? Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
+
+                    double x = EnableSnap ? 
+                        Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
+
+                    double y = EnableSnap ? 
+                        Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
+
                     x /= _panel.Zoom;
                     y /= _panel.Zoom;
+
                     return new ImmutablePoint(x, y);
                 });
 
@@ -377,10 +383,16 @@ namespace RxCanvas.WinForms
                 .Select(e =>
                 {
                     var p = e.EventArgs.Location;
-                    double x = EnableSnap ? Snap((double)(p.X) - _panel.PanX, SnapX * Zoom) : (double)(p.X) - _panel.PanX;
-                    double y = EnableSnap ? Snap((double)(p.Y) - _panel.PanY, SnapY * Zoom) : (double)(p.Y) - _panel.PanY;
+
+                    double x = EnableSnap ? 
+                        Snap((double)(p.X) - _panel.PanX, SnapX * Zoom) : (double)(p.X) - _panel.PanX;
+
+                    double y = EnableSnap ? 
+                        Snap((double)(p.Y) - _panel.PanY, SnapY * Zoom) : (double)(p.Y) - _panel.PanY;
+
                     x /= _panel.Zoom;
                     y /= _panel.Zoom;
+
                     return new ImmutablePoint(x, y);
                 });
 
@@ -388,10 +400,16 @@ namespace RxCanvas.WinForms
                 .Select(e =>
                 {
                     var p = e.EventArgs.Location;
-                    double x = EnableSnap ? Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
-                    double y = EnableSnap ? Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
+
+                    double x = EnableSnap ? 
+                        Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
+
+                    double y = EnableSnap ? 
+                        Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
+
                     x /= _panel.Zoom;
                     y /= _panel.Zoom;
+
                     return new ImmutablePoint(x, y);
                 });
 
