@@ -143,6 +143,112 @@ namespace RxCanvas.Bounds
         }
     }
 
+    public class PointBounds : IBounds
+    {
+        private IPoint _point;
+        private double _size;
+        private double _offset;
+        private ICanvas _canvas;
+        private IPolygon _polygonPoint;
+        private bool _isVisible;
+
+        private enum HitResult { None, Point };
+        private HitResult _hitResult;
+
+        public PointBounds(
+            INativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
+            ICanvas canvas,
+            IPoint point,
+            double size,
+            double offset)
+        {
+            _point = point;
+            _size = size;
+            _offset = offset;
+            _canvas = canvas;
+
+            _hitResult = HitResult.None;
+
+            InitBounds(nativeConverter, canvasFactory);
+        }
+
+        private void InitBounds(
+            INativeConverter nativeConverter,
+            ICanvasFactory canvasFactory)
+        {
+            _polygonPoint = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+        }
+
+        private void UpdatePointBounds()
+        {
+            var ps = _polygonPoint.Points;
+            var ls = _polygonPoint.Lines;
+            Helper.UpdatePointBounds(_point, ps, ls, _size, _offset);
+        }
+
+        public void Update()
+        {
+            UpdatePointBounds();
+        }
+
+        public bool IsVisible()
+        {
+            return _isVisible;
+        }
+
+        public void Show()
+        {
+            if (!_isVisible)
+            {
+                foreach (var line in _polygonPoint.Lines)
+                {
+                    _canvas.Add(line);
+                }
+                _isVisible = true;
+            }
+        }
+
+        public void Hide()
+        {
+            if (_isVisible)
+            {
+                foreach (var line in _polygonPoint.Lines)
+                {
+                    _canvas.Remove(line);
+                }
+                _isVisible = false;
+            }
+        }
+
+        public bool Contains(double x, double y)
+        {
+            if (_polygonPoint.Contains(x, y))
+            {
+                _hitResult = HitResult.Point;
+                return true;
+            }
+            _hitResult = HitResult.None;
+            return false;
+        }
+
+        public void Move(double dx, double dy)
+        {
+            //Debug.Print("_hitResult: {0}", _hitResult);
+            switch(_hitResult)
+            {
+                case HitResult.Point:
+                    {
+                        double x = _point.X - dx;
+                        double y = _point.Y - dy;
+                        _point.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+                        _point.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+                    }
+                    break;
+            }
+        }
+    }
+
     public class LineBounds : IBounds
     {
         private ILine _line;
@@ -154,7 +260,7 @@ namespace RxCanvas.Bounds
         private IPolygon _polygonPoint2;
         private bool _isVisible;
 
-        private enum HitResult { None, Point1, Point2, Line};
+        private enum HitResult { None, Point1, Point2, Line };
         private HitResult _hitResult;
 
         public LineBounds(
@@ -1649,8 +1755,7 @@ namespace RxCanvas.Bounds
 
         public IBounds Create(ICanvas canvas, IPoint point)
         {
-            // TODO: Create PointBounds class.
-            throw new NotImplementedException();
+            return new PointBounds(_nativeConverter, _canvasFactory, canvas, point, 15.0, 0.0);
         }
 
         public IBounds Create(ICanvas canvas, ILine line)
