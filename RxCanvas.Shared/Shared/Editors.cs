@@ -19,8 +19,7 @@ namespace RxCanvas.Editors
             Hover = 1,
             Selected = 2,
             Move = 4,
-            Point1 = 8,
-            Point2 = 16,
+            Selection = 8,
             HoverSelected = Hover | Selected,
             HoverMove = Hover | Move,
             SelectedMove = Selected | Move
@@ -45,11 +44,16 @@ namespace RxCanvas.Editors
         public string Key { get; set; }
         public string Modifiers { get; set; }
 
+        private INativeConverter _nativeConverter; 
+        private ICanvasFactory _canvasFactory;
+        private IBoundsFactory _boundsFactory;
         private ICanvas _canvas;
         private ImmutablePoint _original;
         private ImmutablePoint _start;
         private INative _selected;
         private INative _hover;
+        private IRectangle _xrectangle;
+        private IRectangle _nrectangle;
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _ups;
@@ -61,6 +65,10 @@ namespace RxCanvas.Editors
             IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
+            _nativeConverter = nativeConverter;
+            _canvasFactory = canvasFactory;
+            _boundsFactory = boundsFactory;
+
             _canvas = canvas;
 
             Name = "Selection";
@@ -90,7 +98,7 @@ namespace RxCanvas.Editors
             }
             else
             {
-                if (IsState(State.Point2))
+                if (IsState(State.Selection))
                 {
                     ResetSelection();
                     render = true;
@@ -116,7 +124,7 @@ namespace RxCanvas.Editors
             {
                 if (IsState(State.None))
                 {
-                    InitSelection();
+                    InitSelection(p);
                     _canvas.Capture();
                     render = true;
                 }
@@ -138,9 +146,10 @@ namespace RxCanvas.Editors
                     _canvas.ReleaseCapture();
                 }
 
-                if (IsState(State.Point1))
+                if (IsState(State.Selection))
                 {
                     FinishSelection();
+                    _canvas.Render(null);
                     _canvas.ReleaseCapture();
                 }
             }
@@ -155,7 +164,7 @@ namespace RxCanvas.Editors
                     Move(p);
                 }
 
-                if (IsState(State.Point2))
+                if (IsState(State.Selection))
                 {
                     MoveSelection(p);
                 }
@@ -219,31 +228,74 @@ namespace RxCanvas.Editors
             }
         }
 
-        private void InitSelection()
+        private void InitSelection(ImmutablePoint p)
         {
-            // TODO:
-            _state |= State.Point1;
+            if (_xrectangle == null)
+            {
+                _xrectangle = _canvasFactory.CreateRectangle();
+                _xrectangle.StrokeThickness = 2.0;
+                _xrectangle.Stroke.A = 0xFF;
+                _xrectangle.Stroke.R = 0x33;
+                _xrectangle.Stroke.G = 0x99;
+                _xrectangle.Stroke.B = 0xFF;
+                _xrectangle.Fill.A = 0x3F;
+                _xrectangle.Fill.R = 0x33;
+                _xrectangle.Fill.G = 0x99;
+                _xrectangle.Fill.B = 0xFF;
+            }
+
+            _xrectangle.Point1.X = p.X;
+            _xrectangle.Point1.Y = p.Y;
+            _xrectangle.Point2.X = p.X;
+            _xrectangle.Point2.Y = p.Y;
+
+            if (_nrectangle == null)
+            {
+                _nrectangle = _nativeConverter.Convert(_xrectangle);
+            }
+
+            _canvas.Add(_nrectangle);
+
+            if (_nrectangle.Bounds == null)
+            {
+                _nrectangle.Bounds = _boundsFactory.Create(_canvas, _nrectangle);
+            }
+
+            _nrectangle.Bounds.Update();
+
+            _state |= State.Selection;
             Debug.Print("_state: {0}", _state);
         }
 
         private void MoveSelection(ImmutablePoint p)
         {
-            // TODO:
+            _xrectangle.Point2.X = p.X;
+            _xrectangle.Point2.Y = p.Y;
+            _nrectangle.Point2 = _xrectangle.Point2;
+            _nrectangle.Bounds.Update();
+            _canvas.Render(null);
         }
 
         private void FinishSelection()
         {
-            // TODO:
-            _state = _state & ~State.Point1;
-            _state |= State.Point2;
+            _state = _state & ~State.Selection;
+            _state |= State.None;
+            ResetSelection();
             Debug.Print("_state: {0}", _state);
+
+            // TODO: Find selected elements using SAT algorithm.
         }
 
         private void ResetSelection()
         {
-            // TODO:
-            _state = _state & ~State.Point2;
-            Debug.Print("_state: {0}", _state);
+            //_xrectangle.Point2.X = p.X;
+            //_xrectangle.Point2.Y = p.Y;
+            //_nrectangle.Point2 = _xrectangle.Point2;
+            _nrectangle.Bounds.Update();
+            _canvas.Remove(_nrectangle);
+            //_canvas.Render(null);
+            //_state = _state & ~State.Selection;
+            // Debug.Print("_state: {0}", _state);
         }
 
         private void ShowHover()
@@ -335,6 +387,11 @@ namespace RxCanvas.Editors
                 _selected.Bounds.Hide();
                 _selected = null;
                 render = true;
+            }
+
+            if (IsState(State.Selection))
+            {
+                ResetSelection();
             }
 
             _state = State.None;
