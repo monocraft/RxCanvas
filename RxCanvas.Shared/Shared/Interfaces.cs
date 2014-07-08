@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathUtil;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,18 +8,6 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Interfaces
 {
-    public struct ImmutablePoint
-    {
-        public double X { get; private set; }
-        public double Y { get; private set; }
-        public ImmutablePoint(double x, double y)
-            : this()
-        {
-            X = x;
-            Y = y;
-        }
-    }
-
     public interface IPoint
     {
         double X { get; set; }
@@ -35,6 +24,7 @@ namespace RxCanvas.Interfaces
 
     public interface IBounds
     {
+        Vector2[] GetVertices();
         void Update();
         bool IsVisible();
         void Show();
@@ -146,9 +136,9 @@ namespace RxCanvas.Interfaces
 
     public interface ICanvas : INative
     {
-        IObservable<ImmutablePoint> Downs { get; set; }
-        IObservable<ImmutablePoint> Ups { get; set; }
-        IObservable<ImmutablePoint> Moves { get; set; }
+        IObservable<Vector2> Downs { get; set; }
+        IObservable<Vector2> Ups { get; set; }
+        IObservable<Vector2> Moves { get; set; }
         IHistory History { get; set; }
         double Width { get; set; }
         double Height { get; set; }

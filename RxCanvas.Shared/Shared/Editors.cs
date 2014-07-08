@@ -1,4 +1,5 @@
-﻿using RxCanvas.Interfaces;
+﻿using MathUtil;
+using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
@@ -48,8 +49,8 @@ namespace RxCanvas.Editors
         private ICanvasFactory _canvasFactory;
         private IBoundsFactory _boundsFactory;
         private ICanvas _canvas;
-        private ImmutablePoint _original;
-        private ImmutablePoint _start;
+        private Vector2 _original;
+        private Vector2 _start;
         private INative _selected;
         private INative _hover;
         private IRectangle _xrectangle;
@@ -87,9 +88,15 @@ namespace RxCanvas.Editors
             return (_state & state) == state;
         }
 
-        private void Down(ImmutablePoint p)
+        private void Down(Vector2 p)
         {
             bool render = false;
+
+            if (_overlaping != null)
+            {
+                ResetOverlaping();
+                render = true;
+            }
 
             if (IsState(State.Selected))
             {
@@ -136,7 +143,16 @@ namespace RxCanvas.Editors
             }
         }
 
-        private void Up(ImmutablePoint p)
+        private void ResetOverlaping()
+        {
+            foreach (var child in _overlaping)
+            {
+                child.Bounds.Hide();
+            }
+            _overlaping = null;
+        }
+
+        private void Up(Vector2 p)
         {
             if (_canvas.IsCaptured)
             {
@@ -155,8 +171,13 @@ namespace RxCanvas.Editors
             }
         }
 
-        private void Drag(ImmutablePoint p)
+        private void Drag(Vector2 p)
         {
+            if (_overlaping != null)
+            {
+                return;
+            }
+
             if (_canvas.IsCaptured)
             {
                 if (IsState(State.Move))
@@ -228,7 +249,7 @@ namespace RxCanvas.Editors
             }
         }
 
-        private void InitSelection(ImmutablePoint p)
+        private void InitSelection(Vector2 p)
         {
             if (_xrectangle == null)
             {
@@ -267,7 +288,7 @@ namespace RxCanvas.Editors
             Debug.Print("_state: {0}", _state);
         }
 
-        private void MoveSelection(ImmutablePoint p)
+        private void MoveSelection(Vector2 p)
         {
             _xrectangle.Point2.X = p.X;
             _xrectangle.Point2.Y = p.Y;
@@ -282,8 +303,47 @@ namespace RxCanvas.Editors
             _state |= State.None;
             ResetSelection();
             Debug.Print("_state: {0}", _state);
+            HitTestOverlaping();
+        }
 
-            // TODO: Find selected elements using SAT algorithm.
+        private IList<INative> _overlaping;
+
+        private void HitTestOverlaping()
+        {
+            var sat = new SeparatingAxisTheorem();
+
+            double x = Math.Min(_xrectangle.Point1.X, _xrectangle.Point2.X);
+            double y = Math.Min(_xrectangle.Point1.Y, _xrectangle.Point2.Y);
+            double width = Math.Abs(_xrectangle.Point2.X - _xrectangle.Point1.X);
+            double height = Math.Abs(_xrectangle.Point2.Y - _xrectangle.Point1.Y);
+
+            var selectionVertices = new Vector2[]
+            {
+                new Vector2(x, y),
+                new Vector2(x + width, y),
+                new Vector2(x + width, y + height),
+                new Vector2(x, y + height)
+            };
+
+            _overlaping = _canvas.Children
+                .Where(c =>
+                {
+                    if (c.Bounds != null)
+                    {
+                        var vertices = c.Bounds.GetVertices();
+                        if (vertices != null)
+                        {
+                            return sat.Overlap(selectionVertices, vertices);
+                        }
+                        return false;
+                    }
+                    return false;
+                }).ToList();
+
+            foreach (var child in _overlaping)
+            {
+                child.Bounds.Show();
+            }
         }
 
         private void ResetSelection()
@@ -328,7 +388,7 @@ namespace RxCanvas.Editors
             Debug.Print("_state: {0}", _state);
         }
 
-        private void InitMove(ImmutablePoint p)
+        private void InitMove(Vector2 p)
         {
             // TODO: Create history snapshot but do not push undo.
             _original = p;
@@ -337,7 +397,7 @@ namespace RxCanvas.Editors
             Debug.Print("_state: {0}", _state);
         }
 
-        private void FinishMove(ImmutablePoint p)
+        private void FinishMove(Vector2 p)
         {
             if (p.X == _original.X && p.Y == _original.Y)
             {
@@ -351,7 +411,7 @@ namespace RxCanvas.Editors
             Debug.Print("_state: {0}", _state);
         }
 
-        private void Move(ImmutablePoint p)
+        private void Move(Vector2 p)
         {
             if (_selected != null)
             {
@@ -389,9 +449,16 @@ namespace RxCanvas.Editors
                 render = true;
             }
 
+            if (_overlaping != null)
+            {
+                ResetOverlaping();
+                render = true;
+            }
+
             if (IsState(State.Selection))
             {
                 ResetSelection();
+                render = true;
             }
 
             _state = State.None;

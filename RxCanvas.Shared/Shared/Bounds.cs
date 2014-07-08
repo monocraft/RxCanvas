@@ -1,4 +1,5 @@
-﻿using RxCanvas.Interfaces;
+﻿using MathUtil;
+using RxCanvas.Interfaces;
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
@@ -94,52 +95,15 @@ namespace RxCanvas.Bounds
             line.Point1 = point1;
             line.Point2 = point2;
         }
-    }
 
-    internal static class MonotoneChain
-    {
-        // Implementation of Andrew's monotone chain 2D convex hull algorithm.
-        // http://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
-        // Asymptotic complexity O(n log n).
-
-        // 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
-        // Returns a positive value, if OAB makes a counter-clockwise turn,
-        // negative for clockwise turn, and zero if the points are collinear.
-        public static double Cross(XPoint p1, XPoint p2, XPoint p3)
+        public static void MoveLine(ILine line, Vector2 point1, Vector2 point2)
         {
-            return (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
-        }
-
-        // Returns a list of points on the convex hull in counter-clockwise order.
-        // Note: the last point in the returned list is the same as the first one.
-        public static void ConvexHull(XPoint[] points, out XPoint[] hull, out int k)
-        {
-            int n = points.Length;
-            int i, t;
-
-            k = 0;
-            hull = new XPoint[2 * n];
-
-            // sort points lexicographically
-            Array.Sort(points);
-
-            // lower hull
-            for (i = 0; i < n; i++)
-            {
-                while (k >= 2 && Cross(hull[k - 2], hull[k - 1], points[i]) <= 0)
-                    k--;
-
-                hull[k++] = points[i];
-            }
-
-            // upper hull
-            for (i = n - 2, t = k + 1; i >= 0; i--)
-            {
-                while (k >= t && Cross(hull[k - 2], hull[k - 1], points[i]) <= 0)
-                    k--;
-
-                hull[k++] = points[i];
-            }
+            line.Point1.X = point1.X;
+            line.Point1.Y = point1.Y;
+            line.Point2.X = point2.X;
+            line.Point2.Y = point2.Y;
+            line.Point1 = line.Point1;
+            line.Point2 = line.Point2;
         }
     }
 
@@ -154,6 +118,11 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Point };
         private HitResult _hitResult;
+
+        public Vector2[] GetVertices()
+        {
+            return null;
+        }
 
         public PinBounds(
             INativeConverter nativeConverter,
@@ -263,6 +232,11 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Point1, Point2, Line };
         private HitResult _hitResult;
+
+        public Vector2[] GetVertices()
+        {
+            return null;
+        }
 
         public LineBounds(
             INativeConverter nativeConverter,
@@ -469,6 +443,16 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Start, Point1, Point2, Point3, Bezier };
         private HitResult _hitResult;
 
+        private MonotoneChain _monotoneChain = new MonotoneChain();
+        private Vector2[] _vertices = new Vector2[4];
+        private int k;
+        private Vector2[] _convexHull;
+
+        public Vector2[] GetVertices()
+        {
+            return _convexHull.Take(k).ToArray();
+        }
+
         public BezierBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -524,16 +508,13 @@ namespace RxCanvas.Bounds
             Helper.UpdatePointBounds(_bezier.Point3, ps, ls, _size, _offset);
         }
 
-        private int k;
-        private XPoint[] convexHull;
-
         public bool ConvexHullAsPolygonContains(double x, double y)
         {
             bool contains = false;
             for (int i = 0, j = k - 2; i < k - 1; j = i++)
             {
-                if (((convexHull[i].Y > y) != (convexHull[j].Y > y))
-                    && (x < (convexHull[j].X - convexHull[i].X) * (y - convexHull[i].Y) / (convexHull[j].Y - convexHull[i].Y) + convexHull[i].X))
+                if (((_convexHull[i].Y > y) != (_convexHull[j].Y > y))
+                    && (x < (_convexHull[j].X - _convexHull[i].X) * (y - _convexHull[i].Y) / (_convexHull[j].Y - _convexHull[i].Y) + _convexHull[i].X))
                 {
                     contains = !contains;
                 }
@@ -543,45 +524,41 @@ namespace RxCanvas.Bounds
 
         private void UpdateBezierBounds()
         {
-            var ps = _polygonBezier.Points.Select(p => p as XPoint).ToArray();
             var ls = _polygonBezier.Lines;
 
-            ps[0].X = _bezier.Start.X;
-            ps[0].Y = _bezier.Start.Y;
-            ps[1].X = _bezier.Point1.X;
-            ps[1].Y = _bezier.Point1.Y;
-            ps[2].X = _bezier.Point2.X;
-            ps[2].Y = _bezier.Point2.Y;
-            ps[3].X = _bezier.Point3.X;
-            ps[3].Y = _bezier.Point3.Y;
+            _vertices[0] = new Vector2(_bezier.Start.X, _bezier.Start.Y);
+            _vertices[1] = new Vector2(_bezier.Point1.X, _bezier.Point1.Y);
+            _vertices[2] = new Vector2(_bezier.Point2.X, _bezier.Point2.Y);
+            _vertices[3] = new Vector2(_bezier.Point3.X, _bezier.Point3.Y);
 
-            MonotoneChain.ConvexHull(ps, out convexHull, out k);
+            _monotoneChain.ConvexHull(_vertices, out _convexHull, out k);
+
             //Debug.Print("k: {0}", k);
 
             if (k == 3)
             {
-                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
-                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
+                Helper.MoveLine(ls[0], _convexHull[0], _convexHull[1]);
+                Helper.MoveLine(ls[1], _convexHull[1], _convexHull[2]);
 
                 // not used
-                Helper.MoveLine(ls[2], convexHull[0], convexHull[0]);
-                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
+                Helper.MoveLine(ls[2], _convexHull[0], _convexHull[0]);
+                Helper.MoveLine(ls[3], _convexHull[0], _convexHull[0]);
             }
             else if (k == 4)
             {
-                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
-                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
-                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
+                Helper.MoveLine(ls[0], _convexHull[0], _convexHull[1]);
+                Helper.MoveLine(ls[1], _convexHull[1], _convexHull[2]);
+                Helper.MoveLine(ls[2], _convexHull[2], _convexHull[3]);
 
                 // not used
-                Helper.MoveLine(ls[3], convexHull[0], convexHull[0]);
+                Helper.MoveLine(ls[3], _convexHull[0], _convexHull[0]);
             }
             else if (k == 5)
             {
-                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
-                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
-                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
-                Helper.MoveLine(ls[3], convexHull[3], convexHull[4]);
+                Helper.MoveLine(ls[0], _convexHull[0], _convexHull[1]);
+                Helper.MoveLine(ls[1], _convexHull[1], _convexHull[2]);
+                Helper.MoveLine(ls[2], _convexHull[2], _convexHull[3]);
+                Helper.MoveLine(ls[3], _convexHull[3], _convexHull[4]);
             }
         }
 
@@ -770,6 +747,16 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Start, Point1, Point2, QuadraticBezier };
         private HitResult _hitResult;
 
+        private MonotoneChain _monotoneChain = new MonotoneChain();
+        private Vector2[] _vertices = new Vector2[3];
+        private int k;
+        private Vector2[] _convexHull;
+
+        public Vector2[] GetVertices()
+        {
+            return _convexHull.Take(k).ToArray();
+        }
+
         public QuadraticBezierBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -817,16 +804,13 @@ namespace RxCanvas.Bounds
             Helper.UpdatePointBounds(_quadraticBezier.Point2, ps, ls, _size, _offset);
         }
 
-        private int k;
-        private XPoint[] convexHull;
-
         public bool ConvexHullAsPolygonContains(double x, double y)
         {
             bool contains = false;
             for (int i = 0, j = k - 2; i < k - 1; j = i++)
             {
-                if (((convexHull[i].Y > y) != (convexHull[j].Y > y))
-                    && (x < (convexHull[j].X - convexHull[i].X) * (y - convexHull[i].Y) / (convexHull[j].Y - convexHull[i].Y) + convexHull[i].X))
+                if (((_convexHull[i].Y > y) != (_convexHull[j].Y > y))
+                    && (x < (_convexHull[j].X - _convexHull[i].X) * (y - _convexHull[i].Y) / (_convexHull[j].Y - _convexHull[i].Y) + _convexHull[i].X))
                 {
                     contains = !contains;
                 }
@@ -836,32 +820,29 @@ namespace RxCanvas.Bounds
 
         private void UpdateQuadraticBezierBounds()
         {
-            var ps = _polygonQuadraticBezier.Points.Select(p => p as XPoint).ToArray();
             var ls = _polygonQuadraticBezier.Lines;
 
-            ps[0].X = _quadraticBezier.Start.X;
-            ps[0].Y = _quadraticBezier.Start.Y;
-            ps[1].X = _quadraticBezier.Point1.X;
-            ps[1].Y = _quadraticBezier.Point1.Y;
-            ps[2].X = _quadraticBezier.Point2.X;
-            ps[2].Y = _quadraticBezier.Point2.Y;
+            _vertices[0] = new Vector2(_quadraticBezier.Start.X, _quadraticBezier.Start.Y);
+            _vertices[1] = new Vector2(_quadraticBezier.Point1.X, _quadraticBezier.Point1.Y);
+            _vertices[2] = new Vector2(_quadraticBezier.Point2.X, _quadraticBezier.Point2.Y);
 
-            MonotoneChain.ConvexHull(ps, out convexHull, out k);
+            _monotoneChain.ConvexHull(_vertices, out _convexHull, out k);
+
             //Debug.Print("k: {0}", k);
 
             if (k == 3)
             {
-                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
-                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
+                Helper.MoveLine(ls[0], _convexHull[0], _convexHull[1]);
+                Helper.MoveLine(ls[1], _convexHull[1], _convexHull[2]);
 
                 // not used
-                Helper.MoveLine(ls[2], convexHull[0], convexHull[0]);
+                Helper.MoveLine(ls[2], _convexHull[0], _convexHull[0]);
             }
             else if (k == 4)
             {
-                Helper.MoveLine(ls[0], convexHull[0], convexHull[1]);
-                Helper.MoveLine(ls[1], convexHull[1], convexHull[2]);
-                Helper.MoveLine(ls[2], convexHull[2], convexHull[3]);
+                Helper.MoveLine(ls[0], _convexHull[0], _convexHull[1]);
+                Helper.MoveLine(ls[1], _convexHull[1], _convexHull[2]);
+                Helper.MoveLine(ls[2], _convexHull[2], _convexHull[3]);
             }
         }
 
@@ -1020,6 +1001,11 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Point1, Point2, Arc };
         private HitResult _hitResult;
+
+        public Vector2[] GetVertices()
+        {
+            return null;
+        }
 
         public ArcBounds(
             INativeConverter nativeConverter,
@@ -1205,6 +1191,11 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Rectangle };
         private HitResult _hitResult;
 
+        public Vector2[] GetVertices()
+        {
+            return null;
+        }
+
         public RectangleBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -1389,6 +1380,11 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Ellipse };
         private HitResult _hitResult;
 
+        public Vector2[] GetVertices()
+        {
+            return null;
+        }
+
         public EllipseBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -1572,6 +1568,11 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Point1, Point2, Text };
         private HitResult _hitResult;
+
+        public Vector2[] GetVertices()
+        {
+            return null;
+        }
 
         public TextBounds(
             INativeConverter nativeConverter,

@@ -1,4 +1,5 @@
-﻿using RxCanvas.Binary;
+﻿using MathUtil;
+using RxCanvas.Binary;
 using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -326,9 +327,9 @@ namespace RxCanvas.WinForms
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
-        public IObservable<ImmutablePoint> Downs { get; set; }
-        public IObservable<ImmutablePoint> Ups { get; set; }
-        public IObservable<ImmutablePoint> Moves { get; set; }
+        public IObservable<Vector2> Downs { get; set; }
+        public IObservable<Vector2> Ups { get; set; }
+        public IObservable<Vector2> Moves { get; set; }
 
         public IHistory History { get; set; }
 
@@ -395,7 +396,7 @@ namespace RxCanvas.WinForms
                     x /= _panel.Zoom;
                     y /= _panel.Zoom;
 
-                    return new ImmutablePoint(x, y);
+                    return new Vector2(x, y);
                 });
 
             Ups = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseUp")
@@ -413,7 +414,7 @@ namespace RxCanvas.WinForms
                     x /= _panel.Zoom;
                     y /= _panel.Zoom;
 
-                    return new ImmutablePoint(x, y);
+                    return new Vector2(x, y);
                 });
 
             Moves = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseMove")
@@ -430,7 +431,7 @@ namespace RxCanvas.WinForms
                     x /= _panel.Zoom;
                     y /= _panel.Zoom;
 
-                    return new ImmutablePoint(x, y);
+                    return new Vector2(x, y);
                 });
 
             Native = _panel;

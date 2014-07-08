@@ -1,4 +1,5 @@
-﻿using RxCanvas.Interfaces;
+﻿using MathUtil;
+using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -234,9 +235,9 @@ namespace RxCanvas.Model
     {
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-        public IObservable<ImmutablePoint> Downs { get; set; }
-        public IObservable<ImmutablePoint> Ups { get; set; }
-        public IObservable<ImmutablePoint> Moves { get; set; }
+        public IObservable<Vector2> Downs { get; set; }
+        public IObservable<Vector2> Ups { get; set; }
+        public IObservable<Vector2> Moves { get; set; }
         public IHistory History { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }

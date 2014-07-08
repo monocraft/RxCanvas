@@ -1,4 +1,5 @@
-﻿using RxCanvas.Interfaces;
+﻿using MathUtil;
+using RxCanvas.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -1017,9 +1018,9 @@ namespace RxCanvas.WPF
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
-        public IObservable<ImmutablePoint> Downs { get; set; }
-        public IObservable<ImmutablePoint> Ups { get; set; }
-        public IObservable<ImmutablePoint> Moves { get; set; }
+        public IObservable<Vector2> Downs { get; set; }
+        public IObservable<Vector2> Ups { get; set; }
+        public IObservable<Vector2> Moves { get; set; }
 
         public IHistory History
         {
@@ -1056,7 +1057,7 @@ namespace RxCanvas.WPF
                 "PreviewMouseLeftButtonDown").Select(e =>
             {
                 var p = e.EventArgs.GetPosition(_ncanvas);
-                return new ImmutablePoint(
+                return new Vector2(
                     _xcanvas.EnableSnap ? Snap(p.X, _xcanvas.SnapX) : p.X,
                     _xcanvas.EnableSnap ? Snap(p.Y, _xcanvas.SnapY) : p.Y);
             });
@@ -1066,7 +1067,7 @@ namespace RxCanvas.WPF
                 "PreviewMouseLeftButtonUp").Select(e =>
             {
                 var p = e.EventArgs.GetPosition(_ncanvas);
-                return new ImmutablePoint(
+                return new Vector2(
                     _xcanvas.EnableSnap ? Snap(p.X, _xcanvas.SnapX) : p.X,
                     _xcanvas.EnableSnap ? Snap(p.Y, _xcanvas.SnapY) : p.Y);
             });
@@ -1076,7 +1077,7 @@ namespace RxCanvas.WPF
                 "PreviewMouseMove").Select(e =>
             {
                 var p = e.EventArgs.GetPosition(_ncanvas);
-                return new ImmutablePoint(
+                return new Vector2(
                     _xcanvas.EnableSnap ? Snap(p.X, _xcanvas.SnapX) : p.X,
                     _xcanvas.EnableSnap ? Snap(p.Y, _xcanvas.SnapY) : p.Y);
             });
