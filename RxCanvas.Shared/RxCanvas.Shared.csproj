@@ -68,6 +68,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MathUtil\MonotoneChain.cs" />
+    <Compile Include="MathUtil\Sat.cs" />
+    <Compile Include="MathUtil\Vector2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\Bounds.cs" />
     <Compile Include="Shared\Creators\DxfCreator.cs" />

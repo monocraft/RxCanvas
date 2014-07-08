@@ -85,6 +85,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\RxCanvas.Shared\MathUtil\MonotoneChain.cs">
+      <Link>Shared\MathUtil\MonotoneChain.cs</Link>
+    </Compile>
+    <Compile Include="..\RxCanvas.Shared\MathUtil\Sat.cs">
+      <Link>Shared\MathUtil\Sat.cs</Link>
+    </Compile>
+    <Compile Include="..\RxCanvas.Shared\MathUtil\Vector2.cs">
+      <Link>Shared\MathUtil\Vector2.cs</Link>
+    </Compile>
     <Compile Include="Wpf\Wpf.cs" />
     <Compile Include="Wpf\WpfModule.cs" />
     <Page Include="Wpf\SelectedItemControl.xaml">
