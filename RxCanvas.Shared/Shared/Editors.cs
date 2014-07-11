@@ -53,6 +53,7 @@ namespace RxCanvas.Editors
         private Vector2 _start;
         private INative _selected;
         private INative _hover;
+        private IList<INative> _overlaping;
         private IRectangle _xrectangle;
         private IRectangle _nrectangle;
         private State _state = State.None;
@@ -305,8 +306,6 @@ namespace RxCanvas.Editors
             Debug.Print("_state: {0}", _state);
             HitTestOverlaping();
         }
-
-        private IList<INative> _overlaping;
 
         private void HitTestOverlaping()
         {
