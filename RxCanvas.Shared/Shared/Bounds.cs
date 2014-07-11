@@ -119,11 +119,6 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point };
         private HitResult _hitResult;
 
-        public Vector2[] GetVertices()
-        {
-            return null;
-        }
-
         public PinBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -154,6 +149,11 @@ namespace RxCanvas.Bounds
             var ps = _polygonPoint.Points;
             var ls = _polygonPoint.Lines;
             Helper.UpdatePointBounds(_pin.Point, ps, ls, _size, _offset);
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return null;
         }
 
         public void Update()
@@ -233,11 +233,6 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Line };
         private HitResult _hitResult;
 
-        public Vector2[] GetVertices()
-        {
-            return null;
-        }
-
         public LineBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -311,6 +306,11 @@ namespace RxCanvas.Bounds
             Helper.MoveLine(ls[1], ps[1], ps[2]);
             Helper.MoveLine(ls[2], ps[2], ps[3]);
             Helper.MoveLine(ls[3], ps[3], ps[0]);
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return null;
         }
 
         public void Update()
@@ -448,11 +448,6 @@ namespace RxCanvas.Bounds
         private int k;
         private Vector2[] _convexHull;
 
-        public Vector2[] GetVertices()
-        {
-            return _convexHull.Take(k).ToArray();
-        }
-
         public BezierBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -560,6 +555,11 @@ namespace RxCanvas.Bounds
                 Helper.MoveLine(ls[2], _convexHull[2], _convexHull[3]);
                 Helper.MoveLine(ls[3], _convexHull[3], _convexHull[4]);
             }
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return _convexHull.Take(k).ToArray();
         }
 
         public void Update()
@@ -752,11 +752,6 @@ namespace RxCanvas.Bounds
         private int k;
         private Vector2[] _convexHull;
 
-        public Vector2[] GetVertices()
-        {
-            return _convexHull.Take(k).ToArray();
-        }
-
         public QuadraticBezierBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -844,6 +839,11 @@ namespace RxCanvas.Bounds
                 Helper.MoveLine(ls[1], _convexHull[1], _convexHull[2]);
                 Helper.MoveLine(ls[2], _convexHull[2], _convexHull[3]);
             }
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return _convexHull.Take(k).ToArray();
         }
 
         public void Update()
@@ -1002,11 +1002,6 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Arc };
         private HitResult _hitResult;
 
-        public Vector2[] GetVertices()
-        {
-            return null;
-        }
-
         public ArcBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -1061,6 +1056,11 @@ namespace RxCanvas.Bounds
             double height = Math.Abs(p2.Y - p1.Y);
 
             Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return null;
         }
 
         public void Update()
@@ -1191,11 +1191,6 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Rectangle };
         private HitResult _hitResult;
 
-        public Vector2[] GetVertices()
-        {
-            return null;
-        }
-
         public RectangleBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -1250,6 +1245,11 @@ namespace RxCanvas.Bounds
             double height = Math.Abs(p2.Y - p1.Y);
 
             Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return null;
         }
 
         public void Update()
@@ -1380,11 +1380,6 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Ellipse };
         private HitResult _hitResult;
 
-        public Vector2[] GetVertices()
-        {
-            return null;
-        }
-
         public EllipseBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -1439,6 +1434,11 @@ namespace RxCanvas.Bounds
             double height = Math.Abs(p2.Y - p1.Y);
 
             Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return null;
         }
 
         public void Update()
@@ -1569,11 +1569,6 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Text };
         private HitResult _hitResult;
 
-        public Vector2[] GetVertices()
-        {
-            return null;
-        }
-
         public TextBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -1628,6 +1623,11 @@ namespace RxCanvas.Bounds
             double height = Math.Abs(p2.Y - p1.Y);
 
             Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+        }
+
+        public Vector2[] GetVertices()
+        {
+            return null;
         }
 
         public void Update()
