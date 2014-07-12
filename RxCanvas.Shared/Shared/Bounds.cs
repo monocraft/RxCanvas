@@ -1248,6 +1248,11 @@ namespace RxCanvas.Bounds
 
             Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
 
+            UpdateVertices(x, y, width, height);
+        }
+
+        private void UpdateVertices(double x, double y, double width, double height)
+        {
             _vertices[0] = new Vector2(x, y);
             _vertices[1] = new Vector2(x + width, y);
             _vertices[2] = new Vector2(x + width, y + height);
