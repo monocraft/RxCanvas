@@ -118,6 +118,7 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Point };
         private HitResult _hitResult;
+        private Vector2[] _vertices;
 
         public PinBounds(
             INativeConverter nativeConverter,
@@ -142,6 +143,7 @@ namespace RxCanvas.Bounds
             ICanvasFactory canvasFactory)
         {
             _polygonPoint = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _vertices = new Vector2[4];
         }
 
         private void UpdatePointBounds()
@@ -149,11 +151,25 @@ namespace RxCanvas.Bounds
             var ps = _polygonPoint.Points;
             var ls = _polygonPoint.Lines;
             Helper.UpdatePointBounds(_pin.Point, ps, ls, _size, _offset);
+
+            double x = _pin.Point.X - (_size / 2.0);
+            double y = _pin.Point.Y - (_size / 2.0);
+            double width = _size;
+            double height = _size;
+            UpdateVertices(x, y, width, height);
+        }
+
+        private void UpdateVertices(double x, double y, double width, double height)
+        {
+            _vertices[0] = new Vector2(x, y);
+            _vertices[1] = new Vector2(x + width, y);
+            _vertices[2] = new Vector2(x + width, y + height);
+            _vertices[3] = new Vector2(x, y + height);
         }
 
         public Vector2[] GetVertices()
         {
-            return null;
+            return _vertices;
         }
 
         public void Update()
