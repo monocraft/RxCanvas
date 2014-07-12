@@ -1191,6 +1191,8 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Point1, Point2, Rectangle };
         private HitResult _hitResult;
 
+        private Vector2[] _vertices = new Vector2[4];
+
         public RectangleBounds(
             INativeConverter nativeConverter,
             ICanvasFactory canvasFactory,
@@ -1245,11 +1247,16 @@ namespace RxCanvas.Bounds
             double height = Math.Abs(p2.Y - p1.Y);
 
             Helper.UpdateRectangleBounds(ps, ls, _offset, x, y, width, height);
+
+            _vertices[0] = new Vector2(x, y);
+            _vertices[1] = new Vector2(x + width, y);
+            _vertices[2] = new Vector2(x + width, y + height);
+            _vertices[3] = new Vector2(x, y + height);
         }
 
         public Vector2[] GetVertices()
         {
-            return null;
+            return _vertices;
         }
 
         public void Update()
