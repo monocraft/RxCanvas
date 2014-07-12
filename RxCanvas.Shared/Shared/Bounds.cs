@@ -232,6 +232,7 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Point1, Point2, Line };
         private HitResult _hitResult;
+        private Vector2[] _vertices;
 
         public LineBounds(
             INativeConverter nativeConverter,
@@ -258,6 +259,7 @@ namespace RxCanvas.Bounds
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonLine = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _vertices = new Vector2[4];
         }
 
         private void UpdatePoint1Bounds()
@@ -306,11 +308,21 @@ namespace RxCanvas.Bounds
             Helper.MoveLine(ls[1], ps[1], ps[2]);
             Helper.MoveLine(ls[2], ps[2], ps[3]);
             Helper.MoveLine(ls[3], ps[3], ps[0]);
+
+            UpdateVertices(ps);
+        }
+
+        private void UpdateVertices(IPoint[] ps)
+        {
+            _vertices[0] = new Vector2(ps[0].X, ps[0].Y);
+            _vertices[1] = new Vector2(ps[1].X, ps[1].Y);
+            _vertices[2] = new Vector2(ps[2].X, ps[2].Y);
+            _vertices[3] = new Vector2(ps[3].X, ps[3].Y);
         }
 
         public Vector2[] GetVertices()
         {
-            return null;
+            return _vertices;
         }
 
         public void Update()
