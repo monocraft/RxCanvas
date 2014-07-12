@@ -443,8 +443,8 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Start, Point1, Point2, Point3, Bezier };
         private HitResult _hitResult;
 
-        private MonotoneChain _monotoneChain = new MonotoneChain();
-        private Vector2[] _vertices = new Vector2[4];
+        private MonotoneChain _monotoneChain;
+        private Vector2[] _vertices;
         private int k;
         private Vector2[] _convexHull;
 
@@ -473,6 +473,8 @@ namespace RxCanvas.Bounds
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint3 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _monotoneChain = new MonotoneChain();
+            _vertices = new Vector2[4];
         }
 
         private void UpdateStartBounds()
@@ -747,8 +749,8 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Start, Point1, Point2, QuadraticBezier };
         private HitResult _hitResult;
 
-        private MonotoneChain _monotoneChain = new MonotoneChain();
-        private Vector2[] _vertices = new Vector2[3];
+        private MonotoneChain _monotoneChain;
+        private Vector2[] _vertices;
         private int k;
         private Vector2[] _convexHull;
 
@@ -776,6 +778,8 @@ namespace RxCanvas.Bounds
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonQuadraticBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 3);
+            _monotoneChain = new MonotoneChain();
+            _vertices = new Vector2[3];
         }
 
         private void UpdateStartBounds()
@@ -1190,8 +1194,7 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Point1, Point2, Rectangle };
         private HitResult _hitResult;
-
-        private Vector2[] _vertices = new Vector2[4];
+        private Vector2[] _vertices;
 
         public RectangleBounds(
             INativeConverter nativeConverter,
@@ -1218,6 +1221,7 @@ namespace RxCanvas.Bounds
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonRectangle = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
+            _vertices = new Vector2[4];
         }
 
         private void UpdatePoint1Bounds()
