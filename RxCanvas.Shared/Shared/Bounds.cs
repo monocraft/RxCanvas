@@ -52,7 +52,10 @@ namespace RxCanvas.Bounds
             return polygon;
         }
 
-        public static void UpdatePointBounds(IPoint point, IPoint[] ps, ILine[] ls, double size, double offset)
+        public static void UpdatePointBounds(
+            IPoint point, 
+            IPoint[] ps, ILine[] ls, 
+            double size, double offset)
         {
             Debug.Assert(point != null);
 
@@ -64,7 +67,11 @@ namespace RxCanvas.Bounds
             Helper.UpdateRectangleBounds(ps, ls, offset, x, y, width, height);
         }
 
-        public static void UpdateRectangleBounds(IPoint[] ps, ILine[] ls, double offset, double x, double y, double width, double height)
+        public static void UpdateRectangleBounds(
+            IPoint[] ps, ILine[] ls, 
+            double offset, 
+            double x, double y, 
+            double width, double height)
         {
             Debug.Assert(ps != null);
             Debug.Assert(ls != null);
