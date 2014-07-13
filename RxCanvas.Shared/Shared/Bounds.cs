@@ -13,6 +13,8 @@ namespace RxCanvas.Bounds
 {
     internal static class Helper
     {
+        public static MonotoneChain ConvexHull = new MonotoneChain();
+
         public const int PointBoundVertexCount = 4;
 
         public static double Min(double val1, double val2, double val3, double val4)
@@ -499,8 +501,7 @@ namespace RxCanvas.Bounds
 
         private enum HitResult { None, Start, Point1, Point2, Point3, Bezier };
         private HitResult _hitResult;
-
-        private MonotoneChain _monotoneChain;
+       
         private Vector2[] _vertices;
         private int k;
         private Vector2[] _convexHull;
@@ -530,7 +531,6 @@ namespace RxCanvas.Bounds
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint3 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
-            _monotoneChain = new MonotoneChain();
             _vertices = new Vector2[4];
         }
 
@@ -585,7 +585,7 @@ namespace RxCanvas.Bounds
             _vertices[2] = new Vector2(_bezier.Point2.X, _bezier.Point2.Y);
             _vertices[3] = new Vector2(_bezier.Point3.X, _bezier.Point3.Y);
 
-            _monotoneChain.ConvexHull(_vertices, out _convexHull, out k);
+            Helper.ConvexHull.ConvexHull(_vertices, out _convexHull, out k);
 
             //Debug.Print("k: {0}", k);
 
@@ -826,7 +826,6 @@ namespace RxCanvas.Bounds
         private enum HitResult { None, Start, Point1, Point2, QuadraticBezier };
         private HitResult _hitResult;
 
-        private MonotoneChain _monotoneChain;
         private Vector2[] _vertices;
         private int k;
         private Vector2[] _convexHull;
@@ -855,7 +854,6 @@ namespace RxCanvas.Bounds
             _polygonPoint1 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonPoint2 = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 4);
             _polygonQuadraticBezier = Helper.CreateBoundsPolygon(nativeConverter, canvasFactory, 3);
-            _monotoneChain = new MonotoneChain();
             _vertices = new Vector2[3];
         }
 
@@ -902,7 +900,7 @@ namespace RxCanvas.Bounds
             _vertices[1] = new Vector2(_quadraticBezier.Point1.X, _quadraticBezier.Point1.Y);
             _vertices[2] = new Vector2(_quadraticBezier.Point2.X, _quadraticBezier.Point2.Y);
 
-            _monotoneChain.ConvexHull(_vertices, out _convexHull, out k);
+            Helper.ConvexHull.ConvexHull(_vertices, out _convexHull, out k);
 
             //Debug.Print("k: {0}", k);
 
