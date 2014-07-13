@@ -226,6 +226,15 @@ namespace RxCanvas.Bounds
             return false;
         }
 
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonPoint.Contains(x, y))
+            {
+                return _pin.Point;
+            }
+            return null;
+        }
+
         public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
@@ -429,6 +438,19 @@ namespace RxCanvas.Bounds
             }
             _hitResult = HitResult.None;
             return false;
+        }
+
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonPoint1.Contains(x, y))
+            {
+                return _line.Point1;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                return _line.Point2;
+            }
+            return null;
         }
 
         public void MoveContaining(double dx, double dy)
@@ -722,6 +744,27 @@ namespace RxCanvas.Bounds
             return false;
         }
 
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonStart.Contains(x, y))
+            {
+                return _bezier.Start;
+            }
+            else if (_polygonPoint1.Contains(x, y))
+            {
+                return _bezier.Point1;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                return _bezier.Point2;
+            }
+            else if (_polygonPoint3.Contains(x, y))
+            {
+                return _bezier.Point3;
+            }
+            return null;
+        }
+
         public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
@@ -1012,6 +1055,23 @@ namespace RxCanvas.Bounds
             return false;
         }
 
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonStart.Contains(x, y))
+            {
+                return _quadraticBezier.Start;
+            }
+            else if (_polygonPoint1.Contains(x, y))
+            {
+                return _quadraticBezier.Point1;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                return _quadraticBezier.Point2;
+            }
+            return null;
+        }
+
         public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
@@ -1244,6 +1304,19 @@ namespace RxCanvas.Bounds
             return false;
         }
 
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonPoint1.Contains(x, y))
+            {
+                return _arc.Point1;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                return _arc.Point2;
+            }
+            return null;
+        }
+
         public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
@@ -1457,6 +1530,19 @@ namespace RxCanvas.Bounds
             }
             _hitResult = HitResult.None;
             return false;
+        }
+
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonPoint1.Contains(x, y))
+            {
+                return _rectangle.Point1;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                return _rectangle.Point2;
+            }
+            return null;
         }
 
         public void MoveContaining(double dx, double dy)
@@ -1674,6 +1760,19 @@ namespace RxCanvas.Bounds
             return false;
         }
 
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonPoint1.Contains(x, y))
+            {
+                return _ellipse.Point1;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                return _ellipse.Point2;
+            }
+            return null;
+        }
+
         public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
@@ -1887,6 +1986,19 @@ namespace RxCanvas.Bounds
             }
             _hitResult = HitResult.None;
             return false;
+        }
+        
+        public IPoint ConnectAt(double x, double y)
+        {
+            if (_polygonPoint1.Contains(x, y))
+            {
+                return _text.Point1;
+            }
+            else if (_polygonPoint2.Contains(x, y))
+            {
+                return _text.Point2;
+            }
+            return null;
         }
 
         public void MoveContaining(double dx, double dy)

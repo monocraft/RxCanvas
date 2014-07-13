@@ -30,6 +30,7 @@ namespace RxCanvas.Interfaces
         void Show();
         void Hide();
         bool Contains(double x, double y);
+        IPoint ConnectAt(double x, double y);
         void MoveContaining(double dx, double dy);
         void MoveAll(double dx, double dy);
     }
