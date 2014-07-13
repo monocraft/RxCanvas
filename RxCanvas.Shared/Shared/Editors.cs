@@ -15,6 +15,17 @@ namespace RxCanvas.Editors
     {
         public static SeparatingAxisTheorem SAT = new SeparatingAxisTheorem();
 
+        public static IPoint ConnectAt(
+            IList<INative> children,
+            double x,
+            double y)
+        {
+            return children
+                .Where(c => c.Bounds != null)
+                .Select(c => c.Bounds.ConnectAt(x, y))
+                .FirstOrDefault(p => p != null);
+        }
+
         public static INative HitTest(
             IList<INative> children,
             double x,
@@ -788,6 +799,7 @@ namespace RxCanvas.Editors
                     //_xline.Point2.X = p.X;
                     //_xline.Point2.Y = p.Y;
                     //_nline.Point2 = _xline.Point2;
+                    //ConnectPoint2(p);
                     _nline.Bounds.Hide();
                     _canvas.Render(null);
                     _state = State.None;
@@ -801,6 +813,7 @@ namespace RxCanvas.Editors
                     _xline.Point2.X = p.X;
                     _xline.Point2.Y = p.Y;
                     _nline = nativeConverter.Convert(_xline);
+                    //ConnectPoint1(p);
                     _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nline);
                     _nline.Bounds = boundsFactory.Create(_canvas, _nline);
@@ -823,6 +836,24 @@ namespace RxCanvas.Editors
                     _canvas.Render(null);
                 }
             });
+        }
+
+        private void ConnectPoint1(Vector2 p)
+        {
+            var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
+            if (connector != null)
+            {
+                _nline.Point1 = connector;
+            }
+        }
+
+        private void ConnectPoint2(Vector2 p)
+        {
+            var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
+            if (connector != null)
+            {
+                _nline.Point2 = connector;
+            }
         }
 
         public void Dispose()
