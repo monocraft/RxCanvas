@@ -27,6 +27,7 @@ Keyboard Shortcuts:
     S -> Snap
     Control+Delete -> Clear
     (Create)
+    P -> Pin
     L -> Line
     B -> Bézier
     Q -> Quadratic Bézier
