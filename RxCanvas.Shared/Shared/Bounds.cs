@@ -1951,7 +1951,9 @@ namespace RxCanvas.Bounds
         private readonly INativeConverter _nativeConverter;
         private readonly ICanvasFactory _canvasFactory;
 
-        public BoundsFactory(INativeConverter nativeConverter, ICanvasFactory canvasFactory)
+        public BoundsFactory(
+            INativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory)
         {
             _nativeConverter = nativeConverter;
             _canvasFactory = canvasFactory;
@@ -1959,42 +1961,90 @@ namespace RxCanvas.Bounds
 
         public IBounds Create(ICanvas canvas, IPin pin)
         {
-            return new PinBounds(_nativeConverter, _canvasFactory, canvas, pin, 15.0, 0.0);
+            return new PinBounds(
+                _nativeConverter, 
+                _canvasFactory, 
+                canvas, 
+                pin, 
+                15.0,
+                0.0);
         }
 
         public IBounds Create(ICanvas canvas, ILine line)
         {
-            return new LineBounds(_nativeConverter, _canvasFactory, canvas, line, 15.0, 0.0);
+            return new LineBounds
+                (_nativeConverter,
+                _canvasFactory, 
+                canvas, 
+                line, 
+                15.0, 
+                0.0);
         }
 
         public IBounds Create(ICanvas canvas, IBezier bezier)
         {
-            return new BezierBounds(_nativeConverter, _canvasFactory, canvas, bezier, 15.0, 0.0);
+            return new BezierBounds(
+                _nativeConverter, 
+                _canvasFactory, 
+                canvas, 
+                bezier, 
+                15.0, 
+                0.0);
         }
 
         public IBounds Create(ICanvas canvas, IQuadraticBezier quadraticBezier)
         {
-            return new QuadraticBezierBounds(_nativeConverter, _canvasFactory, canvas, quadraticBezier, 15.0, 0.0);
+            return new QuadraticBezierBounds(
+                _nativeConverter, 
+                _canvasFactory, 
+                canvas, 
+                quadraticBezier, 
+                15.0, 
+                0.0);
         }
 
         public IBounds Create(ICanvas canvas, IArc arc)
         {
-            return new ArcBounds(_nativeConverter, _canvasFactory, canvas, arc, 0.0, 7.5);
+            return new ArcBounds(
+                _nativeConverter, 
+                _canvasFactory, 
+                canvas, 
+                arc, 
+                0.0, 
+                7.5);
         }
 
         public IBounds Create(ICanvas canvas, IRectangle rectangle)
         {
-            return new RectangleBounds(_nativeConverter, _canvasFactory, canvas, rectangle, 0.0, 7.5);
+            return new RectangleBounds(
+                _nativeConverter, 
+                _canvasFactory, 
+                canvas, 
+                rectangle, 
+                0.0, 
+                7.5);
         }
 
         public IBounds Create(ICanvas canvas, IEllipse ellipse)
         {
-            return new EllipseBounds(_nativeConverter, _canvasFactory, canvas, ellipse, 0.0, 7.5);
+            return new EllipseBounds(
+                _nativeConverter, 
+                _canvasFactory, 
+                canvas, 
+                ellipse, 
+                0.0, 
+                7.5);
         }
 
         public IBounds Create(ICanvas canvas, IText text)
         {
-            return new TextBounds(_nativeConverter, _canvasFactory, canvas, text, 0.0, 7.5);
+            return new TextBounds(
+                _nativeConverter, 
+                _canvasFactory, 
+                canvas, 
+                text, 
+                0.0, 
+                7.5);
         }
     }
 }
