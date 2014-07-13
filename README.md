@@ -22,7 +22,8 @@ Keyboard Shortcuts:
     Control+Z -> Undo
     Control+Y -> Redo
     (Canvas)
-    H -> Selection
+    H -> Single Selection
+    J -> Multi Selection
     S -> Snap
     Control+Delete -> Clear
     (Create)

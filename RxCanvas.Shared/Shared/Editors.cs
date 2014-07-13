@@ -11,16 +11,15 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Editors
 {
-    public class XSelectionEditor : IEditor, IDisposable
+    public class XSingleEditor : IEditor, IDisposable
     {
         [Flags]
-        public enum State 
-        { 
+        public enum State
+        {
             None = 0,
             Hover = 1,
             Selected = 2,
             Move = 4,
-            Selection = 8,
             HoverSelected = Hover | Selected,
             HoverMove = Hover | Move,
             SelectedMove = Selected | Move
@@ -29,23 +28,23 @@ namespace RxCanvas.Editors
         public string Name { get; set; }
 
         private bool _isEnabled;
-        public bool IsEnabled 
+        public bool IsEnabled
         {
             get { return _isEnabled; }
-            set 
+            set
             {
                 if (_isEnabled)
                 {
                     Reset();
                 }
-                _isEnabled = value; 
+                _isEnabled = value;
             }
         }
 
         public string Key { get; set; }
         public string Modifiers { get; set; }
 
-        private INativeConverter _nativeConverter; 
+        private INativeConverter _nativeConverter;
         private ICanvasFactory _canvasFactory;
         private IBoundsFactory _boundsFactory;
         private ICanvas _canvas;
@@ -53,17 +52,14 @@ namespace RxCanvas.Editors
         private Vector2 _start;
         private INative _selected;
         private INative _hover;
-        private IList<INative> _overlaping;
-        private IRectangle _xrectangle;
-        private IRectangle _nrectangle;
         private State _state = State.None;
         private IDisposable _downs;
         private IDisposable _ups;
         private IDisposable _drag;
 
-        public XSelectionEditor(
-            INativeConverter nativeConverter, 
-            ICanvasFactory canvasFactory, 
+        public XSingleEditor(
+            INativeConverter nativeConverter,
+            ICanvasFactory canvasFactory,
             IBoundsFactory boundsFactory,
             ICanvas canvas)
         {
@@ -73,7 +69,7 @@ namespace RxCanvas.Editors
 
             _canvas = canvas;
 
-            Name = "Selection";
+            Name = "Single Selection";
             Key = "H";
             Modifiers = "";
 
@@ -93,24 +89,10 @@ namespace RxCanvas.Editors
         {
             bool render = false;
 
-            if (_overlaping != null)
-            {
-                ResetOverlaping();
-                render = true;
-            }
-
             if (IsState(State.Selected))
             {
                 HideSelected();
                 render = true;
-            }
-            else
-            {
-                if (IsState(State.Selection))
-                {
-                    ResetSelection();
-                    render = true;
-                }
             }
 
             if (IsState(State.Hover))
@@ -119,7 +101,7 @@ namespace RxCanvas.Editors
                 render = true;
             }
 
-            _selected = HitTest(p.X, p.Y);
+            _selected = HitTest(_canvas.Children, p.X, p.Y);
             if (_selected != null)
             {
                 ShowSelected();
@@ -128,29 +110,10 @@ namespace RxCanvas.Editors
                 render = true;
             }
 
-            if (!render)
-            {
-                if (IsState(State.None))
-                {
-                    InitSelection(p);
-                    _canvas.Capture();
-                    render = true;
-                }
-            }
-
             if (render)
             {
                 _canvas.Render(null);
             }
-        }
-
-        private void ResetOverlaping()
-        {
-            foreach (var child in _overlaping)
-            {
-                child.Bounds.Hide();
-            }
-            _overlaping = null;
         }
 
         private void Up(Vector2 p)
@@ -162,39 +125,22 @@ namespace RxCanvas.Editors
                     FinishMove(p);
                     _canvas.ReleaseCapture();
                 }
-
-                if (IsState(State.Selection))
-                {
-                    FinishSelection();
-                    _canvas.Render(null);
-                    _canvas.ReleaseCapture();
-                }
             }
         }
 
         private void Drag(Vector2 p)
         {
-            if (_overlaping != null)
-            {
-                return;
-            }
-
             if (_canvas.IsCaptured)
             {
                 if (IsState(State.Move))
                 {
                     Move(p);
                 }
-
-                if (IsState(State.Selection))
-                {
-                    MoveSelection(p);
-                }
             }
             else
             {
                 bool render = false;
-                var result = HitTest(p.X, p.Y);
+                var result = HitTest(_canvas.Children, p.X, p.Y);
 
                 if (IsState(State.Hover))
                 {
@@ -248,113 +194,6 @@ namespace RxCanvas.Editors
                     _canvas.Render(null);
                 }
             }
-        }
-
-        private void InitSelection(Vector2 p)
-        {
-            if (_xrectangle == null)
-            {
-                _xrectangle = _canvasFactory.CreateRectangle();
-                _xrectangle.StrokeThickness = 2.0;
-                _xrectangle.Stroke.A = 0xFF;
-                _xrectangle.Stroke.R = 0x33;
-                _xrectangle.Stroke.G = 0x99;
-                _xrectangle.Stroke.B = 0xFF;
-                _xrectangle.Fill.A = 0x3F;
-                _xrectangle.Fill.R = 0x33;
-                _xrectangle.Fill.G = 0x99;
-                _xrectangle.Fill.B = 0xFF;
-            }
-
-            _xrectangle.Point1.X = p.X;
-            _xrectangle.Point1.Y = p.Y;
-            _xrectangle.Point2.X = p.X;
-            _xrectangle.Point2.Y = p.Y;
-
-            if (_nrectangle == null)
-            {
-                _nrectangle = _nativeConverter.Convert(_xrectangle);
-            }
-
-            _canvas.Add(_nrectangle);
-
-            if (_nrectangle.Bounds == null)
-            {
-                _nrectangle.Bounds = _boundsFactory.Create(_canvas, _nrectangle);
-            }
-
-            _nrectangle.Bounds.Update();
-
-            _state |= State.Selection;
-            Debug.Print("_state: {0}", _state);
-        }
-
-        private void MoveSelection(Vector2 p)
-        {
-            _xrectangle.Point2.X = p.X;
-            _xrectangle.Point2.Y = p.Y;
-            _nrectangle.Point2 = _xrectangle.Point2;
-            _nrectangle.Bounds.Update();
-            _canvas.Render(null);
-        }
-
-        private void FinishSelection()
-        {
-            _state = _state & ~State.Selection;
-            _state |= State.None;
-            ResetSelection();
-            Debug.Print("_state: {0}", _state);
-            HitTestOverlaping();
-        }
-
-        private void HitTestOverlaping()
-        {
-            var sat = new SeparatingAxisTheorem();
-
-            double x = Math.Min(_xrectangle.Point1.X, _xrectangle.Point2.X);
-            double y = Math.Min(_xrectangle.Point1.Y, _xrectangle.Point2.Y);
-            double width = Math.Abs(_xrectangle.Point2.X - _xrectangle.Point1.X);
-            double height = Math.Abs(_xrectangle.Point2.Y - _xrectangle.Point1.Y);
-
-            var selectionVertices = new Vector2[]
-            {
-                new Vector2(x, y),
-                new Vector2(x + width, y),
-                new Vector2(x + width, y + height),
-                new Vector2(x, y + height)
-            };
-
-            _overlaping = _canvas.Children
-                .Where(c =>
-                {
-                    if (c.Bounds != null)
-                    {
-                        var vertices = c.Bounds.GetVertices();
-                        if (vertices != null)
-                        {
-                            return sat.Overlap(selectionVertices, vertices);
-                        }
-                        return false;
-                    }
-                    return false;
-                }).ToList();
-
-            foreach (var child in _overlaping)
-            {
-                child.Bounds.Show();
-            }
-        }
-
-        private void ResetSelection()
-        {
-            //_xrectangle.Point2.X = p.X;
-            //_xrectangle.Point2.Y = p.Y;
-            //_nrectangle.Point2 = _xrectangle.Point2;
-            _nrectangle.Bounds.Update();
-            _canvas.Remove(_nrectangle);
-            //_canvas.Render(null);
-            //_state = _state & ~State.Selection;
-            // Debug.Print("_state: {0}", _state);
         }
 
         private void ShowHover()
@@ -417,13 +256,16 @@ namespace RxCanvas.Editors
                 double dx = _start.X - p.X;
                 double dy = _start.Y - p.Y;
                 _start = p;
-                _selected.Bounds.Move(dx, dy);
+                _selected.Bounds.MoveContaining(dx, dy);
                 _selected.Bounds.Update();
                 _canvas.Render(null);
             }
         }
 
-        private INative HitTest(double x, double y)
+        private INative HitTest(
+            IList<INative> children, 
+            double x, 
+            double y)
         {
             return _canvas.Children
                 .Where(c => c.Bounds != null && c.Bounds.Contains(x, y))
@@ -448,18 +290,6 @@ namespace RxCanvas.Editors
                 render = true;
             }
 
-            if (_overlaping != null)
-            {
-                ResetOverlaping();
-                render = true;
-            }
-
-            if (IsState(State.Selection))
-            {
-                ResetSelection();
-                render = true;
-            }
-
             _state = State.None;
             Debug.Print("_state: {0}", _state);
 
@@ -467,6 +297,409 @@ namespace RxCanvas.Editors
             {
                 _canvas.Render(null);
             }
+        }
+
+        public void Dispose()
+        {
+            _downs.Dispose();
+            _ups.Dispose();
+            _drag.Dispose();
+        }
+    }
+
+    public class XMultiEditor : IEditor, IDisposable
+    {
+        [Flags]
+        public enum State 
+        { 
+            None = 0,
+            Selection = 1,
+            Overlapping = 2,
+            Move = 4
+        }
+
+        public string Name { get; set; }
+
+        private bool _isEnabled;
+        public bool IsEnabled 
+        {
+            get { return _isEnabled; }
+            set 
+            {
+                if (_isEnabled)
+                {
+                    _canvas.EnableSnap = _enableSnapOriginal;
+
+                    Reset();
+                }
+                _isEnabled = value; 
+
+                if (_isEnabled)
+                {
+                    _enableSnapOriginal = _canvas.EnableSnap;
+                    _canvas.EnableSnap = false;
+                }
+            }
+        }
+
+        public string Key { get; set; }
+        public string Modifiers { get; set; }
+
+        private INativeConverter _nativeConverter; 
+        private ICanvasFactory _canvasFactory;
+        private IBoundsFactory _boundsFactory;
+        private ICanvas _canvas;
+        private bool _enableSnapOriginal;
+        private Vector2 _original;
+        private Vector2 _start;
+        private IList<INative> _overlapping;
+        private SeparatingAxisTheorem sat;
+        private IRectangle _xrectangle;
+        private IRectangle _nrectangle;
+        private State _state = State.None;
+        private IDisposable _downs;
+        private IDisposable _ups;
+        private IDisposable _drag;
+
+        public XMultiEditor(
+            INativeConverter nativeConverter, 
+            ICanvasFactory canvasFactory, 
+            IBoundsFactory boundsFactory,
+            ICanvas canvas)
+        {
+            _nativeConverter = nativeConverter;
+            _canvasFactory = canvasFactory;
+            _boundsFactory = boundsFactory;
+
+            _canvas = canvas;
+
+            Name = "Multi Selection";
+            Key = "J";
+            Modifiers = "";
+
+            sat = new SeparatingAxisTheorem();
+
+            var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, _canvas.Moves);
+
+            _downs = _canvas.Downs.Where(_ => IsEnabled).Subscribe(p => Down(p));
+            _ups = _canvas.Ups.Where(_ => IsEnabled).Subscribe(p => Up(p));
+            _drag = drags.Where(_ => IsEnabled).Subscribe(p => Drag(p));
+        }
+
+        private void Down(Vector2 p)
+        {
+            switch(_state)
+            {
+                case State.None:
+                    {
+                        InitSelection(p);
+                        _canvas.Render(null);
+                        _state = State.Selection;
+                        Debug.Print("_state: {0}", _state);
+                    }
+                    break;
+                case State.Selection:
+                    {
+                        ResetSelection();
+                        _canvas.Render(null);
+                        _state = State.None;
+                        Debug.Print("_state: {0}", _state);
+                    }
+                    break;
+                case State.Overlapping:
+                    {
+                        if (HitTest(_overlapping, p.X, p.Y) != null)
+                        {
+                            InitMove(p);
+                            _state = State.Move;
+                            Debug.Print("_state: {0}", _state);
+                        }
+                        else
+                        {
+                            ResetOverlaping();
+                            //_canvas.Render(null);
+                            //_state = State.None;
+                            //Debug.Print("_state: {0}", _state);
+
+                            InitSelection(p);
+                            _canvas.Render(null);
+                            _state = State.Selection;
+                            Debug.Print("_state: {0}", _state);
+                        }
+                    }
+                    break;
+                case State.Move:
+                    {
+                        ResetOverlaping();
+                        _canvas.Render(null);
+                        _state = State.None;
+                        Debug.Print("_state: {0}", _state);
+                    }
+                    break;
+            };
+        }
+
+        private void Up(Vector2 p)
+        {
+            switch (_state)
+            {
+                case State.None:
+                    {
+
+                    }
+                    break;
+                case State.Selection:
+                    {
+                        FinishSelection();
+                        _canvas.Render(null);
+                    }
+                    break;
+                case State.Overlapping:
+                    {
+                        
+                    }
+                    break;
+                case State.Move:
+                    {
+                        FinishMove(p);
+                        _state = State.Overlapping;
+                        Debug.Print("_state: {0}", _state);
+                    }
+                    break;
+            };
+        }
+
+        private void Drag(Vector2 p)
+        {
+            switch (_state)
+            {
+                case State.None:
+                    {
+
+                    }
+                    break;
+                case State.Selection:
+                    {
+                        MoveSelection(p);
+                        _canvas.Render(null);
+                    }
+                    break;
+                case State.Overlapping:
+                    {
+
+                    }
+                    break;
+                case State.Move:
+                    {
+                        Move(p);
+                        _canvas.Render(null);
+                    }
+                    break;
+            };
+        }
+
+        private void InitSelection(Vector2 p)
+        {
+            if (_xrectangle == null)
+            {
+                _xrectangle = _canvasFactory.CreateRectangle();
+                _xrectangle.StrokeThickness = 2.0;
+                _xrectangle.Stroke.A = 0xFF;
+                _xrectangle.Stroke.R = 0x33;
+                _xrectangle.Stroke.G = 0x99;
+                _xrectangle.Stroke.B = 0xFF;
+                _xrectangle.Fill.A = 0x3F;
+                _xrectangle.Fill.R = 0x33;
+                _xrectangle.Fill.G = 0x99;
+                _xrectangle.Fill.B = 0xFF;
+            }
+
+            _xrectangle.Point1.X = p.X;
+            _xrectangle.Point1.Y = p.Y;
+            _xrectangle.Point2.X = p.X;
+            _xrectangle.Point2.Y = p.Y;
+
+            if (_nrectangle == null)
+            {
+                _nrectangle = _nativeConverter.Convert(_xrectangle);
+            }
+
+            _canvas.Add(_nrectangle);
+
+            if (_nrectangle.Bounds == null)
+            {
+                _nrectangle.Bounds = _boundsFactory.Create(_canvas, _nrectangle);
+            }
+
+            _nrectangle.Bounds.Update();
+        }
+
+        private void MoveSelection(Vector2 p)
+        {
+            _xrectangle.Point2.X = p.X;
+            _xrectangle.Point2.Y = p.Y;
+            _nrectangle.Point2 = _xrectangle.Point2;
+            _nrectangle.Bounds.Update();
+        }
+
+        private void FinishSelection()
+        {
+            ResetSelection();
+
+            _overlapping = HitTest(_canvas.Children, _xrectangle);
+            if (_overlapping.Count > 0)
+            {
+                _state = State.Overlapping;
+            }
+            else
+            {
+                _state = State.None;
+            }
+
+            Debug.Print("_state: {0}", _state);
+        }
+
+        private void ResetOverlaping()
+        {
+            foreach (var child in _overlapping)
+            {
+                child.Bounds.Hide();
+            }
+            _overlapping = null;
+        }
+
+        private void ResetSelection()
+        {
+            //_xrectangle.Point2.X = p.X;
+            //_xrectangle.Point2.Y = p.Y;
+            //_nrectangle.Point2 = _xrectangle.Point2;
+            _nrectangle.Bounds.Update();
+            _canvas.Remove(_nrectangle);
+            //_canvas.Render(null);
+        }
+
+        private void InitMove(Vector2 p)
+        {
+            // TODO: Create history snapshot but do not push undo.
+            double x = _enableSnapOriginal ? _canvas.Snap(p.X, _canvas.SnapX) : p.X;
+            double y = _enableSnapOriginal ? _canvas.Snap(p.Y, _canvas.SnapY) : p.Y;
+            _original = new Vector2(x, y);
+            _start = new Vector2(x, y);
+        }
+
+        private void FinishMove(Vector2 p)
+        {
+            double x = _enableSnapOriginal ? _canvas.Snap(p.X, _canvas.SnapX) : p.X;
+            double y = _enableSnapOriginal ? _canvas.Snap(p.Y, _canvas.SnapY) : p.Y;
+            if (x == _original.X && y == _original.Y)
+            {
+                // TODO: Do not push history undo.
+            }
+            else
+            {
+                // TODO: Push history undo.
+            }
+        }
+
+        private void Move(Vector2 p)
+        {
+            if (_overlapping != null)
+            {
+                double x = _enableSnapOriginal ? _canvas.Snap(p.X, _canvas.SnapX) : p.X;
+                double y = _enableSnapOriginal ? _canvas.Snap(p.Y, _canvas.SnapY) : p.Y;
+                double dx = _start.X - x;
+                double dy = _start.Y - y;
+                _start = new Vector2(x, y);
+                Debug.Print("move: {0}", _overlapping.Count);
+                foreach (var child in _overlapping)
+                {
+                    child.Bounds.MoveAll(dx, dy);
+                    child.Bounds.Update();
+                }
+            }
+        }
+
+        private IList<INative> HitTest(
+            IList<INative> children,
+            IRectangle rectangle)
+        {
+            double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+            double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+            double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+            double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
+            var selectionVertices = new Vector2[]
+            {
+                new Vector2(x, y),
+                new Vector2(x + width, y),
+                new Vector2(x + width, y + height),
+                new Vector2(x, y + height)
+            };
+
+            var overlapping = children
+                .Where(c =>
+                {
+                    if (c.Bounds != null)
+                    {
+                        var vertices = c.Bounds.GetVertices();
+                        if (vertices != null)
+                        {
+                            return sat.Overlap(selectionVertices, vertices);
+                        }
+                        return false;
+                    }
+                    return false;
+                }).ToList();
+
+            foreach (var child in overlapping)
+            {
+                child.Bounds.Show();
+            }
+
+            return overlapping;
+        }
+
+        private INative HitTest(
+            IList<INative> children, 
+            double x, 
+            double y)
+        {
+            return children
+                .Where(c => c.Bounds != null && c.Bounds.Contains(x, y))
+                .FirstOrDefault();
+        }
+
+        private void Reset()
+        {
+            switch (_state)
+            {
+                case State.None:
+                    {
+
+                    }
+                    break;
+                case State.Selection:
+                    {
+                        ResetSelection();
+                        _canvas.Render(null);
+                    }
+                    break;
+                case State.Overlapping:
+                    {
+                        ResetOverlaping();
+                        _canvas.Render(null);
+                    }
+                    break;
+                case State.Move:
+                    {
+                        ResetOverlaping();
+                        _canvas.Render(null);
+                    }
+                    break;
+            };
+
+            _state = State.None;
+            Debug.Print("_state: {0}", _state);
         }
 
         public void Dispose()

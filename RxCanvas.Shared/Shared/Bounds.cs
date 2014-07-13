@@ -224,21 +224,29 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch(_hitResult)
             {
                 case HitResult.Point:
-                    {
-                        double x = _pin.Point.X - dx;
-                        double y = _pin.Point.Y - dy;
-                        _pin.Point.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
-                        _pin.Point.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
-                        _pin.Point = _pin.Point;
-                    }
+                    MovePoint(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MovePoint(dx, dy);
+        }
+
+        private void MovePoint(double dx, double dy)
+        {
+            double x = _pin.Point.X - dx;
+            double y = _pin.Point.Y - dy;
+            _pin.Point.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+            _pin.Point.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+            _pin.Point = _pin.Point;
         }
     }
 
@@ -421,44 +429,58 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch(_hitResult)
             {
                 case HitResult.Point1:
-                    {
-                        double x1 = _line.Point1.X - dx;
-                        double y1 = _line.Point1.Y - dy;
-                        _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _line.Point1 = _line.Point1;
-                    }
+                    MovePoint1(dx, dy);
                     break;
                 case HitResult.Point2:
-                    {
-                        double x2 = _line.Point2.X - dx;
-                        double y2 = _line.Point2.Y - dy;
-                        _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _line.Point2 = _line.Point2;
-                    }
+                    MovePoint2(dx, dy);
                     break;
                 case HitResult.Line:
-                    {
-                        double x1 = _line.Point1.X - dx;
-                        double y1 = _line.Point1.Y - dy;
-                        double x2 = _line.Point2.X - dx;
-                        double y2 = _line.Point2.Y - dy;
-                        _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _line.Point1 = _line.Point1;
-                        _line.Point2 = _line.Point2;
-                    }
+                    MoveLine(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MoveLine(dx, dy);
+        }
+
+        private void MovePoint1(double dx, double dy)
+        {
+            double x1 = _line.Point1.X - dx;
+            double y1 = _line.Point1.Y - dy;
+            _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _line.Point1 = _line.Point1;
+        }
+
+        private void MovePoint2(double dx, double dy)
+        {
+            double x2 = _line.Point2.X - dx;
+            double y2 = _line.Point2.Y - dy;
+            _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _line.Point2 = _line.Point2;
+        }
+
+        private void MoveLine(double dx, double dy)
+        {
+            double x1 = _line.Point1.X - dx;
+            double y1 = _line.Point1.Y - dy;
+            double x2 = _line.Point2.X - dx;
+            double y2 = _line.Point2.Y - dy;
+            _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _line.Point1 = _line.Point1;
+            _line.Point2 = _line.Point2;
         }
     }
 
@@ -700,72 +722,92 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch (_hitResult)
             {
                 case HitResult.Start:
-                    {
-                        double x = _bezier.Start.X - dx;
-                        double y = _bezier.Start.Y - dy;
-                        _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
-                        _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
-                        _bezier.Start = _bezier.Start;
-                    }
+                    MoveStart(dx, dy);
                     break;
                 case HitResult.Point1:
-                    {
-                        double x1 = _bezier.Point1.X - dx;
-                        double y1 = _bezier.Point1.Y - dy;
-                        _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _bezier.Point1 = _bezier.Point1;
-                    }
+                    MovePoint1(dx, dy);
                     break;
                 case HitResult.Point2:
-                    {
-                        double x2 = _bezier.Point2.X - dx;
-                        double y2 = _bezier.Point2.Y - dy;
-                        _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _bezier.Point2 = _bezier.Point2;
-                    }
+                    MovePoint2(dx, dy);
                     break;
                 case HitResult.Point3:
-                    {
-                        double x3 = _bezier.Point3.X - dx;
-                        double y3 = _bezier.Point3.Y - dy;
-                        _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
-                        _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
-                        _bezier.Point3 = _bezier.Point3;
-                    }
+                    MovePoint3(dx, dy);
                     break;
                 case HitResult.Bezier:
-                    {
-                        double x = _bezier.Start.X - dx;
-                        double y = _bezier.Start.Y - dy;
-                        double x1 = _bezier.Point1.X - dx;
-                        double y1 = _bezier.Point1.Y - dy;
-                        double x2 = _bezier.Point2.X - dx;
-                        double y2 = _bezier.Point2.Y - dy;
-                        double x3 = _bezier.Point3.X - dx;
-                        double y3 = _bezier.Point3.Y - dy;
-                        _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
-                        _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
-                        _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
-                        _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
-                        _bezier.Start = _bezier.Start;
-                        _bezier.Point1 = _bezier.Point1;
-                        _bezier.Point2 = _bezier.Point2;
-                        _bezier.Point3 = _bezier.Point3;
-                    }
+                    MoveBezier(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MoveBezier(dx, dy);
+        }
+
+        private void MoveStart(double dx, double dy)
+        {
+            double x = _bezier.Start.X - dx;
+            double y = _bezier.Start.Y - dy;
+            _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+            _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+            _bezier.Start = _bezier.Start;
+        }
+
+        private void MovePoint1(double dx, double dy)
+        {
+            double x1 = _bezier.Point1.X - dx;
+            double y1 = _bezier.Point1.Y - dy;
+            _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _bezier.Point1 = _bezier.Point1;
+        }
+
+        private void MovePoint2(double dx, double dy)
+        {
+            double x2 = _bezier.Point2.X - dx;
+            double y2 = _bezier.Point2.Y - dy;
+            _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _bezier.Point2 = _bezier.Point2;
+        }
+
+        private void MovePoint3(double dx, double dy)
+        {
+            double x3 = _bezier.Point3.X - dx;
+            double y3 = _bezier.Point3.Y - dy;
+            _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
+            _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
+            _bezier.Point3 = _bezier.Point3;
+        }
+
+        private void MoveBezier(double dx, double dy)
+        {
+            double x = _bezier.Start.X - dx;
+            double y = _bezier.Start.Y - dy;
+            double x1 = _bezier.Point1.X - dx;
+            double y1 = _bezier.Point1.Y - dy;
+            double x2 = _bezier.Point2.X - dx;
+            double y2 = _bezier.Point2.Y - dy;
+            double x3 = _bezier.Point3.X - dx;
+            double y3 = _bezier.Point3.Y - dy;
+            _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+            _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+            _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
+            _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
+            _bezier.Start = _bezier.Start;
+            _bezier.Point1 = _bezier.Point1;
+            _bezier.Point2 = _bezier.Point2;
+            _bezier.Point3 = _bezier.Point3;
         }
     }
 
@@ -972,58 +1014,75 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch (_hitResult)
             {
                 case HitResult.Start:
-                    {
-                        double x = _quadraticBezier.Start.X - dx;
-                        double y = _quadraticBezier.Start.Y - dy;
-                        _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
-                        _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
-                        _quadraticBezier.Start = _quadraticBezier.Start;
-                    }
+                    MoveStart(dx, dy);
                     break;
                 case HitResult.Point1:
-                    {
-                        double x1 = _quadraticBezier.Point1.X - dx;
-                        double y1 = _quadraticBezier.Point1.Y - dy;
-                        _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _quadraticBezier.Point1 = _quadraticBezier.Point1;
-                    }
+                    MovePoint1(dx, dy);
                     break;
                 case HitResult.Point2:
-                    {
-                        double x2 = _quadraticBezier.Point2.X - dx;
-                        double y2 = _quadraticBezier.Point2.Y - dy;
-                        _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _quadraticBezier.Point2 = _quadraticBezier.Point2;
-                    }
+                    MovePoint2(dx, dy);
                     break;
                 case HitResult.QuadraticBezier:
-                    {
-                        double x = _quadraticBezier.Start.X - dx;
-                        double y = _quadraticBezier.Start.Y - dy;
-                        double x1 = _quadraticBezier.Point1.X - dx;
-                        double y1 = _quadraticBezier.Point1.Y - dy;
-                        double x2 = _quadraticBezier.Point2.X - dx;
-                        double y2 = _quadraticBezier.Point2.Y - dy;
-                        _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
-                        _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
-                        _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _quadraticBezier.Start = _quadraticBezier.Start;
-                        _quadraticBezier.Point1 = _quadraticBezier.Point1;
-                        _quadraticBezier.Point2 = _quadraticBezier.Point2;
-                    }
+                    MoveQuadraticBezier(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MoveQuadraticBezier(dx, dy);
+        }
+
+        private void MoveStart(double dx, double dy)
+        {
+            double x = _quadraticBezier.Start.X - dx;
+            double y = _quadraticBezier.Start.Y - dy;
+            _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+            _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+            _quadraticBezier.Start = _quadraticBezier.Start;
+        }
+
+        private void MovePoint1(double dx, double dy)
+        {
+            double x1 = _quadraticBezier.Point1.X - dx;
+            double y1 = _quadraticBezier.Point1.Y - dy;
+            _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _quadraticBezier.Point1 = _quadraticBezier.Point1;
+        }
+
+        private void MovePoint2(double dx, double dy)
+        {
+            double x2 = _quadraticBezier.Point2.X - dx;
+            double y2 = _quadraticBezier.Point2.Y - dy;
+            _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _quadraticBezier.Point2 = _quadraticBezier.Point2;
+        }
+
+        private void MoveQuadraticBezier(double dx, double dy)
+        {
+            double x = _quadraticBezier.Start.X - dx;
+            double y = _quadraticBezier.Start.Y - dy;
+            double x1 = _quadraticBezier.Point1.X - dx;
+            double y1 = _quadraticBezier.Point1.Y - dy;
+            double x2 = _quadraticBezier.Point2.X - dx;
+            double y2 = _quadraticBezier.Point2.Y - dy;
+            _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
+            _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
+            _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _quadraticBezier.Start = _quadraticBezier.Start;
+            _quadraticBezier.Point1 = _quadraticBezier.Point1;
+            _quadraticBezier.Point2 = _quadraticBezier.Point2;
         }
     }
 
@@ -1187,44 +1246,58 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch (_hitResult)
             {
                 case HitResult.Point1:
-                    {
-                        double x1 = _arc.Point1.X - dx;
-                        double y1 = _arc.Point1.Y - dy;
-                        _arc.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _arc.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _arc.Point1 = _arc.Point1;
-                    }
+                    MovePoint1(dx, dy);
                     break;
                 case HitResult.Point2:
-                    {
-                        double x2 = _arc.Point2.X - dx;
-                        double y2 = _arc.Point2.Y - dy;
-                        _arc.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _arc.Point2 = _arc.Point2;
-                    }
+                    MovePoint2(dx, dy);
                     break;
                 case HitResult.Arc:
-                    {
-                        double x1 = _arc.Point1.X - dx;
-                        double y1 = _arc.Point1.Y - dy;
-                        double x2 = _arc.Point2.X - dx;
-                        double y2 = _arc.Point2.Y - dy;
-                        _arc.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _arc.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _arc.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _arc.Point1 = _arc.Point1;
-                        _arc.Point2 = _arc.Point2;
-                    }
+                    MoveArc(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MoveArc(dx, dy);
+        }
+
+        private void MovePoint1(double dx, double dy)
+        {
+            double x1 = _arc.Point1.X - dx;
+            double y1 = _arc.Point1.Y - dy;
+            _arc.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _arc.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _arc.Point1 = _arc.Point1;
+        }
+
+        private void MovePoint2(double dx, double dy)
+        {
+            double x2 = _arc.Point2.X - dx;
+            double y2 = _arc.Point2.Y - dy;
+            _arc.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _arc.Point2 = _arc.Point2;
+        }
+
+        private void MoveArc(double dx, double dy)
+        {
+            double x1 = _arc.Point1.X - dx;
+            double y1 = _arc.Point1.Y - dy;
+            double x2 = _arc.Point2.X - dx;
+            double y2 = _arc.Point2.Y - dy;
+            _arc.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _arc.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _arc.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _arc.Point1 = _arc.Point1;
+            _arc.Point2 = _arc.Point2;
         }
     }
 
@@ -1388,44 +1461,58 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch (_hitResult)
             {
                 case HitResult.Point1:
-                    {
-                        double x1 = _rectangle.Point1.X - dx;
-                        double y1 = _rectangle.Point1.Y - dy;
-                        _rectangle.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _rectangle.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _rectangle.Point1 = _rectangle.Point1;
-                    }
+                    MovePoint1(dx, dy);
                     break;
                 case HitResult.Point2:
-                    {
-                        double x2 = _rectangle.Point2.X - dx;
-                        double y2 = _rectangle.Point2.Y - dy;
-                        _rectangle.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _rectangle.Point2 = _rectangle.Point2;
-                    }
+                    MovePoint2(dx, dy);
                     break;
                 case HitResult.Rectangle:
-                    {
-                        double x1 = _rectangle.Point1.X - dx;
-                        double y1 = _rectangle.Point1.Y - dy;
-                        double x2 = _rectangle.Point2.X - dx;
-                        double y2 = _rectangle.Point2.Y - dy;
-                        _rectangle.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _rectangle.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _rectangle.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _rectangle.Point1 = _rectangle.Point1;
-                        _rectangle.Point2 = _rectangle.Point2;
-                    }
+                    MoveRectangle(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MoveRectangle(dx, dy);
+        }
+
+        private void MovePoint1(double dx, double dy)
+        {
+            double x1 = _rectangle.Point1.X - dx;
+            double y1 = _rectangle.Point1.Y - dy;
+            _rectangle.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _rectangle.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _rectangle.Point1 = _rectangle.Point1;
+        }
+
+        private void MovePoint2(double dx, double dy)
+        {
+            double x2 = _rectangle.Point2.X - dx;
+            double y2 = _rectangle.Point2.Y - dy;
+            _rectangle.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _rectangle.Point2 = _rectangle.Point2;
+        }
+
+        private void MoveRectangle(double dx, double dy)
+        {
+            double x1 = _rectangle.Point1.X - dx;
+            double y1 = _rectangle.Point1.Y - dy;
+            double x2 = _rectangle.Point2.X - dx;
+            double y2 = _rectangle.Point2.Y - dy;
+            _rectangle.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _rectangle.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _rectangle.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _rectangle.Point1 = _rectangle.Point1;
+            _rectangle.Point2 = _rectangle.Point2;
         }
     }
 
@@ -1589,44 +1676,58 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch (_hitResult)
             {
                 case HitResult.Point1:
-                    {
-                        double x1 = _ellipse.Point1.X - dx;
-                        double y1 = _ellipse.Point1.Y - dy;
-                        _ellipse.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _ellipse.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _ellipse.Point1 = _ellipse.Point1;
-                    }
+                    MovePoint1(dx, dy);
                     break;
                 case HitResult.Point2:
-                    {
-                        double x2 = _ellipse.Point2.X - dx;
-                        double y2 = _ellipse.Point2.Y - dy;
-                        _ellipse.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _ellipse.Point2 = _ellipse.Point2;
-                    }
+                    MovePoint2(dx, dy);
                     break;
                 case HitResult.Ellipse:
-                    {
-                        double x1 = _ellipse.Point1.X - dx;
-                        double y1 = _ellipse.Point1.Y - dy;
-                        double x2 = _ellipse.Point2.X - dx;
-                        double y2 = _ellipse.Point2.Y - dy;
-                        _ellipse.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _ellipse.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _ellipse.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _ellipse.Point1 = _ellipse.Point1;
-                        _ellipse.Point2 = _ellipse.Point2;
-                    }
+                    MoveEllipse(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MoveEllipse(dx, dy);
+        }
+
+        private void MovePoint1(double dx, double dy)
+        {
+            double x1 = _ellipse.Point1.X - dx;
+            double y1 = _ellipse.Point1.Y - dy;
+            _ellipse.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _ellipse.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _ellipse.Point1 = _ellipse.Point1;
+        }
+
+        private void MovePoint2(double dx, double dy)
+        {
+            double x2 = _ellipse.Point2.X - dx;
+            double y2 = _ellipse.Point2.Y - dy;
+            _ellipse.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _ellipse.Point2 = _ellipse.Point2;
+        }
+
+        private void MoveEllipse(double dx, double dy)
+        {
+            double x1 = _ellipse.Point1.X - dx;
+            double y1 = _ellipse.Point1.Y - dy;
+            double x2 = _ellipse.Point2.X - dx;
+            double y2 = _ellipse.Point2.Y - dy;
+            _ellipse.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _ellipse.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _ellipse.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _ellipse.Point1 = _ellipse.Point1;
+            _ellipse.Point2 = _ellipse.Point2;
         }
     }
 
@@ -1790,44 +1891,58 @@ namespace RxCanvas.Bounds
             return false;
         }
 
-        public void Move(double dx, double dy)
+        public void MoveContaining(double dx, double dy)
         {
             //Debug.Print("_hitResult: {0}", _hitResult);
             switch (_hitResult)
             {
                 case HitResult.Point1:
-                    {
-                        double x1 = _text.Point1.X - dx;
-                        double y1 = _text.Point1.Y - dy;
-                        _text.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _text.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _text.Point1 = _text.Point1;
-                    }
+                    MovePoint1(dx, dy);
                     break;
                 case HitResult.Point2:
-                    {
-                        double x2 = _text.Point2.X - dx;
-                        double y2 = _text.Point2.Y - dy;
-                        _text.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _text.Point2 = _text.Point2;
-                    }
+                    MovePoint2(dx, dy);
                     break;
                 case HitResult.Text:
-                    {
-                        double x1 = _text.Point1.X - dx;
-                        double y1 = _text.Point1.Y - dy;
-                        double x2 = _text.Point2.X - dx;
-                        double y2 = _text.Point2.Y - dy;
-                        _text.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
-                        _text.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
-                        _text.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
-                        _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
-                        _text.Point1 = _text.Point1;
-                        _text.Point2 = _text.Point2;
-                    }
+                    MoveText(dx, dy);
                     break;
             }
+        }
+
+        public void MoveAll(double dx, double dy)
+        {
+            MoveText(dx, dy);
+        }
+
+        private void MovePoint1(double dx, double dy)
+        {
+            double x1 = _text.Point1.X - dx;
+            double y1 = _text.Point1.Y - dy;
+            _text.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _text.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _text.Point1 = _text.Point1;
+        }
+
+        private void MovePoint2(double dx, double dy)
+        {
+            double x2 = _text.Point2.X - dx;
+            double y2 = _text.Point2.Y - dy;
+            _text.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _text.Point2 = _text.Point2;
+        }
+
+        private void MoveText(double dx, double dy)
+        {
+            double x1 = _text.Point1.X - dx;
+            double y1 = _text.Point1.Y - dy;
+            double x2 = _text.Point2.X - dx;
+            double y2 = _text.Point2.Y - dy;
+            _text.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
+            _text.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
+            _text.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
+            _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
+            _text.Point1 = _text.Point1;
+            _text.Point2 = _text.Point2;
         }
     }
 

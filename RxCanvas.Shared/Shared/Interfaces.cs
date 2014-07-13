@@ -30,7 +30,8 @@ namespace RxCanvas.Interfaces
         void Show();
         void Hide();
         bool Contains(double x, double y);
-        void Move(double dx, double dy);
+        void MoveContaining(double dx, double dy);
+        void MoveAll(double dx, double dy);
     }
 
     public interface INative
