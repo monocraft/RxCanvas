@@ -11,6 +11,61 @@ using System.Threading.Tasks;
 
 namespace RxCanvas.Editors
 {
+    internal static class Helper
+    {
+        public static SeparatingAxisTheorem SAT = new SeparatingAxisTheorem();
+
+        public static INative HitTest(
+            IList<INative> children,
+            double x,
+            double y)
+        {
+            return children
+                .Where(c => c.Bounds != null && c.Bounds.Contains(x, y))
+                .FirstOrDefault();
+        }
+
+        public static IList<INative> HitTest(
+            IList<INative> children,
+            IRectangle rectangle)
+        {
+            double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
+            double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
+            double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
+            double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
+
+            var selectionVertices = new Vector2[]
+            {
+                new Vector2(x, y),
+                new Vector2(x + width, y),
+                new Vector2(x + width, y + height),
+                new Vector2(x, y + height)
+            };
+
+            var overlapping = children
+                .Where(c =>
+                {
+                    if (c.Bounds != null)
+                    {
+                        var vertices = c.Bounds.GetVertices();
+                        if (vertices != null)
+                        {
+                            return SAT.Overlap(selectionVertices, vertices);
+                        }
+                        return false;
+                    }
+                    return false;
+                }).ToList();
+
+            foreach (var child in overlapping)
+            {
+                child.Bounds.Show();
+            }
+
+            return overlapping;
+        }
+    }
+
     public class XSingleEditor : IEditor, IDisposable
     {
         [Flags]
@@ -101,7 +156,7 @@ namespace RxCanvas.Editors
                 render = true;
             }
 
-            _selected = HitTest(_canvas.Children, p.X, p.Y);
+            _selected = Helper.HitTest(_canvas.Children, p.X, p.Y);
             if (_selected != null)
             {
                 ShowSelected();
@@ -140,7 +195,7 @@ namespace RxCanvas.Editors
             else
             {
                 bool render = false;
-                var result = HitTest(_canvas.Children, p.X, p.Y);
+                var result = Helper.HitTest(_canvas.Children, p.X, p.Y);
 
                 if (IsState(State.Hover))
                 {
@@ -262,16 +317,6 @@ namespace RxCanvas.Editors
             }
         }
 
-        private INative HitTest(
-            IList<INative> children, 
-            double x, 
-            double y)
-        {
-            return _canvas.Children
-                .Where(c => c.Bounds != null && c.Bounds.Contains(x, y))
-                .FirstOrDefault();
-        }
-
         private void Reset()
         {
             bool render = false;
@@ -353,7 +398,6 @@ namespace RxCanvas.Editors
         private Vector2 _original;
         private Vector2 _start;
         private IList<INative> _overlapping;
-        private SeparatingAxisTheorem sat;
         private IRectangle _xrectangle;
         private IRectangle _nrectangle;
         private State _state = State.None;
@@ -376,8 +420,6 @@ namespace RxCanvas.Editors
             Name = "Multi Selection";
             Key = "J";
             Modifiers = "";
-
-            sat = new SeparatingAxisTheorem();
 
             var drags = Observable.Merge(_canvas.Downs, _canvas.Ups, _canvas.Moves);
 
@@ -408,7 +450,7 @@ namespace RxCanvas.Editors
                     break;
                 case State.Overlapping:
                     {
-                        if (HitTest(_overlapping, p.X, p.Y) != null)
+                        if (Helper.HitTest(_overlapping, p.X, p.Y) != null)
                         {
                             InitMove(p);
                             _state = State.Move;
@@ -546,7 +588,7 @@ namespace RxCanvas.Editors
         {
             ResetSelection();
 
-            _overlapping = HitTest(_canvas.Children, _xrectangle);
+            _overlapping = Helper.HitTest(_canvas.Children, _xrectangle);
             if (_overlapping.Count > 0)
             {
                 _state = State.Overlapping;
@@ -617,56 +659,6 @@ namespace RxCanvas.Editors
                     child.Bounds.Update();
                 }
             }
-        }
-
-        private IList<INative> HitTest(
-            IList<INative> children,
-            IRectangle rectangle)
-        {
-            double x = Math.Min(rectangle.Point1.X, rectangle.Point2.X);
-            double y = Math.Min(rectangle.Point1.Y, rectangle.Point2.Y);
-            double width = Math.Abs(rectangle.Point2.X - rectangle.Point1.X);
-            double height = Math.Abs(rectangle.Point2.Y - rectangle.Point1.Y);
-
-            var selectionVertices = new Vector2[]
-            {
-                new Vector2(x, y),
-                new Vector2(x + width, y),
-                new Vector2(x + width, y + height),
-                new Vector2(x, y + height)
-            };
-
-            var overlapping = children
-                .Where(c =>
-                {
-                    if (c.Bounds != null)
-                    {
-                        var vertices = c.Bounds.GetVertices();
-                        if (vertices != null)
-                        {
-                            return sat.Overlap(selectionVertices, vertices);
-                        }
-                        return false;
-                    }
-                    return false;
-                }).ToList();
-
-            foreach (var child in overlapping)
-            {
-                child.Bounds.Show();
-            }
-
-            return overlapping;
-        }
-
-        private INative HitTest(
-            IList<INative> children, 
-            double x, 
-            double y)
-        {
-            return children
-                .Where(c => c.Bounds != null && c.Bounds.Contains(x, y))
-                .FirstOrDefault();
         }
 
         private void Reset()
