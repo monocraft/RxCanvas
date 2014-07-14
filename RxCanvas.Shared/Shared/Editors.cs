@@ -746,13 +746,22 @@ namespace RxCanvas.Editors
                 _xpin.Point.X = p.X;
                 _xpin.Point.Y = p.Y;
                 _npin = nativeConverter.Convert(_xpin);
+                ConnectPoint(p);
                 _canvas.History.Snapshot(_canvas);
                 _canvas.Add(_npin);
                 _npin.Bounds = boundsFactory.Create(_canvas, _npin);
                 _npin.Bounds.Update();
                 _canvas.Render(null);
             });
+        }
 
+        private void ConnectPoint(Vector2 p)
+        {
+            var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
+            if (connector != null)
+            {
+                _npin.Point = connector;
+            }
         }
 
         public void Dispose()
