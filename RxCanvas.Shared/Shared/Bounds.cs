@@ -114,6 +114,19 @@ namespace RxCanvas.Bounds
             line.Point1 = line.Point1;
             line.Point2 = line.Point2;
         }
+
+        public static void UpdateConnected(IPoint point, double dx, double dy)
+        {
+            foreach (var connected in point.Connected)
+            {
+                var bounds = connected.Bounds;
+                if (bounds != null)
+                {
+                    //bounds.MoveAll(dx, dy);
+                    bounds.Update();
+                }
+            }
+        }
     }
 
     public class PinBounds : IBounds
@@ -258,6 +271,7 @@ namespace RxCanvas.Bounds
             _pin.Point.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
             _pin.Point.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
             _pin.Point = _pin.Point;
+            Helper.UpdateConnected(_pin.Point, dx, dy);
         }
     }
 
@@ -519,6 +533,7 @@ namespace RxCanvas.Bounds
             _line.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
             _line.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
             _line.Point1 = _line.Point1;
+            Helper.UpdateConnected(_line.Point1, dx, dy);
         }
 
         private void MovePoint2(double dx, double dy)
@@ -528,6 +543,7 @@ namespace RxCanvas.Bounds
             _line.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
             _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _line.Point2 = _line.Point2;
+            Helper.UpdateConnected(_line.Point2, dx, dy);
         }
 
         private void MoveLine(double dx, double dy)
@@ -542,6 +558,8 @@ namespace RxCanvas.Bounds
             _line.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _line.Point1 = _line.Point1;
             _line.Point2 = _line.Point2;
+            Helper.UpdateConnected(_line.Point1, dx, dy);
+            Helper.UpdateConnected(_line.Point2, dx, dy);
         }
     }
 
@@ -837,6 +855,7 @@ namespace RxCanvas.Bounds
             _bezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
             _bezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
             _bezier.Start = _bezier.Start;
+            Helper.UpdateConnected(_bezier.Start, dx, dy);
         }
 
         private void MovePoint1(double dx, double dy)
@@ -846,6 +865,7 @@ namespace RxCanvas.Bounds
             _bezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
             _bezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
             _bezier.Point1 = _bezier.Point1;
+            Helper.UpdateConnected(_bezier.Point1, dx, dy);
         }
 
         private void MovePoint2(double dx, double dy)
@@ -855,6 +875,7 @@ namespace RxCanvas.Bounds
             _bezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
             _bezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _bezier.Point2 = _bezier.Point2;
+            Helper.UpdateConnected(_bezier.Point2, dx, dy);
         }
 
         private void MovePoint3(double dx, double dy)
@@ -864,6 +885,7 @@ namespace RxCanvas.Bounds
             _bezier.Point3.X = _canvas.EnableSnap ? _canvas.Snap(x3, _canvas.SnapX) : x3;
             _bezier.Point3.Y = _canvas.EnableSnap ? _canvas.Snap(y3, _canvas.SnapY) : y3;
             _bezier.Point3 = _bezier.Point3;
+            Helper.UpdateConnected(_bezier.Point3, dx, dy);
         }
 
         private void MoveBezier(double dx, double dy)
@@ -888,6 +910,10 @@ namespace RxCanvas.Bounds
             _bezier.Point1 = _bezier.Point1;
             _bezier.Point2 = _bezier.Point2;
             _bezier.Point3 = _bezier.Point3;
+            Helper.UpdateConnected(_bezier.Start, dx, dy);
+            Helper.UpdateConnected(_bezier.Point1, dx, dy);
+            Helper.UpdateConnected(_bezier.Point2, dx, dy);
+            Helper.UpdateConnected(_bezier.Point3, dx, dy);
         }
     }
 
@@ -1141,6 +1167,7 @@ namespace RxCanvas.Bounds
             _quadraticBezier.Start.X = _canvas.EnableSnap ? _canvas.Snap(x, _canvas.SnapX) : x;
             _quadraticBezier.Start.Y = _canvas.EnableSnap ? _canvas.Snap(y, _canvas.SnapY) : y;
             _quadraticBezier.Start = _quadraticBezier.Start;
+            Helper.UpdateConnected(_quadraticBezier.Start, dx, dy);
         }
 
         private void MovePoint1(double dx, double dy)
@@ -1150,6 +1177,7 @@ namespace RxCanvas.Bounds
             _quadraticBezier.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
             _quadraticBezier.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
             _quadraticBezier.Point1 = _quadraticBezier.Point1;
+            Helper.UpdateConnected(_quadraticBezier.Point1, dx, dy);
         }
 
         private void MovePoint2(double dx, double dy)
@@ -1159,6 +1187,7 @@ namespace RxCanvas.Bounds
             _quadraticBezier.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
             _quadraticBezier.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _quadraticBezier.Point2 = _quadraticBezier.Point2;
+            Helper.UpdateConnected(_quadraticBezier.Point2, dx, dy);
         }
 
         private void MoveQuadraticBezier(double dx, double dy)
@@ -1178,6 +1207,9 @@ namespace RxCanvas.Bounds
             _quadraticBezier.Start = _quadraticBezier.Start;
             _quadraticBezier.Point1 = _quadraticBezier.Point1;
             _quadraticBezier.Point2 = _quadraticBezier.Point2;
+            Helper.UpdateConnected(_quadraticBezier.Start, dx, dy);
+            Helper.UpdateConnected(_quadraticBezier.Point1, dx, dy);
+            Helper.UpdateConnected(_quadraticBezier.Point2, dx, dy);
         }
     }
 
@@ -1383,6 +1415,7 @@ namespace RxCanvas.Bounds
             _arc.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
             _arc.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
             _arc.Point1 = _arc.Point1;
+            Helper.UpdateConnected(_arc.Point1, dx, dy);
         }
 
         private void MovePoint2(double dx, double dy)
@@ -1392,6 +1425,7 @@ namespace RxCanvas.Bounds
             _arc.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
             _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _arc.Point2 = _arc.Point2;
+            Helper.UpdateConnected(_arc.Point2, dx, dy);
         }
 
         private void MoveArc(double dx, double dy)
@@ -1406,6 +1440,8 @@ namespace RxCanvas.Bounds
             _arc.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _arc.Point1 = _arc.Point1;
             _arc.Point2 = _arc.Point2;
+            Helper.UpdateConnected(_arc.Point1, dx, dy);
+            Helper.UpdateConnected(_arc.Point2, dx, dy);
         }
     }
 
@@ -1611,6 +1647,7 @@ namespace RxCanvas.Bounds
             _rectangle.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
             _rectangle.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
             _rectangle.Point1 = _rectangle.Point1;
+            Helper.UpdateConnected(_rectangle.Point1, dx, dy);
         }
 
         private void MovePoint2(double dx, double dy)
@@ -1620,6 +1657,7 @@ namespace RxCanvas.Bounds
             _rectangle.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
             _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _rectangle.Point2 = _rectangle.Point2;
+            Helper.UpdateConnected(_rectangle.Point2, dx, dy);
         }
 
         private void MoveRectangle(double dx, double dy)
@@ -1634,6 +1672,8 @@ namespace RxCanvas.Bounds
             _rectangle.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _rectangle.Point1 = _rectangle.Point1;
             _rectangle.Point2 = _rectangle.Point2;
+            Helper.UpdateConnected(_rectangle.Point1, dx, dy);
+            Helper.UpdateConnected(_rectangle.Point2, dx, dy);
         }
     }
 
@@ -1839,6 +1879,7 @@ namespace RxCanvas.Bounds
             _ellipse.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
             _ellipse.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
             _ellipse.Point1 = _ellipse.Point1;
+            Helper.UpdateConnected(_ellipse.Point1, dx, dy);
         }
 
         private void MovePoint2(double dx, double dy)
@@ -1848,6 +1889,7 @@ namespace RxCanvas.Bounds
             _ellipse.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
             _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _ellipse.Point2 = _ellipse.Point2;
+            Helper.UpdateConnected(_ellipse.Point2, dx, dy);
         }
 
         private void MoveEllipse(double dx, double dy)
@@ -1862,6 +1904,8 @@ namespace RxCanvas.Bounds
             _ellipse.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _ellipse.Point1 = _ellipse.Point1;
             _ellipse.Point2 = _ellipse.Point2;
+            Helper.UpdateConnected(_ellipse.Point1, dx, dy);
+            Helper.UpdateConnected(_ellipse.Point2, dx, dy);
         }
     }
 
@@ -2067,6 +2111,7 @@ namespace RxCanvas.Bounds
             _text.Point1.X = _canvas.EnableSnap ? _canvas.Snap(x1, _canvas.SnapX) : x1;
             _text.Point1.Y = _canvas.EnableSnap ? _canvas.Snap(y1, _canvas.SnapY) : y1;
             _text.Point1 = _text.Point1;
+            Helper.UpdateConnected(_text.Point1, dx, dy);
         }
 
         private void MovePoint2(double dx, double dy)
@@ -2076,6 +2121,7 @@ namespace RxCanvas.Bounds
             _text.Point2.X = _canvas.EnableSnap ? _canvas.Snap(x2, _canvas.SnapX) : x2;
             _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _text.Point2 = _text.Point2;
+            Helper.UpdateConnected(_text.Point2, dx, dy);
         }
 
         private void MoveText(double dx, double dy)
@@ -2090,6 +2136,8 @@ namespace RxCanvas.Bounds
             _text.Point2.Y = _canvas.EnableSnap ? _canvas.Snap(y2, _canvas.SnapY) : y2;
             _text.Point1 = _text.Point1;
             _text.Point2 = _text.Point2;
+            Helper.UpdateConnected(_text.Point1, dx, dy);
+            Helper.UpdateConnected(_text.Point2, dx, dy);
         }
     }
 

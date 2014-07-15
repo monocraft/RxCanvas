@@ -767,6 +767,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _npin.Point = connector;
+                connector.Connected.Add(_npin);
             }
         } 
 
@@ -867,6 +868,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nline.Point1 = connector;
+                connector.Connected.Add(_nline);
             }
         }
 
@@ -876,6 +878,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nline.Point2 = connector;
+                connector.Connected.Add(_nline);
             }
         } 
 
@@ -1042,6 +1045,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nb.Start = connector;
+                connector.Connected.Add(_nb);
             }
         }
 
@@ -1051,6 +1055,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nb.Point1 = connector;
+                connector.Connected.Add(_nb);
             }
         }
 
@@ -1060,6 +1065,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nb.Point2 = connector;
+                connector.Connected.Add(_nb);
             }
         }
 
@@ -1069,6 +1075,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nb.Point3 = connector;
+                connector.Connected.Add(_nb);
             }
         }
 
@@ -1205,6 +1212,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nqb.Start = connector;
+                connector.Connected.Add(_nqb);
             }
         }
 
@@ -1214,6 +1222,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nqb.Point1 = connector;
+                connector.Connected.Add(_nqb);
             }
         }
 
@@ -1223,6 +1232,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nqb.Point2 = connector;
+                connector.Connected.Add(_nqb);
             }
         }
 
@@ -1324,6 +1334,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _narc.Point1 = connector;
+                connector.Connected.Add(_narc);
             }
         }
 
@@ -1333,6 +1344,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _narc.Point2 = connector;
+                connector.Connected.Add(_narc);
             }
         }
 
@@ -1434,6 +1446,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nrectangle.Point1 = connector;
+                connector.Connected.Add(_nrectangle);
             }
         }
 
@@ -1443,6 +1456,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nrectangle.Point2 = connector;
+                connector.Connected.Add(_nrectangle);
             }
         } 
 
@@ -1544,6 +1558,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nellipse.Point1 = connector;
+                connector.Connected.Add(_nellipse);
             }
         }
 
@@ -1553,6 +1568,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _nellipse.Point2 = connector;
+                connector.Connected.Add(_nellipse);
             }
         }
 
@@ -1654,6 +1670,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _ntext.Point1 = connector;
+                connector.Connected.Add(_ntext);
             }
         }
 
@@ -1663,6 +1680,7 @@ namespace RxCanvas.Editors
             if (connector != null)
             {
                 _ntext.Point2 = connector;
+                connector.Connected.Add(_ntext);
             }
         }
 
@@ -1703,27 +1721,32 @@ namespace RxCanvas.Editors
                 Fill = new XColor(0xFF, 0x00, 0x00, 0x00)
             };
 
-            return new XPin()
+            var pin = new XPin()
             {
                 Point = new XPoint(0.0, 0.0),
                 Shape = shape,
             };
+            pin.Point.Connected.Add(pin);
+            return pin;
         }
 
         public ILine CreateLine()
         {
-            return new XLine()
+            var line = new XLine()
             {
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
                 Stroke = new XColor(0xFF, 0x00, 0x00, 0x00),
                 StrokeThickness = 2.0,
             };
+            line.Point1.Connected.Add(line);
+            line.Point2.Connected.Add(line);
+            return line;
         }
 
         public IBezier CreateBezier()
         {
-            return new XBezier()
+            var bezier = new XBezier()
             {
                 Start = new XPoint(0.0, 0.0),
                 Point1 = new XPoint(0.0, 0.0),
@@ -1735,11 +1758,16 @@ namespace RxCanvas.Editors
                 IsFilled = false,
                 IsClosed = false
             };
+            bezier.Start.Connected.Add(bezier);
+            bezier.Point1.Connected.Add(bezier);
+            bezier.Point2.Connected.Add(bezier);
+            bezier.Point3.Connected.Add(bezier);
+            return bezier;
         }
 
         public IQuadraticBezier CreateQuadraticBezier()
         {
-            return new XQuadraticBezier()
+            var quadraticBezier = new XQuadraticBezier()
             {
                 Start = new XPoint(0.0, 0.0),
                 Point1 = new XPoint(0.0, 0.0),
@@ -1750,11 +1778,15 @@ namespace RxCanvas.Editors
                 IsFilled = false,
                 IsClosed = false
             };
+            quadraticBezier.Start.Connected.Add(quadraticBezier);
+            quadraticBezier.Point1.Connected.Add(quadraticBezier);
+            quadraticBezier.Point2.Connected.Add(quadraticBezier);
+            return quadraticBezier;
         }
 
         public IArc CreateArc()
         {
-            return new XArc()
+            var arc = new XArc()
             {
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
@@ -1766,11 +1798,14 @@ namespace RxCanvas.Editors
                 IsFilled = false,
                 IsClosed = false
             };
+            arc.Point1.Connected.Add(arc);
+            arc.Point2.Connected.Add(arc);
+            return arc;
         }
 
         public IRectangle CreateRectangle()
         {
-            return new XRectangle()
+            var rectangle = new XRectangle()
             {
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
@@ -1778,11 +1813,14 @@ namespace RxCanvas.Editors
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)
             };
+            rectangle.Point1.Connected.Add(rectangle);
+            rectangle.Point2.Connected.Add(rectangle);
+            return rectangle;
         }
 
         public IEllipse CreateEllipse()
         {
-            return new XEllipse()
+            var ellipse = new XEllipse()
             {
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
@@ -1790,11 +1828,14 @@ namespace RxCanvas.Editors
                 StrokeThickness = 2.0,
                 Fill = new XColor(0x00, 0xFF, 0xFF, 0xFF)
             };
+            ellipse.Point1.Connected.Add(ellipse);
+            ellipse.Point2.Connected.Add(ellipse);
+            return ellipse;
         }
 
         public IText CreateText()
         {
-            return new XText()
+            var text = new XText()
             {
                 Point1 = new XPoint(0.0, 0.0),
                 Point2 = new XPoint(0.0, 0.0),
@@ -1805,6 +1846,9 @@ namespace RxCanvas.Editors
                 Foreground = new XColor(0xFF, 0x00, 0x00, 0x00),
                 Backgroud = new XColor(0x00, 0xFF, 0xFF, 0xFF),
             };
+            text.Point1.Connected.Add(text);
+            text.Point2.Connected.Add(text);
+            return text;
         }
 
         public IBlock CreateBlock()

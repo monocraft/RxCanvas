@@ -98,11 +98,13 @@ namespace RxCanvas.Model
     public class XPoint : IPoint, IComparable<XPoint>
     {
         public int Id { get; set; }
+        public IList<INative> Connected { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
 
         public XPoint(double x, double y)
         {
+            Connected = new List<INative>();
             X = x;
             Y = y;
         }

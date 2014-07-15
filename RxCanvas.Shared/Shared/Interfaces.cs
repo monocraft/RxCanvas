@@ -11,6 +11,7 @@ namespace RxCanvas.Interfaces
     public interface IPoint
     {
         int Id { get; set; }
+        IList<INative> Connected { get; set; }
         double X { get; set; }
         double Y { get; set; }
     }
