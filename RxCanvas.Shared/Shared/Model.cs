@@ -97,6 +97,7 @@ namespace RxCanvas.Model
 
     public class XPoint : IPoint, IComparable<XPoint>
     {
+        public int Id { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
 
