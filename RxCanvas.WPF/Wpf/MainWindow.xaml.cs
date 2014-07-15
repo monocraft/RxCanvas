@@ -180,7 +180,7 @@ namespace RxCanvas.WPF
         {
             string filter = ToFileFilter();
             int defaultFilterIndex = _view.Files
-                .IndexOf(_view.Files.Where(c => c.Name == "Json")
+                .IndexOf(_view.Files.Where(c => c.Name == "Binary")
                 .FirstOrDefault()) + 1;
 
             var dlg = new OpenFileDialog()
@@ -201,7 +201,7 @@ namespace RxCanvas.WPF
         {
             string filter = ToFileFilter();
             int defaultFilterIndex = _view.Files
-                .IndexOf(_view.Files.Where(c => c.Name == "Json")
+                .IndexOf(_view.Files.Where(c => c.Name == "Binary")
                 .FirstOrDefault()) + 1;
 
             var dlg = new SaveFileDialog()
