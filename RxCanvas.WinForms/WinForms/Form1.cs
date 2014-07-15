@@ -226,7 +226,7 @@ namespace RxCanvas.WinForms
         {
             string filter = ToFileFilter();
             int defaultFilterIndex = _view.Files
-                .IndexOf(_view.Files.Where(c => c.Name == "Json")
+                .IndexOf(_view.Files.Where(c => c.Name == "Binary")
                 .FirstOrDefault()) + 1;
 
             openFileDialog1.Filter = filter;
@@ -238,7 +238,7 @@ namespace RxCanvas.WinForms
         {
             string filter = ToFileFilter();
             int defaultFilterIndex = _view.Files
-                .IndexOf(_view.Files.Where(c => c.Name == "Json")
+                .IndexOf(_view.Files.Where(c => c.Name == "Binary")
                 .FirstOrDefault()) + 1;
             
             saveFileDialog1.Filter = filter;
