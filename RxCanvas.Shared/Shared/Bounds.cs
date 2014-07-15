@@ -325,25 +325,62 @@ namespace RxCanvas.Bounds
             var ps1 = _polygonPoint1.Points;
             var ps2 = _polygonPoint2.Points;
 
-            ps[0].X = Helper.Min(ps1[0].X, ps1[1].X, ps1[2].X, ps1[3].X);
-            ps[1].X = Helper.Max(ps1[0].X, ps1[1].X, ps1[2].X, ps1[3].X);
-            ps[2].X = Helper.Max(ps2[0].X, ps2[1].X, ps2[2].X, ps2[3].X);
-            ps[3].X = Helper.Min(ps2[0].X, ps2[1].X, ps2[2].X, ps2[3].X);
+            double min1X = Helper.Min(ps1[0].X, ps1[1].X, ps1[2].X, ps1[3].X);
+            double min1Y = Helper.Min(ps1[0].Y, ps1[1].Y, ps1[2].Y, ps1[3].Y);
+            double max1X = Helper.Max(ps1[0].X, ps1[1].X, ps1[2].X, ps1[3].X);
+            double max1Y = Helper.Max(ps1[0].Y, ps1[1].Y, ps1[2].Y, ps1[3].Y);
+            double min2X = Helper.Min(ps2[0].X, ps2[1].X, ps2[2].X, ps2[3].X);
+            double min2Y = Helper.Min(ps2[0].Y, ps2[1].Y, ps2[2].Y, ps2[3].Y);
+            double max2X = Helper.Max(ps2[0].X, ps2[1].X, ps2[2].X, ps2[3].X);
+            double max2Y = Helper.Max(ps2[0].Y, ps2[1].Y, ps2[2].Y, ps2[3].Y);
 
-            if (((_line.Point2.X > _line.Point1.X) && (_line.Point2.Y < _line.Point1.Y)) ||
-                ((_line.Point2.X < _line.Point1.X) && (_line.Point2.Y > _line.Point1.Y)))
+            if (Math.Round(_line.Point1.X, 1) == Math.Round(_line.Point2.X, 1))
             {
-                ps[0].Y = Helper.Min(ps1[0].Y, ps1[1].Y, ps1[2].Y, ps1[3].Y);
-                ps[1].Y = Helper.Max(ps1[0].Y, ps1[1].Y, ps1[2].Y, ps1[3].Y);
-                ps[2].Y = Helper.Max(ps2[0].Y, ps2[1].Y, ps2[2].Y, ps2[3].Y);
-                ps[3].Y = Helper.Min(ps2[0].Y, ps2[1].Y, ps2[2].Y, ps2[3].Y);
+                ps[0].X = Math.Min(min1X, min2X);
+                ps[0].Y = Math.Max(min1Y, min2Y);
+                ps[1].X = Math.Min(min1X, min2X);
+                ps[1].Y = Math.Min(max1Y, max2Y);
+                ps[2].X = Math.Max(max1X, max2X);
+                ps[2].Y = Math.Min(max1Y, max2Y);
+                ps[3].X = Math.Max(max1X, max2X);
+                ps[3].Y = Math.Max(min1Y, min2Y);
+            }
+            else if (Math.Round(_line.Point1.Y, 1) == Math.Round(_line.Point2.Y, 1))
+            {
+                ps[0].X = Math.Max(min1X, min2X);
+                ps[0].Y = Math.Min(min1Y, min2Y);
+                ps[1].X = Math.Min(max1X, max2X);
+                ps[1].Y = Math.Min(min1Y, min2Y);
+                ps[2].X = Math.Min(max1X, max2X);
+                ps[2].Y = Math.Max(max1Y, max2Y);
+                ps[3].X = Math.Max(min1X, min2X);
+                ps[3].Y = Math.Max(max1Y, max2Y);
             }
             else
             {
-                ps[0].Y = Helper.Max(ps1[0].Y, ps1[1].Y, ps1[2].Y, ps1[3].Y);
-                ps[1].Y = Helper.Min(ps1[0].Y, ps1[1].Y, ps1[2].Y, ps1[3].Y);
-                ps[2].Y = Helper.Min(ps2[0].Y, ps2[1].Y, ps2[2].Y, ps2[3].Y);
-                ps[3].Y = Helper.Max(ps2[0].Y, ps2[1].Y, ps2[2].Y, ps2[3].Y);
+                if (((_line.Point2.X > _line.Point1.X) && (_line.Point2.Y < _line.Point1.Y)) ||
+                    ((_line.Point2.X < _line.Point1.X) && (_line.Point2.Y > _line.Point1.Y)))
+                {
+                    ps[0].X = min1X;
+                    ps[0].Y = min1Y;
+                    ps[1].X = max1X;
+                    ps[1].Y = max1Y;
+                    ps[2].X = max2X;
+                    ps[2].Y = max2Y;
+                    ps[3].X = min2X;
+                    ps[3].Y = min2Y;
+                }
+                else
+                {
+                    ps[0].X = min1X;
+                    ps[0].Y = max1Y;
+                    ps[1].X = max1X;
+                    ps[1].Y = min1Y;
+                    ps[2].X = max2X;
+                    ps[2].Y = min2Y;
+                    ps[3].X = min2X;
+                    ps[3].Y = max2Y;
+                }
             }
 
             Helper.MoveLine(ls[0], ps[0], ps[1]);
