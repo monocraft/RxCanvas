@@ -26,6 +26,7 @@ namespace RxCanvas.WPF
 
     public class WpfPin : IPin
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -92,6 +93,7 @@ namespace RxCanvas.WPF
 
     public class WpfLine : ILine
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -166,6 +168,7 @@ namespace RxCanvas.WPF
 
     public class WpfBezier : IBezier
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -302,6 +305,7 @@ namespace RxCanvas.WPF
 
     public class WpfQuadraticBezier : IQuadraticBezier
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -425,6 +429,7 @@ namespace RxCanvas.WPF
 
     public class WpfArc : IArc
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -688,6 +693,7 @@ namespace RxCanvas.WPF
 
     public class WpfRectangle : IRectangle
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -788,6 +794,7 @@ namespace RxCanvas.WPF
 
     public class WpfEllipse : IEllipse
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -888,6 +895,7 @@ namespace RxCanvas.WPF
 
     public class WpfText : IText
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 
@@ -1015,6 +1023,7 @@ namespace RxCanvas.WPF
 
     public class WpfCanvas : ICanvas
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 

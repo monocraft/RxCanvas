@@ -324,6 +324,7 @@ namespace RxCanvas.WinForms
 
     public class WinFormsCanvas : ICanvas
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
 

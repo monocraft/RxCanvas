@@ -37,6 +37,7 @@ namespace RxCanvas.Interfaces
 
     public interface INative
     {
+        int Id { get; set; }
         object Native { get; set; }
         IBounds Bounds { get; set; }
     }

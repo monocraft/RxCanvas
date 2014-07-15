@@ -90,6 +90,7 @@ namespace RxCanvas.Model
 
     public abstract class XNative : INative
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
     }
@@ -123,6 +124,7 @@ namespace RxCanvas.Model
 
     public class XPin : IPin
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Point { get; set; }
@@ -131,6 +133,7 @@ namespace RxCanvas.Model
 
     public class XLine : ILine
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Point1 { get; set; }
@@ -141,6 +144,7 @@ namespace RxCanvas.Model
 
     public class XBezier : IBezier
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Start { get; set; }
@@ -156,6 +160,7 @@ namespace RxCanvas.Model
 
     public class XQuadraticBezier : IQuadraticBezier
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Start { get; set; }
@@ -170,6 +175,7 @@ namespace RxCanvas.Model
 
     public class XArc : IArc
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Point1 { get; set; }
@@ -185,6 +191,7 @@ namespace RxCanvas.Model
 
     public class XRectangle : IRectangle
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Point1 { get; set; }
@@ -196,6 +203,7 @@ namespace RxCanvas.Model
 
     public class XEllipse : IEllipse
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Point1 { get; set; }
@@ -207,6 +215,7 @@ namespace RxCanvas.Model
 
     public class XText : IText
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IPoint Point1 { get; set; }
@@ -221,6 +230,7 @@ namespace RxCanvas.Model
 
     public class XBlock : IBlock
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IList<INative> Children { get; set; }
@@ -233,6 +243,7 @@ namespace RxCanvas.Model
 
     public class XCanvas : ICanvas
     {
+        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
         public IObservable<Vector2> Downs { get; set; }
