@@ -177,10 +177,14 @@ namespace RxCanvas.Views
 
         public ICanvas ToModel()
         {
+            //var scope = _scopes.LastOrDefault();
+            //var drawingCanvas = scope.Resolve<ICanvas>();
+            //var modelConverter = scope.Resolve<IModelConverter>();
+            //return modelConverter.Convert(drawingCanvas);
+
             var scope = _scopes.LastOrDefault();
-            var drawingCanvas = scope.Resolve<ICanvas>();
-            var modelConverter = scope.Resolve<IModelConverter>();
-            return modelConverter.Convert(drawingCanvas);
+            return scope.Resolve<ICanvas>();
+
         }
 
         public void AsNative(ICanvas xcanvas)
