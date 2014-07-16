@@ -764,7 +764,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _npin)
             {
                 _npin.Point = connector;
                 connector.Connected.Add(_npin);
@@ -865,7 +865,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nline)
             {
                 _nline.Point1 = connector;
                 connector.Connected.Add(_nline);
@@ -875,7 +875,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nline)
             {
                 _nline.Point2 = connector;
                 connector.Connected.Add(_nline);
@@ -1042,7 +1042,7 @@ namespace RxCanvas.Editors
         private void ConnectStart(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nb)
             {
                 _nb.Start = connector;
                 connector.Connected.Add(_nb);
@@ -1052,7 +1052,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nb)
             {
                 _nb.Point1 = connector;
                 connector.Connected.Add(_nb);
@@ -1062,7 +1062,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nb)
             {
                 _nb.Point2 = connector;
                 connector.Connected.Add(_nb);
@@ -1072,7 +1072,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint3(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nb)
             {
                 _nb.Point3 = connector;
                 connector.Connected.Add(_nb);
@@ -1209,7 +1209,7 @@ namespace RxCanvas.Editors
         private void ConnectStart(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nqb)
             {
                 _nqb.Start = connector;
                 connector.Connected.Add(_nqb);
@@ -1219,7 +1219,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nqb)
             {
                 _nqb.Point1 = connector;
                 connector.Connected.Add(_nqb);
@@ -1229,7 +1229,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nqb)
             {
                 _nqb.Point2 = connector;
                 connector.Connected.Add(_nqb);
@@ -1331,7 +1331,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _narc)
             {
                 _narc.Point1 = connector;
                 connector.Connected.Add(_narc);
@@ -1341,7 +1341,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _narc)
             {
                 _narc.Point2 = connector;
                 connector.Connected.Add(_narc);
@@ -1443,7 +1443,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nrectangle)
             {
                 _nrectangle.Point1 = connector;
                 connector.Connected.Add(_nrectangle);
@@ -1453,7 +1453,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nrectangle)
             {
                 _nrectangle.Point2 = connector;
                 connector.Connected.Add(_nrectangle);
@@ -1555,7 +1555,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nellipse)
             {
                 _nellipse.Point1 = connector;
                 connector.Connected.Add(_nellipse);
@@ -1565,7 +1565,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _nellipse)
             {
                 _nellipse.Point2 = connector;
                 connector.Connected.Add(_nellipse);
@@ -1667,7 +1667,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _ntext)
             {
                 _ntext.Point1 = connector;
                 connector.Connected.Add(_ntext);
@@ -1677,7 +1677,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _ntext)
             {
                 _ntext.Point2 = connector;
                 connector.Connected.Add(_ntext);
