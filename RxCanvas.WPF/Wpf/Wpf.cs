@@ -26,21 +26,17 @@ namespace RxCanvas.WPF
 
     public class WpfPin : IPin
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
-        private Ellipse _ellipse;
+        private Ellipse _nellipse;
         private double _size;
-        private IPoint _point;
-        private INative _shape;
+        private IPin _xpin;
 
         public WpfPin(IPin pin)
         {
-            _point = pin.Point;
-            _shape = pin.Shape;
+            _xpin = pin;
 
             _size = 8.0;
 
@@ -49,7 +45,7 @@ namespace RxCanvas.WPF
             _fillBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0x00));
             _fillBrush.Freeze();
 
-            _ellipse = new Ellipse()
+            _nellipse = new Ellipse()
             {
                 Stroke = _strokeBrush,
                 StrokeThickness = 2.0,
@@ -58,25 +54,31 @@ namespace RxCanvas.WPF
 
             Update();
 
-            Native = _ellipse;
+            Native = _nellipse;
+        }
+
+        public int Id
+        {
+            get { return _xpin.Id; }
+            set { _xpin.Id = value; }
         }
 
         public INative Shape
         {
-            get { return _shape; }
+            get { return _xpin.Shape; }
             set
             {
-                _shape = value;
+                _xpin.Shape = value;
                 Update();
             }
         }
 
         public IPoint Point
         {
-            get { return _point; }
+            get { return _xpin.Point; }
             set
             {
-                _point = value;
+                _xpin.Point = value;
                 Update();
             }
         }
@@ -84,119 +86,111 @@ namespace RxCanvas.WPF
         private void Update()
         {
             double hsize = _size / 2.0;
-            Canvas.SetLeft(_ellipse, _point.X - hsize);
-            Canvas.SetTop(_ellipse, _point.Y - hsize);
-            _ellipse.Width = _size;
-            _ellipse.Height = _size;
+            Canvas.SetLeft(_nellipse, _xpin.Point.X - hsize);
+            Canvas.SetTop(_nellipse, _xpin.Point.Y - hsize);
+            _nellipse.Width = _size;
+            _nellipse.Height = _size;
         }
     }
 
     public class WpfLine : ILine
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _strokeBrush;
-        private IColor _stroke;
-        private Line _line;
-        private IPoint _point1;
-        private IPoint _point2;
+        private Line _nline;
+        private ILine _xline;
 
         public WpfLine(ILine line)
         {
-            _stroke = line.Stroke;
-            _point1 = line.Point1;
-            _point2 = line.Point2;
+            _xline = line;
 
-            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+            _strokeBrush = new SolidColorBrush(_xline.Stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
-            _line = new Line()
+            _nline = new Line()
             {
-                X1 = _point1.X,
-                Y1 = _point1.Y,
-                X2 = _point2.X,
-                Y2 = _point2.Y,
+                X1 = _xline.Point1.X,
+                Y1 = _xline.Point1.Y,
+                X2 = _xline.Point2.X,
+                Y2 = _xline.Point2.Y,
                 Stroke = _strokeBrush,
                 StrokeThickness = line.StrokeThickness
             };
 
-            Native = _line;
+            Native = _nline;
+        }
+
+        public int Id
+        {
+            get { return _xline.Id; }
+            set { _xline.Id = value; }
         }
 
         public IPoint Point1
         {
-            get { return _point1; }
+            get { return _xline.Point1; }
             set
             {
-                _point1 = value;
-                _line.X1 = _point1.X;
-                _line.Y1 = _point1.Y;
+                _xline.Point1 = value;
+                _nline.X1 = _xline.Point1.X;
+                _nline.Y1 = _xline.Point1.Y;
             }
         }
 
         public IPoint Point2
         {
-            get { return _point2; }
+            get { return _xline.Point2; }
             set
             {
-                _point2 = value;
-                _line.X2 = _point2.X;
-                _line.Y2 = _point2.Y;
+                _xline.Point2 = value;
+                _nline.X2 = _xline.Point2.X;
+                _nline.Y2 = _xline.Point2.Y;
             }
         }
 
         public IColor Stroke
         {
-            get { return _stroke; }
+            get { return _xline.Stroke; }
             set
             {
-                _stroke = value;
-                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+                _xline.Stroke = value;
+                _strokeBrush = new SolidColorBrush(_xline.Stroke.ToNativeColor());
                 _strokeBrush.Freeze();
-                _line.Stroke = _strokeBrush;
+                _nline.Stroke = _strokeBrush;
             }
         }
 
         public double StrokeThickness
         {
-            get { return _line.StrokeThickness; }
-            set { _line.StrokeThickness = value; }
+            get { return _xline.StrokeThickness; }
+            set 
+            {
+                _xline.StrokeThickness = value;
+                _nline.StrokeThickness = value; 
+            }
         }
     }
 
     public class WpfBezier : IBezier
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
         private Path _path;
         private PathGeometry _pg;
         private PathFigure _pf;
         private BezierSegment _bs;
-        private IColor _fill;
-        private IColor _stroke;
-        private IPoint _start;
-        private IPoint _point1;
-        private IPoint _point2;
-        private IPoint _point3;
+        private IBezier _xb;
 
         public WpfBezier(IBezier b)
         {
-            _fill = b.Fill;
-            _stroke = b.Stroke;
-            _start = b.Start;
-            _point1 = b.Point1;
-            _point2 = b.Point2;
-            _point3 = b.Point3;
+            _xb = b;
 
-            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+            _fillBrush = new SolidColorBrush(_xb.Fill.ToNativeColor());
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+            _strokeBrush = new SolidColorBrush(_xb.Stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
             _path = new Path();
@@ -220,53 +214,59 @@ namespace RxCanvas.WPF
             Native = _path;
         }
 
+        public int Id
+        {
+            get { return _xb.Id; }
+            set { _xb.Id = value; }
+        }
+
         public IPoint Start
         {
-            get { return _start; }
+            get { return _xb.Start; }
             set
             {
-                _start = value;
-                _pf.StartPoint = new Point(_start.X, _start.Y);
+                _xb.Start = value;
+                _pf.StartPoint = new Point(_xb.Start.X, _xb.Start.Y);
             }
         }
 
         public IPoint Point1
         {
-            get { return _point1; }
+            get { return _xb.Point1; }
             set
             {
-                _point1 = value;
-                _bs.Point1 = new Point(_point1.X, _point1.Y);
+                _xb.Point1 = value;
+                _bs.Point1 = new Point(_xb.Point1.X, _xb.Point1.Y);
             }
         }
 
         public IPoint Point2
         {
-            get { return _point2; }
+            get { return _xb.Point2; }
             set
             {
-                _point2 = value;
-                _bs.Point2 = new Point(_point2.X, _point2.Y);
+                _xb.Point2 = value;
+                _bs.Point2 = new Point(_xb.Point2.X, _xb.Point2.Y);
             }
         }
 
         public IPoint Point3
         {
-            get { return _point3; }
+            get { return _xb.Point3; }
             set
             {
-                _point3 = value;
-                _bs.Point3 = new Point(_point3.X, _point3.Y);
+                _xb.Point3 = value;
+                _bs.Point3 = new Point(_xb.Point3.X, _xb.Point3.Y);
             }
         }
 
         public IColor Fill
         {
-            get { return _fill; }
+            get { return _xb.Fill; }
             set
             {
-                _fill = value;
-                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+                _xb.Fill = value;
+                _fillBrush = new SolidColorBrush(_xb.Fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _path.Fill = _fillBrush;
             }
@@ -274,11 +274,11 @@ namespace RxCanvas.WPF
 
         public IColor Stroke
         {
-            get { return _stroke; }
+            get { return _xb.Stroke; }
             set
             {
-                _stroke = value;
-                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+                _xb.Stroke = value;
+                _strokeBrush = new SolidColorBrush(_xb.Stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _path.Stroke = _strokeBrush;
             }
@@ -286,52 +286,54 @@ namespace RxCanvas.WPF
 
         public double StrokeThickness
         {
-            get { return _path.StrokeThickness; }
-            set { _path.StrokeThickness = value; }
+            get { return _xb.StrokeThickness; }
+            set 
+            {
+                _xb.StrokeThickness = value;
+                _path.StrokeThickness = value; 
+            }
         }
 
         public bool IsFilled
         {
-            get { return _pf.IsFilled; }
-            set { _pf.IsFilled = value; }
+            get { return _xb.IsFilled; }
+            set 
+            {
+                _xb.IsFilled = value;
+                _pf.IsFilled = value; 
+            }
         }
 
         public bool IsClosed
         {
-            get { return _pf.IsClosed; }
-            set { _pf.IsClosed = value; }
+            get { return _xb.IsClosed; }
+            set 
+            {
+                _xb.IsClosed = value;
+                _pf.IsClosed = value; 
+            }
         }
     }
 
     public class WpfQuadraticBezier : IQuadraticBezier
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
         private Path _path;
         private PathGeometry _pg;
         private PathFigure _pf;
         private QuadraticBezierSegment _qbs;
-        private IColor _fill;
-        private IColor _stroke;
-        private IPoint _start;
-        private IPoint _point1;
-        private IPoint _point2;
+        private IQuadraticBezier _xqb;
 
         public WpfQuadraticBezier(IQuadraticBezier qb)
         {
-            _fill = qb.Fill;
-            _stroke = qb.Stroke;
-            _start = qb.Start;
-            _point1 = qb.Point1;
-            _point2 = qb.Point2;
+            _xqb = qb;
 
-            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+            _fillBrush = new SolidColorBrush(_xqb.Fill.ToNativeColor());
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+            _strokeBrush = new SolidColorBrush(_xqb.Stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
             _path = new Path();
@@ -354,43 +356,49 @@ namespace RxCanvas.WPF
             Native = _path;
         }
 
+        public int Id
+        {
+            get { return _xqb.Id; }
+            set { _xqb.Id = value; }
+        }
+
         public IPoint Start
         {
-            get { return _start; }
+            get { return _xqb.Start; }
             set
             {
-                _start = value;
-                _pf.StartPoint = new Point(_start.X, _start.Y);
+                _xqb.Start = value;
+                _pf.StartPoint = new Point(_xqb.Start.X, _xqb.Start.Y);
             }
         }
 
         public IPoint Point1
         {
-            get { return _point1; }
+            get { return _xqb.Point1; }
             set
             {
-                _point1 = value;
-                _qbs.Point1 = new Point(_point1.X, _point1.Y);
+                _xqb.Point1 = value;
+                _qbs.Point1 = new Point(_xqb.Point1.X, _xqb.Point1.Y);
             }
         }
 
         public IPoint Point2
         {
-            get { return _point2; }
+            get { return _xqb.Point2; }
             set
             {
-                _point2 = value;
-                _qbs.Point2 = new Point(_point2.X, _point2.Y);
+                _xqb.Point2 = value;
+                _qbs.Point2 = new Point(_xqb.Point2.X, _xqb.Point2.Y);
             }
         }
 
         public IColor Fill
         {
-            get { return _fill; }
+            get { return _xqb.Fill; }
             set
             {
-                _fill = value;
-                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+                _xqb.Fill = value;
+                _fillBrush = new SolidColorBrush(_xqb.Fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _path.Fill = _fillBrush;
             }
@@ -398,11 +406,11 @@ namespace RxCanvas.WPF
 
         public IColor Stroke
         {
-            get { return _stroke; }
+            get { return _xqb.Stroke; }
             set
             {
-                _stroke = value;
-                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+                _xqb.Stroke = value;
+                _strokeBrush = new SolidColorBrush(_xqb.Stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _path.Stroke = _strokeBrush;
             }
@@ -410,29 +418,39 @@ namespace RxCanvas.WPF
 
         public double StrokeThickness
         {
-            get { return _path.StrokeThickness; }
-            set { _path.StrokeThickness = value; }
+            get { return _xqb.StrokeThickness; }
+            set 
+            {
+                _xqb.StrokeThickness = value;
+                _path.StrokeThickness = value; 
+            }
         }
 
         public bool IsFilled
         {
-            get { return _pf.IsFilled; }
-            set { _pf.IsFilled = value; }
+            get { return _xqb.IsFilled; }
+            set 
+            {
+                _xqb.IsFilled = value;
+                _pf.IsFilled = value; 
+            }
         }
 
         public bool IsClosed
         {
-            get { return _pf.IsClosed; }
-            set { _pf.IsClosed = value; }
+            get { return _xqb.IsClosed; }
+            set 
+            {
+                _xqb.IsClosed = value;
+                _pf.IsClosed = value; 
+            }
         }
     }
 
     public class WpfArc : IArc
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _fillBrush;
         private SolidColorBrush _strokeBrush;
         private Path _path;
@@ -440,19 +458,15 @@ namespace RxCanvas.WPF
         private PathFigure _pf;
         private ArcSegment _as;
         private Point _start;
-        private IColor _fill;
-        private IColor _stroke;
-        private IArc _source;
+        private IArc _xarc;
 
         public WpfArc(IArc arc)
         {
-            _source = arc;
-            _fill = arc.Fill;
-            _stroke = arc.Stroke;
+            _xarc = arc;
 
-            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+            _fillBrush = new SolidColorBrush(_xarc.Fill.ToNativeColor());
             _fillBrush.Freeze();
-            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+            _strokeBrush = new SolidColorBrush(_xarc.Stroke.ToNativeColor());
             _strokeBrush.Freeze();
 
             _path = new Path();
@@ -600,61 +614,67 @@ namespace RxCanvas.WPF
             segment.IsStroked = isStroked;
         }
 
+        public int Id
+        {
+            get { return _xarc.Id; }
+            set { _xarc.Id = value; }
+        }
+
         public IPoint Point1
         {
-            get { return _source.Point1; }
+            get { return _xarc.Point1; }
             set
             {
-                _source.Point1 = value;
+                _xarc.Point1 = value;
                 Update();
             }
         }
 
         public IPoint Point2
         {
-            get { return _source.Point2; }
+            get { return _xarc.Point2; }
             set
             {
-                _source.Point2 = value;
+                _xarc.Point2 = value;
                 Update();
             }
         }
 
         private void Update()
         {
-            SetArcSegment(_as, _source, out _start);
+            SetArcSegment(_as, _xarc, out _start);
             _pf.StartPoint = _start;
         }
 
         public double StartAngle
         {
-            get { return _source.StartAngle; }
+            get { return _xarc.StartAngle; }
             set 
             {
-                _source.StartAngle = value;
-                SetArcSegment(_as, _source, out _start);
+                _xarc.StartAngle = value;
+                SetArcSegment(_as, _xarc, out _start);
                 _pf.StartPoint = _start;
             }
         }
 
         public double SweepAngle
         {
-            get { return _source.SweepAngle; }
+            get { return _xarc.SweepAngle; }
             set 
             {
-                _source.SweepAngle = value;
-                SetArcSegment(_as, _source, out _start);
+                _xarc.SweepAngle = value;
+                SetArcSegment(_as, _xarc, out _start);
                 _pf.StartPoint = _start;
             }
         }
 
         public IColor Stroke
         {
-            get { return _stroke; }
+            get { return _xarc.Stroke; }
             set
             {
-                _stroke = value;
-                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+                _xarc.Stroke = value;
+                _strokeBrush = new SolidColorBrush(_xarc.Stroke.ToNativeColor());
                 _strokeBrush.Freeze();
                 _path.Stroke = _strokeBrush;
             }
@@ -662,17 +682,21 @@ namespace RxCanvas.WPF
 
         public double StrokeThickness
         {
-            get { return _path.StrokeThickness; }
-            set { _path.StrokeThickness = value; }
+            get { return _xarc.StrokeThickness; }
+            set 
+            {
+                _xarc.StrokeThickness = value;
+                _path.StrokeThickness = value; 
+            }
         }
 
         public IColor Fill
         {
-            get { return _fill; }
+            get { return _xarc.Fill; }
             set
             {
-                _fill = value;
-                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+                _xarc.Fill = value;
+                _fillBrush = new SolidColorBrush(_xarc.Fill.ToNativeColor());
                 _fillBrush.Freeze();
                 _path.Fill = _fillBrush;
             }
@@ -680,44 +704,44 @@ namespace RxCanvas.WPF
 
         public bool IsFilled
         {
-            get { return _pf.IsFilled; }
-            set { _pf.IsFilled = value; }
+            get { return _xarc.IsFilled; }
+            set 
+            {
+                _xarc.IsFilled = value;
+                _pf.IsFilled = value; 
+            }
         }
 
         public bool IsClosed
         {
-            get { return _pf.IsClosed; }
-            set { _pf.IsClosed = value; }
+            get { return _xarc.IsClosed; }
+            set 
+            {
+                _xarc.IsClosed = value;
+                _pf.IsClosed = value; 
+            }
         }
     }
 
     public class WpfRectangle : IRectangle
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
-        private Rectangle _rectangle;
-        private IColor _stroke;
-        private IColor _fill;
-        private IPoint _point1;
-        private IPoint _point2;
+        private Rectangle _nrectangle;
+        private IRectangle _xrectangle;
 
         public WpfRectangle(IRectangle rectangle)
         {
-            _stroke = rectangle.Stroke;
-            _fill = rectangle.Fill;
-            _point1 = rectangle.Point1;
-            _point2 = rectangle.Point2;
+            _xrectangle = rectangle;
 
-            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+            _strokeBrush = new SolidColorBrush(_xrectangle.Stroke.ToNativeColor());
             _strokeBrush.Freeze();
-            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+            _fillBrush = new SolidColorBrush(_xrectangle.Fill.ToNativeColor());
             _fillBrush.Freeze();
 
-            _rectangle = new Rectangle()
+            _nrectangle = new Rectangle()
             {
                 Stroke = _strokeBrush,
                 StrokeThickness = rectangle.StrokeThickness,
@@ -726,99 +750,101 @@ namespace RxCanvas.WPF
 
             Update();
 
-            Native = _rectangle;
+            Native = _nrectangle;
+        }
+
+        public int Id
+        {
+            get { return _xrectangle.Id; }
+            set { _xrectangle.Id = value; }
         }
 
         public IPoint Point1
         {
-            get { return _point1; }
+            get { return _xrectangle.Point1; }
             set
             {
-                _point1 = value;
+                _xrectangle.Point1 = value;
                 Update();
             }
         }
 
         public IPoint Point2
         {
-            get { return _point2; }
+            get { return _xrectangle.Point2; }
             set
             {
-                _point2 = value;
+                _xrectangle.Point2 = value;
                 Update();
             }
         }
 
         private void Update()
         {
-            double x = Math.Min(_point1.X, _point2.X);
-            double y = Math.Min(_point1.Y, _point2.Y);
-            double width = Math.Abs(_point2.X - _point1.X);
-            double height = Math.Abs(_point2.Y - _point1.Y);
-            Canvas.SetLeft(_rectangle, x - 1.0);
-            Canvas.SetTop(_rectangle, y - 1.0);
-            _rectangle.Width = width + 2.0;
-            _rectangle.Height = height + 2.0;
+            double x = Math.Min(_xrectangle.Point1.X, _xrectangle.Point2.X);
+            double y = Math.Min(_xrectangle.Point1.Y, _xrectangle.Point2.Y);
+            double width = Math.Abs(_xrectangle.Point2.X - _xrectangle.Point1.X);
+            double height = Math.Abs(_xrectangle.Point2.Y - _xrectangle.Point1.Y);
+            Canvas.SetLeft(_nrectangle, x - 1.0);
+            Canvas.SetTop(_nrectangle, y - 1.0);
+            _nrectangle.Width = width + 2.0;
+            _nrectangle.Height = height + 2.0;
         }
 
         public IColor Stroke
         {
-            get { return _stroke; }
+            get { return _xrectangle.Stroke; }
             set
             {
-                _stroke = value;
-                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+                _xrectangle.Stroke = value;
+                _strokeBrush = new SolidColorBrush(_xrectangle.Stroke.ToNativeColor());
                 _strokeBrush.Freeze();
-                _rectangle.Stroke = _strokeBrush;
+                _nrectangle.Stroke = _strokeBrush;
             }
         }
 
         public double StrokeThickness
         {
-            get { return _rectangle.StrokeThickness; }
-            set { _rectangle.StrokeThickness = value; }
+            get { return _xrectangle.StrokeThickness; }
+            set 
+            {
+                _xrectangle.StrokeThickness = value;
+                _nrectangle.StrokeThickness = value; 
+            }
         }
 
         public IColor Fill
         {
-            get { return _fill; }
+            get { return _xrectangle.Fill; }
             set
             {
-                _fill = value;
-                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+                _xrectangle.Fill = value;
+                _fillBrush = new SolidColorBrush(_xrectangle.Fill.ToNativeColor());
                 _fillBrush.Freeze();
-                _rectangle.Fill = _fillBrush;
+                _nrectangle.Fill = _fillBrush;
             }
         }
     }
 
     public class WpfEllipse : IEllipse
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _strokeBrush;
         private SolidColorBrush _fillBrush;
-        private Ellipse _ellipse;
-        private IColor _stroke;
-        private IColor _fill;
-        private IPoint _point1;
-        private IPoint _point2;
+        private Ellipse _nellipse;
+        private IEllipse _xellipse;
 
         public WpfEllipse(IEllipse ellipse)
         {
-            _stroke = ellipse.Stroke;
-            _fill = ellipse.Fill;
-            _point1 = ellipse.Point1;
-            _point2 = ellipse.Point2;
+            _xellipse = ellipse;
 
-            _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+            _strokeBrush = new SolidColorBrush(_xellipse.Stroke.ToNativeColor());
             _strokeBrush.Freeze();
-            _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+            _fillBrush = new SolidColorBrush(_xellipse.Fill.ToNativeColor());
             _fillBrush.Freeze();
 
-            _ellipse = new Ellipse()
+            _nellipse = new Ellipse()
             {
                 Stroke = _strokeBrush,
                 StrokeThickness = ellipse.StrokeThickness,
@@ -827,97 +853,99 @@ namespace RxCanvas.WPF
 
             Update();
 
-            Native = _ellipse;
+            Native = _nellipse;
+        }
+
+        public int Id
+        {
+            get { return _xellipse.Id; }
+            set { _xellipse.Id = value; }
         }
 
         public IPoint Point1
         {
-            get { return _point1; }
+            get { return _xellipse.Point1; }
             set
             {
-                _point1 = value;
+                _xellipse.Point1 = value;
                 Update();
             }
         }
 
         public IPoint Point2
         {
-            get { return _point2; }
+            get { return _xellipse.Point2; }
             set
             {
-                _point2 = value;
+                _xellipse.Point2 = value;
                 Update();
             }
         }
 
         private void Update()
         {
-            double x = Math.Min(_point1.X, _point2.X);
-            double y = Math.Min(_point1.Y, _point2.Y);
-            double width = Math.Abs(_point2.X - _point1.X);
-            double height = Math.Abs(_point2.Y - _point1.Y);
-            Canvas.SetLeft(_ellipse, x - 1.0);
-            Canvas.SetTop(_ellipse, y - 1.0);
-            _ellipse.Width = width + 2.0;
-            _ellipse.Height = height + 2.0;
+            double x = Math.Min(_xellipse.Point1.X, _xellipse.Point2.X);
+            double y = Math.Min(_xellipse.Point1.Y, _xellipse.Point2.Y);
+            double width = Math.Abs(_xellipse.Point2.X - _xellipse.Point1.X);
+            double height = Math.Abs(_xellipse.Point2.Y - _xellipse.Point1.Y);
+            Canvas.SetLeft(_nellipse, x - 1.0);
+            Canvas.SetTop(_nellipse, y - 1.0);
+            _nellipse.Width = width + 2.0;
+            _nellipse.Height = height + 2.0;
         }
 
         public IColor Stroke
         {
-            get { return _stroke; }
+            get { return _xellipse.Stroke; }
             set
             {
-                _stroke = value;
-                _strokeBrush = new SolidColorBrush(_stroke.ToNativeColor());
+                _xellipse.Stroke = value;
+                _strokeBrush = new SolidColorBrush(_xellipse.Stroke.ToNativeColor());
                 _strokeBrush.Freeze();
-                _ellipse.Stroke = _strokeBrush;
+                _nellipse.Stroke = _strokeBrush;
             }
         }
 
         public double StrokeThickness
         {
-            get { return _ellipse.StrokeThickness; }
-            set { _ellipse.StrokeThickness = value; }
+            get { return _xellipse.StrokeThickness; }
+            set 
+            {
+                _xellipse.StrokeThickness = value;
+                _nellipse.StrokeThickness = value; 
+            }
         }
 
         public IColor Fill
         {
-            get { return _fill; }
+            get { return _xellipse.Fill; }
             set
             {
-                _fill = value;
-                _fillBrush = new SolidColorBrush(_fill.ToNativeColor());
+                _xellipse.Fill = value;
+                _fillBrush = new SolidColorBrush(_xellipse.Fill.ToNativeColor());
                 _fillBrush.Freeze();
-                _ellipse.Fill = _fillBrush;
+                _nellipse.Fill = _fillBrush;
             }
         }
     }
 
     public class WpfText : IText
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         private SolidColorBrush _foregroundBrush;
         private SolidColorBrush _backgroundBrush;
         private Grid _grid;
         private TextBlock _tb;
-        private IColor _foreground;
-        private IColor _background;
-        private IPoint _point1;
-        private IPoint _point2;
+        private IText _xtext;
 
         public WpfText(IText text)
         {
-            _foreground = text.Foreground;
-            _background = text.Backgroud;
-            _point1 = text.Point1;
-            _point2 = text.Point2;
+            _xtext = text;
 
-            _foregroundBrush = new SolidColorBrush(_foreground.ToNativeColor());
+            _foregroundBrush = new SolidColorBrush(_xtext.Foreground.ToNativeColor());
             _foregroundBrush.Freeze();
-            _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
+            _backgroundBrush = new SolidColorBrush(_xtext.Backgroud.ToNativeColor());
             _backgroundBrush.Freeze();
 
             _grid = new Grid();
@@ -939,32 +967,38 @@ namespace RxCanvas.WPF
             Native = _grid;
         }
 
+        public int Id
+        {
+            get { return _xtext.Id; }
+            set { _xtext.Id = value; }
+        }
+
         public IPoint Point1
         {
-            get { return _point1; }
+            get { return _xtext.Point1; }
             set
             {
-                _point1 = value;
+                _xtext.Point1 = value;
                 Update();
             }
         }
 
         public IPoint Point2
         {
-            get { return _point2; }
+            get { return _xtext.Point2; }
             set
             {
-                _point2 = value;
+                _xtext.Point2 = value;
                 Update();
             }
         }
 
         private void Update()
         {
-            double x = Math.Min(_point1.X, _point2.X);
-            double y = Math.Min(_point1.Y, _point2.Y);
-            double width = Math.Abs(_point2.X - _point1.X);
-            double height = Math.Abs(_point2.Y - _point1.Y);
+            double x = Math.Min(_xtext.Point1.X, _xtext.Point2.X);
+            double y = Math.Min(_xtext.Point1.Y, _xtext.Point2.Y);
+            double width = Math.Abs(_xtext.Point2.X - _xtext.Point1.X);
+            double height = Math.Abs(_xtext.Point2.Y - _xtext.Point1.Y);
             Canvas.SetLeft(_grid, x - 1.0);
             Canvas.SetTop(_grid, y - 1.0);
             _grid.Width = width + 2.0;
@@ -973,35 +1007,51 @@ namespace RxCanvas.WPF
 
         public int HorizontalAlignment
         {
-            get { return (int)_tb.HorizontalAlignment; }
-            set { _tb.HorizontalAlignment = (HorizontalAlignment)value; }
+            get { return _xtext.HorizontalAlignment; }
+            set 
+            {
+                _xtext.HorizontalAlignment = value;
+                _tb.HorizontalAlignment = (HorizontalAlignment)value; 
+            }
         }
 
         public int VerticalAlignment
         {
-            get { return (int)_tb.VerticalAlignment; }
-            set { _tb.VerticalAlignment = (VerticalAlignment)value; }
+            get { return _xtext.VerticalAlignment; }
+            set 
+            {
+                _xtext.VerticalAlignment = value;
+                _tb.VerticalAlignment = (VerticalAlignment)value; 
+            }
         }
 
         public double Size
         {
-            get { return _tb.FontSize; }
-            set { _tb.FontSize = value; }
+            get { return _xtext.Size; }
+            set 
+            {
+                _xtext.Size = value;
+                _tb.FontSize = value; 
+            }
         }
 
         public string Text
         {
-            get { return _tb.Text; }
-            set { _tb.Text = value; }
+            get { return _xtext.Text; }
+            set 
+            {
+                _xtext.Text = value;
+                _tb.Text = value; 
+            }
         }
 
         public IColor Foreground
         {
-            get { return _foreground; }
+            get { return _xtext.Foreground; }
             set
             {
-                _foreground = value;
-                _foregroundBrush = new SolidColorBrush(_foreground.ToNativeColor());
+                _xtext.Foreground = value;
+                _foregroundBrush = new SolidColorBrush(_xtext.Foreground.ToNativeColor());
                 _foregroundBrush.Freeze();
                 _tb.Foreground = _foregroundBrush;
             }
@@ -1009,11 +1059,11 @@ namespace RxCanvas.WPF
 
         public IColor Backgroud
         {
-            get { return _background; }
+            get { return _xtext.Backgroud; }
             set
             {
-                _background = value;
-                _backgroundBrush = new SolidColorBrush(_background.ToNativeColor());
+                _xtext.Backgroud = value;
+                _backgroundBrush = new SolidColorBrush(_xtext.Backgroud.ToNativeColor());
                 _backgroundBrush.Freeze();
                 _grid.Background = _backgroundBrush;
                 _tb.Background = _backgroundBrush;
@@ -1023,20 +1073,11 @@ namespace RxCanvas.WPF
 
     public class WpfCanvas : ICanvas
     {
-        public int Id { get; set; }
         public object Native { get; set; }
         public IBounds Bounds { get; set; }
-
         public IObservable<Vector2> Downs { get; set; }
         public IObservable<Vector2> Ups { get; set; }
         public IObservable<Vector2> Moves { get; set; }
-
-        public IHistory History
-        {
-            get { return _xcanvas.History; }
-            set { _xcanvas.History = value; }
-        }
-
         private SolidColorBrush _backgroundBrush;
         private ICanvas _xcanvas;
         private Canvas _ncanvas;
@@ -1092,6 +1133,18 @@ namespace RxCanvas.WPF
             });
 
             Native = _ncanvas;
+        }
+
+        public int Id
+        {
+            get { return _xcanvas.Id; }
+            set { _xcanvas.Id = value; }
+        }
+
+        public IHistory History
+        {
+            get { return _xcanvas.History; }
+            set { _xcanvas.History = value; }
         }
 
         public IList<INative> Children
