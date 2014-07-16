@@ -13,21 +13,21 @@ namespace RxCanvas.Serializers
     internal enum NativeType : byte
     {
         // Solution
-        Solution = 0x01,
-        Project = 0x02,
-        Canvas = 0x03,
+        Solution        = 0x01,
+        Project         = 0x02,
+        Canvas          = 0x03,
         // Block
-        Block = 0x11,
-        End = 0x12,
+        Block           = 0x11,
+        End             = 0x12,
         // Primitive
-        Pin = 0x21,
-        Line = 0x22,
-        Bezier = 0x23,
+        Pin             = 0x21,
+        Line            = 0x22,
+        Bezier          = 0x23,
         QuadraticBezier = 0x24,
-        Arc = 0x25,
-        Rectangle = 0x26,
-        Ellipse = 0x27,
-        Text = 0x28,
+        Arc             = 0x25,
+        Rectangle       = 0x26,
+        Ellipse         = 0x27,
+        Text            = 0x28,
     }
 
     internal struct BPoint
@@ -35,6 +35,134 @@ namespace RxCanvas.Serializers
         public int Id;
         public int[] Connected;
         public IPoint Point;
+    }
+
+    internal class IdReset
+    {
+        private void Reset(IPoint point)
+        {
+            point.Id = 0;
+        }
+
+        private void Reset(IPin pin)
+        {
+            pin.Id = 0;
+            Reset(pin.Point);
+            Reset(pin.Shape);
+        }
+
+        private void Reset(ILine line)
+        {
+            line.Id = 0;
+            Reset(line.Point1);
+            Reset(line.Point2);
+        }
+
+        private void Reset(IBezier bezier)
+        {
+            bezier.Id = 0;
+            Reset(bezier.Start);
+            Reset(bezier.Point1);
+            Reset(bezier.Point2);
+            Reset(bezier.Point3);
+        }
+
+        private void Reset(IQuadraticBezier quadraticBezier)
+        {
+            quadraticBezier.Id = 0;
+            Reset(quadraticBezier.Start);
+            Reset(quadraticBezier.Point1);
+            Reset(quadraticBezier.Point2);
+        }
+
+        private void Reset(IArc arc)
+        {
+            arc.Id = 0;
+            Reset(arc.Point1);
+            Reset(arc.Point2);
+        }
+
+        private void Reset(IRectangle rectangle)
+        {
+            rectangle.Id = 0;
+            Reset(rectangle.Point1);
+            Reset(rectangle.Point2);
+        }
+
+        private void Reset(IEllipse ellipse)
+        {
+            ellipse.Id = 0;
+            Reset(ellipse.Point1);
+            Reset(ellipse.Point2);
+        }
+
+        private void Reset(IText text)
+        {
+            text.Id = 0;
+            Reset(text.Point1);
+            Reset(text.Point2);
+        }
+
+        private void Reset(IList<INative> children)
+        {
+            int count = children.Count;
+            for (int i = 0; i < count; i++)
+            {
+                Reset(children[i]);
+            }
+        }
+
+        private void Reset(INative child)
+        {
+            if (child is IPin)
+            {
+                Reset(child as IPin);
+            }
+            else if (child is ILine)
+            {
+                Reset(child as ILine);
+            }
+            else if (child is IBezier)
+            {
+                Reset(child as IBezier);
+            }
+            else if (child is IQuadraticBezier)
+            {
+                Reset(child as IQuadraticBezier);
+            }
+            else if (child is IArc)
+            {
+                Reset(child as IArc);
+            }
+            else if (child is IRectangle)
+            {
+                Reset(child as IRectangle);
+            }
+            else if (child is IEllipse)
+            {
+                Reset(child as IEllipse);
+            }
+            else if (child is IText)
+            {
+                Reset(child as IText);
+            }
+            else if (child is IBlock)
+            {
+                Reset(child as IBlock);
+            }
+        }
+
+        private void Reset(IBlock block)
+        {
+            block.Id = 0;
+            Reset(block.Children);
+        }
+
+        public void Reset(ICanvas canvas)
+        {
+            canvas.Id = 0;
+            Reset(canvas.Children);
+        }
     }
 
     internal class IdPreprocessor
@@ -56,6 +184,7 @@ namespace RxCanvas.Serializers
         {
             pin.Id = NextId();
             Process(pin.Point);
+            Process(pin.Shape);
         }
 
         private void Process(ILine line)
@@ -204,6 +333,8 @@ namespace RxCanvas.Serializers
     internal class CanvasReader
     {
         private BinaryReader _reader;
+        private IDictionary<int, BPoint> _bpoints;
+        private IDictionary<int, INative> _natives;
 
         private NativeType ReadNativeType()
         {
@@ -240,9 +371,13 @@ namespace RxCanvas.Serializers
 
         private IPoint ReadPoint()
         {
-            return new XPoint(
-                _reader.ReadDouble(),
-                _reader.ReadDouble());
+            int id = _reader.ReadInt32();
+            BPoint bpoint;
+            if (_bpoints.TryGetValue(id, out bpoint))
+            {
+                return bpoint.Point;
+            }
+            throw new InvalidDataException();
         }
 
         private IColor ReadColor()
@@ -256,17 +391,19 @@ namespace RxCanvas.Serializers
 
         private IPin ReadPin()
         {
-            return new XPin()
+            var pin = new XPin()
             {
                 Id = _reader.ReadInt32(),
                 Point = ReadPoint(),
                 Shape = ReadNative(),
             };
+            _natives.Add(pin.Id, pin);
+            return pin;
         }
 
         private ILine ReadLine()
         {
-            return new XLine()
+            var line = new XLine()
             {
                 Id = _reader.ReadInt32(),
                 Point1 = ReadPoint(),
@@ -274,11 +411,13 @@ namespace RxCanvas.Serializers
                 Stroke = ReadColor(),
                 StrokeThickness = _reader.ReadDouble()  
             };
+            _natives.Add(line.Id, line);
+            return line;
         }
 
         private IBezier ReadBezier()
         {
-            return new XBezier()
+            var bezier = new XBezier()
             {
                 Id = _reader.ReadInt32(),
                 Start = ReadPoint(),
@@ -291,11 +430,13 @@ namespace RxCanvas.Serializers
                 IsFilled = _reader.ReadBoolean(),
                 IsClosed = _reader.ReadBoolean()
             };
+            _natives.Add(bezier.Id, bezier);
+            return bezier;
         }
 
         private IQuadraticBezier ReadQuadraticBezier()
         {
-            return new XQuadraticBezier()
+            var quadraticBezier = new XQuadraticBezier()
             {
                 Id = _reader.ReadInt32(),
                 Start = ReadPoint(),
@@ -307,11 +448,13 @@ namespace RxCanvas.Serializers
                 IsFilled = _reader.ReadBoolean(),
                 IsClosed = _reader.ReadBoolean()
             };
+            _natives.Add(quadraticBezier.Id, quadraticBezier);
+            return quadraticBezier;
         }
 
         private IArc ReadArc()
         {
-            return new XArc()
+            var arc = new XArc()
             {
                 Id = _reader.ReadInt32(),
                 Point1 = ReadPoint(),
@@ -324,11 +467,13 @@ namespace RxCanvas.Serializers
                 IsFilled = _reader.ReadBoolean(),
                 IsClosed = _reader.ReadBoolean()
             };
+            _natives.Add(arc.Id, arc);
+            return arc;
         }
 
         private IRectangle ReadRectangle()
         {
-            return new XRectangle()
+            var rectangle = new XRectangle()
             {
                 Id = _reader.ReadInt32(),
                 Point1 = ReadPoint(),
@@ -337,11 +482,13 @@ namespace RxCanvas.Serializers
                 StrokeThickness = _reader.ReadDouble(),
                 Fill = ReadColor()
             };
+            _natives.Add(rectangle.Id, rectangle);
+            return rectangle;
         }
 
         private IEllipse ReadEllipse()
         {
-            return new XEllipse()
+            var ellipse = new XEllipse()
             {
                 Id = _reader.ReadInt32(),
                 Point1 = ReadPoint(),
@@ -350,11 +497,13 @@ namespace RxCanvas.Serializers
                 StrokeThickness = _reader.ReadDouble(),
                 Fill = ReadColor()
             };
+            _natives.Add(ellipse.Id, ellipse);
+            return ellipse;
         }
 
         private IText ReadText()
         {
-            return new XText()
+            var text = new XText()
             {
                 Id = _reader.ReadInt32(),
                 Point1 = ReadPoint(),
@@ -366,6 +515,8 @@ namespace RxCanvas.Serializers
                 Foreground = ReadColor(),
                 Backgroud = ReadColor()
             };
+            _natives.Add(text.Id, text);
+            return text;
         }
 
         private IBlock ReadBlock()
@@ -409,6 +560,7 @@ namespace RxCanvas.Serializers
                         children.Add(ReadBlock());
                         break;
                     case NativeType.End:
+                        _natives.Add(block.Id, block);
                         return block;
                     default:
                         throw new InvalidDataException();
@@ -418,9 +570,74 @@ namespace RxCanvas.Serializers
             throw new InvalidDataException();
         }
 
+        private BPoint ReadBPoint()
+        {
+            int id = _reader.ReadInt32();
+            int length = _reader.ReadInt32();
+
+            var bpoint = new BPoint()
+            {
+                Id = id
+            };
+
+            bpoint.Connected = new int[length];
+            for (int i = 0; i < length; i++)
+            {
+                int connected = _reader.ReadInt32();
+                bpoint.Connected[i] = connected;
+            }
+
+            double x = _reader.ReadDouble();
+            double y = _reader.ReadDouble();
+            var point = new XPoint(x, y)
+            {
+                Id = id
+            };
+
+            bpoint.Point = point;
+            return bpoint;
+        }
+
+        public void UpdatePointConnections()
+        {
+            foreach (var bpoint in _bpoints)
+            {
+                for (int i = 0; i < bpoint.Value.Connected.Length; i++)
+                {
+                    INative native;
+                    if (_natives.TryGetValue(bpoint.Value.Connected[i], out native))
+                    {
+                        bpoint.Value.Point.Connected.Add(native);
+                    }
+                    else
+                    {
+                        // TODO:
+                        //throw new InvalidDataException();
+                    }
+                }
+            }
+        }
+
         public ICanvas Read(BinaryReader reader)
         {
             _reader = reader;
+            _natives = new Dictionary<int, INative>();
+
+            // read binary points
+            _bpoints = new Dictionary<int, BPoint>();
+            int length = _reader.ReadInt32();
+            for (int i = 0; i < length; i++)
+            {
+                var bpoint = ReadBPoint();
+                _bpoints.Add(bpoint.Id, bpoint);
+            }
+
+            // read canvas contents
+            var nativeType = ReadNativeType();
+            if (nativeType != NativeType.Canvas)
+            {
+                throw new InvalidDataException();
+            }
 
             var canvas = new XCanvas()
             {
@@ -468,13 +685,13 @@ namespace RxCanvas.Serializers
                         break;
                     case NativeType.End:
                         _reader = null;
+                        UpdatePointConnections();
                         return canvas;
                     default:
                         _reader = null;
                         throw new InvalidDataException();
                 }
             }
-
             _reader = null;
             throw new InvalidDataException();
         }
@@ -489,20 +706,9 @@ namespace RxCanvas.Serializers
             _writer.Write((byte)type);
         }
 
-        private void Write(ref BPoint bpoint)
-        {
-            _writer.Write(bpoint.Id);
-            _writer.Write(bpoint.Connected.Length);
-            for (int i = 0; i < bpoint.Connected.Length; i++)
-            {
-                _writer.Write(bpoint.Connected[i]);
-            }
-            _writer.Write(bpoint.Point.X);
-            _writer.Write(bpoint.Point.Y);
-        }
-
         private void Write(IPoint point)
         {
+            // point are written only as Id
             _writer.Write(point.Id);
         }
 
@@ -683,16 +889,32 @@ namespace RxCanvas.Serializers
             Write(NativeType.End);
         }
 
-        public void Write(BinaryWriter writer, ref BPoint[] bpoints, ICanvas canvas)
+        private void Write(ref BPoint bpoint)
         {
-            _writer = writer;
+            _writer.Write(bpoint.Id);
+            _writer.Write(bpoint.Connected.Length);
+            for (int i = 0; i < bpoint.Connected.Length; i++)
+            {
+                _writer.Write(bpoint.Connected[i]);
+            }
+            _writer.Write(bpoint.Point.X);
+            _writer.Write(bpoint.Point.Y);
+        }
 
+        private void Write(ref BPoint[] bpoints)
+        {
             _writer.Write(bpoints.Length);
             for (int i = 0; i < bpoints.Length; i++)
             {
                 Write(ref bpoints[i]);
             }
+        }
 
+        public void Write(BinaryWriter writer, ref BPoint[] bpoints, ICanvas canvas)
+        {
+            _writer = writer;
+
+            Write(ref bpoints);
             Write(canvas);
 
             _writer = null;
@@ -728,16 +950,22 @@ namespace RxCanvas.Serializers
 
         public ICanvas Read(Stream stream)
         {
+            var idReset = new IdReset();
             var canvasReader = new CanvasReader();
 
             using (var reader = new BinaryReader(stream))
             {
-                return canvasReader.Read(reader);
+                var canvas = canvasReader.Read(reader);
+                idReset.Reset(canvas);
+                return canvas;
             }
         }
 
         public void Write(Stream stream, ICanvas canvas)
         {
+            var idReset = new IdReset();
+            idReset.Reset(canvas);
+
             var idPreprocessor = new IdPreprocessor();
             var bpoints = idPreprocessor.Process(canvas);
             var canvasWriter = new CanvasWriter();
@@ -745,6 +973,7 @@ namespace RxCanvas.Serializers
             using (var writer = new BinaryWriter(stream))
             {
                 canvasWriter.Write(writer, ref bpoints, canvas);
+                idReset.Reset(canvas);
             }
         }
     }
