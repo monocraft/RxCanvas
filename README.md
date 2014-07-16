@@ -1,4 +1,4 @@
-RxCanvas
+﻿RxCanvas
 ========
 
 Portable 2D graphics editor.
@@ -15,17 +15,19 @@ Platforms:
 Keyboard Shortcuts:
 
     (File)
-    Control+O -> Open
-    Control+S -> Save
-    Control+E -> Export
+    Ctrl+O -> Open
+    Ctrl+S -> Save
+    Ctrl+E -> Export
     (Edit)
-    Control+Z -> Undo
-    Control+Y -> Redo
+    Ctrl+Z -> Undo
+    Ctrl+Y -> Redo
     (Canvas)
+    G -> Create Block
     H -> Single Selection
     J -> Multi Selection
     S -> Snap
-    Control+Delete -> Clear
+    Del -> Delete Selected
+    Ctrl+Del -> Clear
     (Create)
     P -> Pin
     L -> Line
