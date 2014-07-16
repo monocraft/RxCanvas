@@ -2,6 +2,7 @@
 using RxCanvas.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -894,6 +895,7 @@ namespace RxCanvas.Serializers
             _writer.Write(bpoint.Connected.Length);
             for (int i = 0; i < bpoint.Connected.Length; i++)
             {
+                Debug.Assert(bpoint.Connected[i] != 0);
                 _writer.Write(bpoint.Connected[i]);
             }
             _writer.Write(bpoint.Point.X);
