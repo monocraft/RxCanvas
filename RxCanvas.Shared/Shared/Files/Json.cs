@@ -8,14 +8,46 @@ using System.IO;
 using System.Linq;
 #if !__ANDROID__
 using System.Runtime.Serialization;
-#endif
 using System.Runtime.Serialization.Formatters;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using Newtonsoft.Json.Serialization;
+using System.Collections.ObjectModel;
 
 namespace RxCanvas.Serializers
 {
+    public class JsonContractResolver : DefaultContractResolver
+    {
+        private HashSet<string> _properties;
+
+        public JsonContractResolver()
+        {
+            _properties = new HashSet<string>()
+            {
+                "Native",
+                "Downs",
+                "Ups",
+                "Moves",
+                "Bounds",
+                "History"
+            };
+        }
+
+        protected override JsonProperty CreateProperty(
+            MemberInfo member,
+            MemberSerialization memberSerialization)
+        {
+            var property = base.CreateProperty(member, memberSerialization);
+            if (_properties.Contains(property.PropertyName))
+            {
+                property.ShouldSerialize = predicate => false;
+            }
+            return property;
+        }
+    }
+
     public class JsonSerializationBinder : SerializationBinder
     {
         private readonly string _assemblyName;
@@ -28,7 +60,14 @@ namespace RxCanvas.Serializers
         public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
             assemblyName = null;
-            typeName = serializedType.Name.Substring(1, serializedType.Name.Length - 1);
+            if (typeof(ObservableCollection<INative>) == serializedType)
+            {
+                typeName = serializedType.ToString();
+            }
+            else
+            {
+                typeName = serializedType.Name.Substring(1, serializedType.Name.Length - 1);
+            }
         }
 
         public override Type BindToType(string assemblyName, string typeName)
@@ -93,6 +132,7 @@ namespace RxCanvas.Serializers
             TypeNameHandling = TypeNameHandling.Auto,
             Binder = new JsonSerializationBinder(),
             NullValueHandling = NullValueHandling.Ignore,
+            ContractResolver = new JsonContractResolver(),
             Converters =  { new ColorJsonConverter(), new PointJsonConverter() }
         };
 

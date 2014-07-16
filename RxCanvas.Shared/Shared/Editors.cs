@@ -748,10 +748,10 @@ namespace RxCanvas.Editors
                 _xpin.Point.X = p.X;
                 _xpin.Point.Y = p.Y;
                 _npin = nativeConverter.Convert(_xpin);
-#if CONNECTORS
-                ConnectPoint(p); 
-#endif
                 _canvas.History.Snapshot(_canvas);
+#if CONNECTORS
+                ConnectPoint(p);
+#endif
                 _canvas.Add(_npin);
                 _npin.Bounds = boundsFactory.Create(_canvas, _npin);
                 _npin.Bounds.Update();
@@ -764,7 +764,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xpin)
             {
                 _npin.Point = connector;
                 connector.Connected.Add(_npin);
@@ -833,10 +833,10 @@ namespace RxCanvas.Editors
                     _xline.Point2.X = p.X;
                     _xline.Point2.Y = p.Y;
                     _nline = nativeConverter.Convert(_xline);
-#if CONNECTORS
-                    ConnectPoint1(p); 
-#endif
                     _canvas.History.Snapshot(_canvas);
+#if CONNECTORS
+                    ConnectPoint1(p);
+#endif
                     _canvas.Add(_nline);
                     _nline.Bounds = boundsFactory.Create(_canvas, _nline);
                     _nline.Bounds.Update();
@@ -865,7 +865,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xline)
             {
                 _nline.Point1 = connector;
                 connector.Connected.Add(_nline);
@@ -875,7 +875,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xline)
             {
                 _nline.Point2 = connector;
                 connector.Connected.Add(_nline);
@@ -985,10 +985,10 @@ namespace RxCanvas.Editors
                     _xb.Point3.X = p.X;
                     _xb.Point3.Y = p.Y;
                     _nb = nativeConverter.Convert(_xb);
+                    _canvas.History.Snapshot(_canvas);
 #if CONNECTORS
                     ConnectStart(p);
 #endif
-                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nb);
                     _nb.Bounds = boundsFactory.Create(_canvas, _nb);
                     _nb.Bounds.Update();
@@ -1042,7 +1042,7 @@ namespace RxCanvas.Editors
         private void ConnectStart(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xb)
             {
                 _nb.Start = connector;
                 connector.Connected.Add(_nb);
@@ -1052,7 +1052,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xb)
             {
                 _nb.Point1 = connector;
                 connector.Connected.Add(_nb);
@@ -1062,7 +1062,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xb)
             {
                 _nb.Point2 = connector;
                 connector.Connected.Add(_nb);
@@ -1072,7 +1072,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint3(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xb)
             {
                 _nb.Point3 = connector;
                 connector.Connected.Add(_nb);
@@ -1164,10 +1164,10 @@ namespace RxCanvas.Editors
                     _xqb.Point2.X = p.X;
                     _xqb.Point2.Y = p.Y;
                     _nqb = nativeConverter.Convert(_xqb);
+                    _canvas.History.Snapshot(_canvas);
 #if CONNECTORS
                     ConnectStart(p);
 #endif
-                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nqb);
                     _nqb.Bounds = boundsFactory.Create(_canvas, _nqb);
                     _nqb.Bounds.Update();
@@ -1209,7 +1209,7 @@ namespace RxCanvas.Editors
         private void ConnectStart(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xqb)
             {
                 _nqb.Start = connector;
                 connector.Connected.Add(_nqb);
@@ -1219,7 +1219,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xqb)
             {
                 _nqb.Point1 = connector;
                 connector.Connected.Add(_nqb);
@@ -1229,7 +1229,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xqb)
             {
                 _nqb.Point2 = connector;
                 connector.Connected.Add(_nqb);
@@ -1299,10 +1299,10 @@ namespace RxCanvas.Editors
                     _xarc.Point2.X = p.X;
                     _xarc.Point2.Y = p.Y;
                     _narc = nativeConverter.Convert(_xarc);
+                    _canvas.History.Snapshot(_canvas);
 #if CONNECTORS
                     ConnectPoint1(p);
 #endif
-                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_narc);
                     _narc.Bounds = boundsFactory.Create(_canvas, _narc);
                     _narc.Bounds.Update();
@@ -1331,7 +1331,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xarc)
             {
                 _narc.Point1 = connector;
                 connector.Connected.Add(_narc);
@@ -1341,7 +1341,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xarc)
             {
                 _narc.Point2 = connector;
                 connector.Connected.Add(_narc);
@@ -1411,10 +1411,10 @@ namespace RxCanvas.Editors
                     _xrectangle.Point2.X = p.X;
                     _xrectangle.Point2.Y = p.Y;
                     _nrectangle = nativeConverter.Convert(_xrectangle);
-#if CONNECTORS
-                    ConnectPoint1(p); 
-#endif
                     _canvas.History.Snapshot(_canvas);
+#if CONNECTORS
+                    ConnectPoint1(p);
+#endif
                     _canvas.Add(_nrectangle);
                     _nrectangle.Bounds = boundsFactory.Create(_canvas, _nrectangle);
                     _nrectangle.Bounds.Update();
@@ -1443,7 +1443,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xrectangle)
             {
                 _nrectangle.Point1 = connector;
                 connector.Connected.Add(_nrectangle);
@@ -1453,7 +1453,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xrectangle)
             {
                 _nrectangle.Point2 = connector;
                 connector.Connected.Add(_nrectangle);
@@ -1523,10 +1523,10 @@ namespace RxCanvas.Editors
                     _xellipse.Point2.X = p.X;
                     _xellipse.Point2.Y = p.Y;
                     _nellipse = nativeConverter.Convert(_xellipse);
+                    _canvas.History.Snapshot(_canvas);
 #if CONNECTORS
                     ConnectPoint1(p);
 #endif
-                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_nellipse);
                     _nellipse.Bounds = boundsFactory.Create(_canvas, _nellipse);
                     _nellipse.Bounds.Update();
@@ -1555,7 +1555,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xellipse)
             {
                 _nellipse.Point1 = connector;
                 connector.Connected.Add(_nellipse);
@@ -1565,7 +1565,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xellipse)
             {
                 _nellipse.Point2 = connector;
                 connector.Connected.Add(_nellipse);
@@ -1635,10 +1635,10 @@ namespace RxCanvas.Editors
                     _xtext.Point2.X = p.X;
                     _xtext.Point2.Y = p.Y;
                     _ntext = nativeConverter.Convert(_xtext);
+                    _canvas.History.Snapshot(_canvas);
 #if CONNECTORS
                     ConnectPoint1(p);
 #endif
-                    _canvas.History.Snapshot(_canvas);
                     _canvas.Add(_ntext);
                     _ntext.Bounds = boundsFactory.Create(_canvas, _ntext);
                     _ntext.Bounds.Update();
@@ -1667,7 +1667,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint1(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xtext)
             {
                 _ntext.Point1 = connector;
                 connector.Connected.Add(_ntext);
@@ -1677,7 +1677,7 @@ namespace RxCanvas.Editors
         private void ConnectPoint2(Vector2 p)
         {
             var connector = Helper.ConnectAt(_canvas.Children, p.X, p.Y);
-            if (connector != null)
+            if (connector != null && connector.Connected[0] != _xtext)
             {
                 _ntext.Point2 = connector;
                 connector.Connected.Add(_ntext);
