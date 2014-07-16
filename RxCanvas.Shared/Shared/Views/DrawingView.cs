@@ -318,5 +318,61 @@ namespace RxCanvas.Views
                 }
             }
         }
+
+        public void CreateBlock()
+        {
+            var scope = _scopes.LastOrDefault();
+            var nativeConverter = scope.Resolve<INativeConverter>();
+            var canvasFactory = scope.Resolve<ICanvasFactory>();
+            var drawingCanvas = scope.Resolve<ICanvas>();
+            var boundsFactory = scope.Resolve<IBoundsFactory>();
+
+            var selected = drawingCanvas
+                .Children
+                .Where(c => c.Bounds != null && c.Bounds.IsVisible())
+                .ToList();
+
+            foreach(var child in selected)
+            {
+                child.Bounds.Hide();
+            }
+            drawingCanvas.History.Snapshot(drawingCanvas);
+
+            var xblock = canvasFactory.CreateBlock();
+
+            foreach(var child in selected)
+            {
+                xblock.Children.Add(child);
+                drawingCanvas.Children.Remove(child);
+            }
+
+            var nblock = nativeConverter.Convert(xblock);
+            drawingCanvas.Children.Add(nblock);
+            drawingCanvas.Render(null);
+        }
+
+        public void Delete()
+        {
+            var scope = _scopes.LastOrDefault();
+            var drawingCanvas = scope.Resolve<ICanvas>();
+
+            var selected = drawingCanvas
+                .Children
+                .Where(c => c.Bounds != null && c.Bounds.IsVisible())
+                .ToList();
+
+            foreach (var child in selected)
+            {
+                child.Bounds.Hide();
+            }
+            drawingCanvas.History.Snapshot(drawingCanvas);
+
+            foreach (var child in selected)
+            {
+                drawingCanvas.Children.Remove(child);
+            }
+
+            drawingCanvas.Render(null);
+        }
     }
 }
