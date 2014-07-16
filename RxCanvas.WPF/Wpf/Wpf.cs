@@ -1293,7 +1293,7 @@ namespace RxCanvas.WPF
 
         public IBlock Convert(IBlock block)
         {
-            throw new NotImplementedException();
+            return block;
         }
 
         public ICanvas Convert(ICanvas canvas)
