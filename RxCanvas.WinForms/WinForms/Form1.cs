@@ -122,6 +122,20 @@ namespace RxCanvas.WinForms
                         editor.Modifiers == "" ? Keys.None : (Keys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
                     () => _view.Enable(_editor));
             }
+
+            // block shortcut
+            _shortcuts.Add(
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("G"),
+                    Keys.None),
+                () => _view.CreateBlock());
+
+            // delete shortcut
+            _shortcuts.Add(
+                new Tuple<Keys, Keys>(
+                    (Keys)keyConverter.ConvertFromString("Delete"),
+                    Keys.None),
+                () => _view.Delete());
         }
 
         private void Initialize()

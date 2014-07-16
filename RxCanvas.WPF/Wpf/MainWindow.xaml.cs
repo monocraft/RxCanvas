@@ -105,6 +105,20 @@ namespace RxCanvas.WPF
                         editor.Modifiers == "" ? ModifierKeys.None : (ModifierKeys)modifiersKeyConverter.ConvertFromString(editor.Modifiers)),
                     () => _view.Enable(_editor));
             }
+
+            // block shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>(
+                    (Key)keyConverter.ConvertFromString("G"),
+                    ModifierKeys.None),
+                () => _view.CreateBlock());
+
+            // delete shortcut
+            _shortcuts.Add(
+                new Tuple<Key, ModifierKeys>(
+                    (Key)keyConverter.ConvertFromString("Delete"),
+                    ModifierKeys.None),
+                () => _view.Delete());
         }
 
         private void Initialize()
