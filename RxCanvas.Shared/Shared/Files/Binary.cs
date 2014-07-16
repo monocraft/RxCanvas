@@ -611,8 +611,7 @@ namespace RxCanvas.Serializers
                     }
                     else
                     {
-                        // TODO:
-                        //throw new InvalidDataException();
+                        throw new InvalidDataException();
                     }
                 }
             }
