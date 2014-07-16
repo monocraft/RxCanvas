@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using Newtonsoft.Json.Serialization;
+using System.Collections.ObjectModel;
 
 namespace RxCanvas.Serializers
 {
@@ -59,7 +60,14 @@ namespace RxCanvas.Serializers
         public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
             assemblyName = null;
-            typeName = serializedType.Name.Substring(1, serializedType.Name.Length - 1);
+            if (typeof(ObservableCollection<INative>) == serializedType)
+            {
+                typeName = serializedType.ToString();
+            }
+            else
+            {
+                typeName = serializedType.Name.Substring(1, serializedType.Name.Length - 1);
+            }
         }
 
         public override Type BindToType(string assemblyName, string typeName)
