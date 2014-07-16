@@ -240,7 +240,7 @@ namespace RxCanvas.Model
 
         public XBlock()
         {
-            Children = new ObservableCollection<INative>();
+            Children = new List<INative>();
         }
     }
 
