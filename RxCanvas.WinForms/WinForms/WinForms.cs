@@ -127,13 +127,13 @@ namespace RxCanvas.WinForms
             // layers
             for (int i = 0; i < layers.Count; i++)
             {
-                DrawLayer(g, layers[i]);
+                DrawChildren(g, layers[i].Children);
             }
         }
 
-        private void DrawLayer(Graphics g, ICanvas layer)
+        private void DrawChildren(Graphics g, IList<INative> children)
         {
-            foreach (var child in layer.Children)
+            foreach (var child in children)
             {
                 if (child is IPin)
                 {
@@ -318,6 +318,12 @@ namespace RxCanvas.WinForms
                     brush.Dispose();
                     font.Dispose();
                 }
+                else if (child is IBlock)
+                {
+                    var block = child as IBlock;
+
+                    DrawChildren(g, block.Children);
+                }
             }
         }
     }
@@ -377,7 +383,7 @@ namespace RxCanvas.WinForms
 
             History = canvas.History;
 
-            Children = new ObservableCollection<INative>();
+            Children = new List<INative>();
 
             _panel = panel;
             _panel.Layers.Add(this);
