@@ -54,7 +54,7 @@ namespace RxCanvas.Views
         public void Open(string path, int index)
         {
             var xcanvas = Files[index].Open(path);
-            AsNative(xcanvas);
+            ToNative(xcanvas);
         }
 
         public void Save(string path, int index)
@@ -94,7 +94,7 @@ namespace RxCanvas.Views
             var xcanvas = drawingCanvas.History.Undo(drawingCanvas);
             if (xcanvas != null)
             {
-                AsNative(xcanvas);
+                ToNative(xcanvas);
                 Render();
             }
         }
@@ -105,7 +105,7 @@ namespace RxCanvas.Views
             var xcanvas = drawingCanvas.History.Redo(drawingCanvas);
             if (xcanvas != null)
             {
-                AsNative(xcanvas);
+                ToNative(xcanvas);
                 Render();
             }
         }
@@ -188,36 +188,44 @@ namespace RxCanvas.Views
 #endif
         }
 
-        public void AsNative(ICanvas xcanvas)
+        public INative ToNative(ICanvas xcanvas)
         {
             var scope = _scopes.LastOrDefault();
             var nativeConverter = scope.Resolve<INativeConverter>();
             var canvasFactory = scope.Resolve<ICanvasFactory>();
-            var drawingCanvas = scope.Resolve<ICanvas>();
+            var nativeCanvas = scope.Resolve<ICanvas>();
             var boundsFactory = scope.Resolve<IBoundsFactory>();
 
-            drawingCanvas.Clear();
+            nativeCanvas.Clear();
 
-            AsNative(
+            var natives = ToNatives(
                 nativeConverter,
                 boundsFactory,
-                drawingCanvas,
+                nativeCanvas,
                 xcanvas.Children);
+
+            foreach (var native in natives)
+            {
+                nativeCanvas.Add(native);
+            }
+
+            return nativeCanvas;
         }
 
-        private void AsNative(
+        private IList<INative> ToNatives(
             INativeConverter nativeConverter,
             IBoundsFactory boundsFactory,
             ICanvas nativeCanvas,
             IList<INative> xchildren)
         {
+            var natives = new List<INative>();
+
             foreach (var child in xchildren)
             {
                 if (child is IPin)
                 {
                     var native = nativeConverter.Convert(child as IPin);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -227,8 +235,7 @@ namespace RxCanvas.Views
                 else if (child is ILine)
                 {
                     var native = nativeConverter.Convert(child as ILine);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -238,8 +245,7 @@ namespace RxCanvas.Views
                 else if (child is IBezier)
                 {
                     var native = nativeConverter.Convert(child as IBezier);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -249,8 +255,7 @@ namespace RxCanvas.Views
                 else if (child is IQuadraticBezier)
                 {
                     var native = nativeConverter.Convert(child as IQuadraticBezier);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -260,8 +265,7 @@ namespace RxCanvas.Views
                 else if (child is IArc)
                 {
                     var native = nativeConverter.Convert(child as IArc);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -271,8 +275,7 @@ namespace RxCanvas.Views
                 else if (child is IRectangle)
                 {
                     var native = nativeConverter.Convert(child as IRectangle);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -282,8 +285,7 @@ namespace RxCanvas.Views
                 else if (child is IEllipse)
                 {
                     var native = nativeConverter.Convert(child as IEllipse);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -293,8 +295,7 @@ namespace RxCanvas.Views
                 else if (child is IText)
                 {
                     var native = nativeConverter.Convert(child as IText);
-                    nativeCanvas.Add(native);
-
+                    natives.Add(native);
                     native.Bounds = boundsFactory.Create(nativeCanvas, native);
                     if (native.Bounds != null)
                     {
@@ -303,20 +304,20 @@ namespace RxCanvas.Views
                 }
                 else if (child is IBlock)
                 {
-                    var block = child as IBlock;
-                    nativeCanvas.Add(block);
-
-                    AsNative(
+                    var native = nativeConverter.Convert(child as IBlock);
+                    natives.Add(native);
+                    var blockNatives = ToNatives(
                         nativeConverter,
                         boundsFactory,
                         nativeCanvas,
-                        block.Children);
+                        native.Children);
                 }
                 else
                 {
                     throw new NotSupportedException();
                 }
             }
+            return natives;
         }
 
         public void CreateBlock()
