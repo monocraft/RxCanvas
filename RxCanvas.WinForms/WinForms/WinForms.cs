@@ -110,7 +110,7 @@ namespace RxCanvas.WinForms
             g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             g.CompositingQuality = CompositingQuality.HighQuality;
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            
+
             // pan
             g.TranslateTransform(
                 (float)PanX, 
@@ -293,7 +293,7 @@ namespace RxCanvas.WinForms
                 {
                     var text = child as IText;
                     Brush brush = new SolidBrush(ToNativeColor(text.Foreground));
-                    Font font = new Font("Callibri", (float)text.Size);
+                    Font font = new Font("Calibri", (float)(text.Size *  72 / 96));
 
                     double x = Math.Min(text.Point1.X, text.Point2.X);
                     double y = Math.Min(text.Point1.Y, text.Point2.Y);
