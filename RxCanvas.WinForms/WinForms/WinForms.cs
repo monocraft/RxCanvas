@@ -390,58 +390,32 @@ namespace RxCanvas.WinForms
 
             Downs = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseDown")
                 .Where(e => e.EventArgs.Button == MouseButtons.Left)
-                .Select(e =>
-                {
-                    var p = e.EventArgs.Location;
-
-                    double x = EnableSnap ? 
-                        Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
-
-                    double y = EnableSnap ? 
-                        Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
-
-                    x /= _panel.Zoom;
-                    y /= _panel.Zoom;
-
-                    return new Vector2(x, y);
-                });
+                .Select(e => Snap(e.EventArgs.Location));
 
             Ups = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseUp")
                 .Where(e => e.EventArgs.Button == MouseButtons.Left)
-                .Select(e =>
-                {
-                    var p = e.EventArgs.Location;
-
-                    double x = EnableSnap ? 
-                        Snap((double)(p.X) - _panel.PanX, SnapX * Zoom) : (double)(p.X) - _panel.PanX;
-
-                    double y = EnableSnap ? 
-                        Snap((double)(p.Y) - _panel.PanY, SnapY * Zoom) : (double)(p.Y) - _panel.PanY;
-
-                    x /= _panel.Zoom;
-                    y /= _panel.Zoom;
-
-                    return new Vector2(x, y);
-                });
+                .Select(e => Snap(e.EventArgs.Location));
 
             Moves = Observable.FromEventPattern<MouseEventArgs>(_panel, "MouseMove")
-                .Select(e =>
-                {
-                    var p = e.EventArgs.Location;
-
-                    double x = EnableSnap ? 
-                        Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : (double)(p.X) - _panel.PanX;
-
-                    double y = EnableSnap ? 
-                        Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : (double)(p.Y) - _panel.PanY;
-
-                    x /= _panel.Zoom;
-                    y /= _panel.Zoom;
-
-                    return new Vector2(x, y);
-                });
+                .Select(e => Snap(e.EventArgs.Location));
 
             Native = _panel;
+        }
+
+        private Vector2 Snap(Point p)
+        {
+            double x = EnableSnap ?
+                Snap((double)(p.X) - _panel.PanX, SnapX * _panel.Zoom) : 
+                (double)(p.X) - _panel.PanX;
+
+            double y = EnableSnap ?
+                Snap((double)(p.Y) - _panel.PanY, SnapY * _panel.Zoom) : 
+                (double)(p.Y) - _panel.PanY;
+
+            x /= _panel.Zoom;
+            y /= _panel.Zoom;
+
+            return new Vector2(x, y);
         }
 
         public void Capture()
