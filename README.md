@@ -2,7 +2,6 @@
 ========
 
 Portable 2D graphics editor.
-============================
 
 ##  Supported Platforms
 
