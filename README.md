@@ -2,8 +2,9 @@
 ========
 
 Portable 2D graphics editor.
+============================
 
-Platforms:
+##  Supported Platforms
 
     WPF
     Windows Forms
@@ -12,7 +13,7 @@ Platforms:
     iOS (?...)
     Linux (?...)
 
-Keyboard Shortcuts:
+## Keyboard Shortcuts
 
     (File)
     Ctrl+O -> Open
@@ -38,10 +39,14 @@ Keyboard Shortcuts:
     E -> Ellipse
     T -> Text
 
-Mouse:
+## Mouse
 
     Move -> Hover
     Left Click -> Create Selection
     Left Click -> Create Object
     Move -> Move Created Object
     Left Down+Move -> Move Selected Object
+
+## License
+
+RxCanvas is licensed under the [MIT license](LICENSE.TXT).
