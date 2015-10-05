@@ -29,7 +29,12 @@ namespace RxCanvas.Views
             builder.RegisterAssemblyTypes(assembly)
                 .As<IFile>()
                 .InstancePerLifetimeScope();
-
+                
+            // shared creators
+            builder.RegisterAssemblyTypes(assembly)
+                .As<ICreator>()
+                .InstancePerLifetimeScope();
+                
             // shared model
             builder.Register<IModelConverter>(c => new XModelConverter()).SingleInstance();
             builder.Register<ICanvasFactory>(c => new XCanvasFactory()).SingleInstance();
